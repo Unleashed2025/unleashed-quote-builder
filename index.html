@@ -593,6 +593,21 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
     }
+    /* -- Install App button -- */
+    #installBtn { display: none; }
+    #installBtn.visible { display: inline-flex; align-items: center; gap: 8px; }
+    .btn-install {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 20px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #a7f3d0, #67e8f9);
+      color: #08111f;
+      font-size: .85rem; font-weight: 700;
+      border: none; cursor: pointer;
+      box-shadow: 0 8px 20px rgba(103,232,249,0.25);
+      transition: all .18s;
+    }
+    .btn-install:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(103,232,249,0.35); }
   </style>
 </head>
 <body>
@@ -629,6 +644,7 @@
       <span style="padding:6px 14px;border-radius:999px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);font-size:.78rem;font-weight:600;color:rgba(255,255,255,0.9);">② Choose your service</span>
       <span style="padding:6px 14px;border-radius:999px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);font-size:.78rem;font-weight:600;color:rgba(255,255,255,0.9);">③ Configure options</span>
       <span style="padding:6px 14px;border-radius:999px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);font-size:.78rem;font-weight:600;color:rgba(255,255,255,0.9);">④ Download PDF</span>
+      <span id="installBtn"><button class="btn-install" onclick="installPwa()">&#8659; Install App</button></span>
     </div>
   </div>
 </div>
@@ -2446,6 +2462,31 @@ function today() {
 toggleMs365Options();
 updateMsLicensePrices();
 updatePanel();
+</script>
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/unleashed-quote-builder/sw.js").catch(() => {});
+    });
+  }
+  let deferredInstallPrompt = null;
+  function installPwa() {
+    if (!deferredInstallPrompt) return;
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(() => {
+      deferredInstallPrompt = null;
+      document.getElementById("installBtn").classList.remove("visible");
+    });
+  }
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    document.getElementById("installBtn").classList.add("visible");
+  });
+  window.addEventListener("appinstalled", () => {
+    deferredInstallPrompt = null;
+    document.getElementById("installBtn").classList.remove("visible");
+  });
 </script>
 </body>
 </html>
