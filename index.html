@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unleashed Solutions – Quote Builder</title>
+
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+  <style>
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:   #0f2744;
+      --navy2:  #1a3a5c;
+      --orange: #e8640a;
+      --orange2:#f97b2a;
+      --light:  #f4f7fb;
+      --border: #d1dae8;
+      --text:   #1e293b;
+      --muted:  #64748b;
+      --white:  #ffffff;
+      --green:  #16a34a;
+      --red:    #dc2626;
+      --radius: 10px;
+      --shadow: 0 4px 24px rgba(15,39,68,.10);
+    }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--light);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--navy);
+      color: var(--white);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 70px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,.3);
+    }
+    .logo-block { display: flex; align-items: center; gap: 14px; }
+    .logo-icon {
+      width: 42px; height: 42px;
+      background: var(--orange);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 1.3rem; color: var(--white);
+      letter-spacing: -1px;
+    }
+    .logo-text { line-height: 1.15; }
+    .logo-text strong { font-size: 1.1rem; letter-spacing: .5px; }
+    .logo-text span { font-size: .75rem; color: #94a3b8; }
+    .header-tagline { font-size: .78rem; color: #7fb3e8; text-align: right; line-height: 1.4; max-width: 260px; }
+
+    /* ── Layout ── */
+    .page { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; display: grid; grid-template-columns: 1fr 340px; gap: 2rem; align-items: start; }
+    @media(max-width:900px){ .page { grid-template-columns: 1fr; } }
+
+    /* ── Card ── */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.75rem 2rem;
+      margin-bottom: 1.25rem;
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 1.25rem;
+      padding-bottom: .65rem;
+      border-bottom: 2px solid var(--orange);
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .card-title .step-badge {
+      background: var(--orange);
+      color: var(--white);
+      border-radius: 50%;
+      width: 24px; height: 24px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .78rem; font-weight: 700; flex-shrink: 0;
+    }
+
+    /* ── Form elements ── */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    .form-row.single { grid-template-columns: 1fr; }
+    .form-row.triple { grid-template-columns: 1fr 1fr 1fr; }
+    @media(max-width:600px){ .form-row, .form-row.triple { grid-template-columns: 1fr; } }
+
+    label { display: block; font-size: .82rem; font-weight: 600; color: var(--navy); margin-bottom: .35rem; }
+    input[type=text], input[type=email], input[type=number], select, textarea {
+      width: 100%; padding: .6rem .85rem;
+      border: 1.5px solid var(--border);
+      border-radius: 7px;
+      font-size: .92rem;
+      color: var(--text);
+      background: var(--white);
+      transition: border .2s;
+    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--orange); }
+    textarea { resize: vertical; min-height: 70px; }
+
+    /* ── Radio tile ── */
+    .radio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+    @media(max-width:500px){ .radio-grid { grid-template-columns: 1fr; } }
+    .radio-tile input[type=radio] { display: none; }
+    .radio-tile label {
+      display: block;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: .9rem 1rem;
+      cursor: pointer;
+      transition: all .18s;
+      background: var(--white);
+      margin: 0;
+    }
+    .radio-tile input[type=radio]:checked + label {
+      border-color: var(--orange);
+      background: #fff5ee;
+      box-shadow: 0 0 0 3px rgba(232,100,10,.12);
+    }
+    .tile-name { font-weight: 700; font-size: .95rem; color: var(--navy); margin-top: .1rem; }
+    .tile-price { font-size: .82rem; color: var(--orange); font-weight: 600; margin-top: .2rem; margin-bottom: .1rem; }
+    .tile-desc { font-size: .75rem; color: var(--muted); margin-top: .25rem; line-height: 1.4; }
+    .tile-tag {
+      display: inline-block; font-size: .65rem; font-weight: 700;
+      padding: .18rem .5rem; border-radius: 4px; margin-bottom: .25rem; letter-spacing: .3px;
+    }
+    .tile-tag.ms  { background: #e8f0fe; color: #1a56db; }
+    .tile-tag.bic { background: #f0fdf4; color: #16a34a; }
+    .tile-features { list-style: none; margin-top: .55rem; padding-top: .55rem; border-top: 1px solid var(--border); }
+    .radio-tile input[type=radio]:checked + label .tile-features { border-top-color: #f9c4a0; }
+    .tile-features li {
+      font-size: .73rem; color: var(--text); padding: .18rem 0;
+      display: flex; gap: .4rem; line-height: 1.35; align-items: flex-start;
+    }
+    .tile-features .fc { color: var(--green); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+    /* none tile */
+    .radio-tile.none-tile label { border-style: dashed; }
+    .radio-tile.none-tile input[type=radio]:checked + label { border-color: var(--border); background: var(--light); box-shadow: none; }
+
+    /* ── Onboarding display ── */
+    .onboarding-display { display: flex; align-items: baseline; gap: 1rem; padding: 1.1rem 1.25rem; background: var(--light); border-radius: 8px; margin-top: .5rem; flex-wrap: wrap; }
+    .ob-cost { font-size: 2rem; font-weight: 800; color: var(--navy); }
+    .ob-meta { font-size: .82rem; color: var(--muted); line-height: 1.5; }
+
+    /* ── Checkbox addon ── */
+    .addon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+    @media(max-width:500px){ .addon-grid { grid-template-columns: 1fr; } }
+    .addon-item { display: flex; align-items: flex-start; gap: .6rem; padding: .7rem .9rem; border: 1.5px solid var(--border); border-radius: 7px; cursor: pointer; transition: all .18s; }
+    .addon-item:has(input:checked) { border-color: var(--orange); background: #fff5ee; }
+    .addon-item input[type=checkbox] { margin-top: 2px; accent-color: var(--orange); width: 16px; height: 16px; flex-shrink: 0; }
+    .addon-label { font-size: .85rem; }
+    .addon-name { font-weight: 600; color: var(--navy); }
+    .addon-price { font-size: .75rem; color: var(--orange); }
+    .addon-base { font-size: .72rem; color: var(--muted); }
+
+    /* ── vCTO ── */
+    .vcto-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .vcto-row input[type=number] { width: 110px; }
+    .vcto-total { font-size: .9rem; font-weight: 700; color: var(--orange); }
+
+    /* ── Contract term ── */
+    .term-grid { display: flex; gap: .75rem; flex-wrap: wrap; }
+    .term-tile input[type=radio] { display: none; }
+    .term-tile label {
+      display: block; padding: .6rem 1.25rem;
+      border: 2px solid var(--border); border-radius: 20px;
+      cursor: pointer; font-size: .85rem; font-weight: 600;
+      color: var(--muted); transition: all .18s;
+    }
+    .term-tile input[type=radio]:checked + label { border-color: var(--navy); background: var(--navy); color: var(--white); }
+
+    /* ── Sticky quote panel ── */
+    .quote-panel {
+      position: sticky;
+      top: 86px;
+      background: var(--navy);
+      color: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .qp-header { background: var(--orange); padding: 1rem 1.5rem; font-weight: 700; font-size: 1rem; }
+    .qp-body { padding: 1.25rem 1.5rem; }
+    .qp-line { display: flex; justify-content: space-between; align-items: flex-start; gap:.5rem; font-size: .83rem; margin-bottom: .55rem; color: #cbd5e1; }
+    .qp-line .qp-label { flex: 1; }
+    .qp-line .qp-val { font-weight: 600; color: #fff; white-space: nowrap; }
+    .qp-divider { border: none; border-top: 1px solid rgba(255,255,255,.15); margin: .85rem 0; }
+    .qp-total-row { display: flex; justify-content: space-between; align-items: center; margin-top: .5rem; }
+    .qp-total-label { font-size: .85rem; color: #94a3b8; }
+    .qp-total-val { font-size: 1.6rem; font-weight: 800; color: var(--orange); }
+    .qp-sub { font-size: .72rem; color: #64748b; margin-top: .15rem; }
+    .qp-empty { color: #64748b; font-size: .85rem; font-style: italic; padding: .5rem 0; }
+
+    /* ── Buttons ── */
+    .btn-generate {
+      display: block; width: 100%;
+      background: var(--orange); color: var(--white);
+      border: none; border-radius: 8px;
+      padding: .9rem 1.5rem;
+      font-size: 1rem; font-weight: 700;
+      cursor: pointer; margin-top: 1.25rem;
+      transition: background .2s, transform .1s;
+      letter-spacing: .3px;
+    }
+    .btn-generate:hover { background: var(--orange2); }
+    .btn-generate:active { transform: scale(.98); }
+    .btn-generate:disabled { background: #94a3b8; cursor: not-allowed; }
+
+    .qp-note { font-size: .73rem; color: #64748b; margin-top: .75rem; text-align: center; line-height: 1.5; }
+
+    /* ── Status banner ── */
+    #status-banner {
+      display: none;
+      padding: .85rem 1.25rem;
+      border-radius: 7px;
+      font-size: .88rem;
+      font-weight: 600;
+      margin-top: 1rem;
+      text-align: center;
+    }
+    #status-banner.success { background: #dcfce7; color: var(--green); }
+    #status-banner.error   { background: #fee2e2; color: var(--red); }
+
+    /* ── VCM note ── */
+    .vcm-note { background: #fff8ee; border: 1px solid #fbd38d; border-radius: 7px; padding: .7rem 1rem; font-size: .8rem; color: #92400e; margin-top: .75rem; }
+
+    /* ── Section subtitle ── */
+    .section-sub { font-size: .8rem; color: var(--muted); margin-bottom: 1rem; margin-top: -.5rem; }
+
+    /* ── Onboarding ── */
+    .onboarding-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: .5rem; }
+    .onboarding-row input[type=number] { width: 140px; }
+    /* ── Bundle radio-grid full width ── */
+    .bundle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+    @media(max-width:580px){ .bundle-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════ HEADER ════════════════════════ -->
+<header>
+  <div class="logo-block">
+    <div class="logo-icon">U</div>
+    <div class="logo-text">
+      <strong>UNLEASHED SOLUTIONS</strong><br>
+      <span>Quote Builder</span>
+    </div>
+  </div>
+  <div class="header-tagline">Protecting your data, people and<br>reputation without complexity</div>
+</header>
+
+<!-- ════════════════════════ PAGE ════════════════════════ -->
+<div class="page">
+
+  <!-- ══ LEFT COLUMN – FORM ══ -->
+  <div class="form-col">
+
+    <!-- STEP 1 – Client Details -->
+    <div class="card">
+      <div class="card-title"><span class="step-badge">1</span> Your Details</div>
+      <div class="form-row">
+        <div>
+          <label for="client-company">Company Name *</label>
+          <input type="text" id="client-company" placeholder="Acme Ltd" oninput="updatePanel()" />
+        </div>
+        <div>
+          <label for="client-name">Your Name *</label>
+          <input type="text" id="client-name" placeholder="Jane Smith" oninput="updatePanel()" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label for="client-email">Email Address *</label>
+          <input type="email" id="client-email" placeholder="jane@acme.com" oninput="updatePanel()" />
+        </div>
+        <div>
+          <label for="client-phone">Phone Number</label>
+          <input type="text" id="client-phone" placeholder="+44 7700 900000" />
+        </div>
+      </div>
+      <div class="form-row single">
+        <div>
+          <label for="client-notes">Anything you'd like us to know? (optional)</label>
+          <textarea id="client-notes" placeholder="e.g. We're looking to move in Q2, we currently have 2 providers…"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 – Users & Devices -->
+    <div class="card">
+      <div class="card-title"><span class="step-badge">2</span> Users &amp; Devices</div>
+      <p class="section-sub">These numbers drive your pricing — enter your best estimate.</p>
+      <div class="form-row triple">
+        <div>
+          <label for="num-users">Number of Users *</label>
+          <input type="number" id="num-users" min="1" placeholder="e.g. 25" oninput="updatePanel()" />
+        </div>
+        <div>
+          <label for="num-devices">Number of Devices</label>
+          <input type="number" id="num-devices" min="0" placeholder="e.g. 30" oninput="updatePanel()" />
+        </div>
+        <div>
+          <label for="num-phones">Phones / Seats</label>
+          <input type="number" id="num-phones" min="0" placeholder="e.g. 5" oninput="updatePanel()" />
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3 – Managed Service Bundle -->
+    <div class="card">
+      <div class="card-title"><span class="step-badge">3</span> Managed IT Service Bundle</div>
+      <p class="section-sub">Select the bundle that best fits your needs. Prices shown per user / per month.</p>
+      <div class="bundle-grid">
+
+        <div class="radio-tile none-tile">
+          <input type="radio" name="bundle" id="bundle-none" value="none" checked onchange="updatePanel()" />
+          <label for="bundle-none">
+            <div class="tile-name">No Bundle</div>
+            <div class="tile-price">—</div>
+            <div class="tile-desc">I'll choose standalone services only.</div>
+          </label>
+        </div>
+
+        <div class="radio-tile">
+          <input type="radio" name="bundle" id="bundle-ms-std" value="ms-std" onchange="updatePanel()" />
+          <label for="bundle-ms-std">
+            <span class="tile-tag ms">MICROSOFT MANAGED</span>
+            <div class="tile-name">Standard</div>
+            <div class="tile-price">£20 / user / month</div>
+            <ul class="tile-features">
+              <li><span class="fc">✓</span> Unlimited remote support (9:00–17:30)</li>
+              <li><span class="fc">✓</span> Office 365, Windows &amp; Mac support</li>
+              <li><span class="fc">✓</span> Bi-annual health check</li>
+              <li><span class="fc">✓</span> ISPM – Identity Security Posture Management</li>
+              <li><span class="fc">✓</span> MFA &amp; Windows Defender anti-virus</li>
+              <li><span class="fc">✓</span> Email anti-spam protection</li>
+              <li><span class="fc">✓</span> Dedicated success manager &amp; service reviews</li>
+            </ul>
+          </label>
+        </div>
+
+        <div class="radio-tile">
+          <input type="radio" name="bundle" id="bundle-ms-prem" value="ms-prem" onchange="updatePanel()" />
+          <label for="bundle-ms-prem">
+            <span class="tile-tag ms">MICROSOFT MANAGED</span>
+            <div class="tile-name">Premium</div>
+            <div class="tile-price">£30 / user / month</div>
+            <ul class="tile-features">
+              <li><span class="fc">✓</span> Everything in Standard, plus:</li>
+              <li><span class="fc">✓</span> Device monitoring, reporting &amp; patching</li>
+              <li><span class="fc">✓</span> Asset &amp; inventory reporting</li>
+              <li><span class="fc">✓</span> Intune, Conditional Access &amp; Entra ID</li>
+              <li><span class="fc">✓</span> Defender P1 EDR — endpoint detection &amp; response</li>
+              <li><span class="fc">✓</span> Defender for Office — advanced email security</li>
+              <li><span class="fc">✓</span> Microsoft 365 backup &amp; recovery</li>
+              <li><span class="fc">✓</span> Centralised M365 threat remediation</li>
+              <li><span class="fc">✓</span> Digital &amp; cyber security roadmap</li>
+            </ul>
+          </label>
+        </div>
+
+        <div class="radio-tile">
+          <input type="radio" name="bundle" id="bundle-bic-std" value="bic-std" onchange="updatePanel()" />
+          <label for="bundle-bic-std">
+            <span class="tile-tag bic">BEST IN CLASS</span>
+            <div class="tile-name">Standard</div>
+            <div class="tile-price">£30 / user / month</div>
+            <ul class="tile-features">
+              <li><span class="fc">✓</span> Unlimited remote support (9:00–17:30)</li>
+              <li><span class="fc">✓</span> Office 365, Windows &amp; Mac support</li>
+              <li><span class="fc">✓</span> Bi-annual health check</li>
+              <li><span class="fc">✓</span> ISPM &amp; breach alerts</li>
+              <li><span class="fc">✓</span> MFA / Conditional Access</li>
+              <li><span class="fc">✓</span> Anti-Virus / XDR &amp; MDR — threat hunting across endpoints</li>
+              <li><span class="fc">✓</span> SaaS Backup &amp; email security</li>
+              <li><span class="fc">✓</span> Dedicated success manager &amp; service reviews</li>
+            </ul>
+          </label>
+        </div>
+
+        <div class="radio-tile">
+          <input type="radio" name="bundle" id="bundle-bic-prem" value="bic-prem" onchange="updatePanel()" />
+          <label for="bundle-bic-prem">
+            <span class="tile-tag bic">BEST IN CLASS</span>
+            <div class="tile-name">Premium</div>
+            <div class="tile-price">£40 / user / month</div>
+            <ul class="tile-features">
+              <li><span class="fc">✓</span> Everything in Standard, plus:</li>
+              <li><span class="fc">✓</span> Device monitoring, reporting &amp; patching</li>
+              <li><span class="fc">✓</span> Asset &amp; inventory reporting</li>
+              <li><span class="fc">✓</span> Intune, Conditional Access &amp; Entra ID</li>
+              <li><span class="fc">✓</span> Email security &amp; phishing training</li>
+              <li><span class="fc">✓</span> DLP — data loss prevention across email, endpoints &amp; cloud</li>
+              <li><span class="fc">✓</span> Microsoft 365 Application Protection</li>
+              <li><span class="fc">✓</span> Digital &amp; cyber security roadmap</li>
+              <li><span class="fc">✓</span> Fractional vCTO — quarterly reviews &amp; technical oversight</li>
+            </ul>
+          </label>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- STEP 4 – Virtual Compliance Manager -->
+    <div class="card">
+      <div class="card-title"><span class="step-badge">4</span> Unleashed Virtual Compliance Manager (VCM)</div>
+      <p class="section-sub">Fractional compliance support tailored to your organisation's size.</p>
+      <div class="radio-grid">
+
+        <div class="radio-tile none-tile">
+          <input type="radio" name="vcm" id="vcm-none" value="none" checked onchange="updatePanel()" />
+          <label for="vcm-none">
+            <div class="tile-name">Not Required</div>
+            <div class="tile-price">—</div>
+          </label>
+        </div>
+
+        <div class="radio-tile">
+          <input type="radio" name="vcm" id="vcm-std" value="vcm-std" onchange="updatePanel()" />
+          <label for="vcm-std">
+            <div class="tile-name">VCM – Standard</div>
+            <div class="tile-price" id="vcm-std-price">Price by user band</div>
+            <div class="tile-desc">Cyber Essentials guidance, policy templates &amp; quarterly reviews.</div>
+          </label>
+        </div>
+
+        <div class="radio-tile">
+          <input type="radio" name="vcm" id="vcm-prem" value="vcm-prem" onchange="updatePanel()" />
+          <label for="vcm-prem">
+            <div class="tile-name">VCM – Premium</div>
+            <div class="tile-price" id="vcm-prem-price">Price by user band</div>
+            <div class="tile-desc">Everything in Standard plus audit support, board reporting &amp; incident response.</div>
+          </label>
+        </div>
+
+      </div>
+      <div class="vcm-note" id="vcm-note" style="display:none">
+        ⚠️ VCM pricing is indicative — our team will confirm the exact monthly cost for your user band before issuing a formal proposal.
+      </div>
+    </div>
+
+    <!-- STEP 5 – Virtual CTO -->
+    <div class="card">
+      <div class="card-title"><span class="step-badge">5</span> Unleashed Virtual CTO</div>
+      <p class="section-sub">Strategic technology leadership on a fractional day-rate basis. £1,000 per day.</p>
+      <div class="vcto-row">
+        <div>
+          <label for="vcto-days">Estimated days per month</label>
+          <input type="number" id="vcto-days" min="0" max="20" placeholder="0" oninput="updatePanel()" />
+        </div>
+        <div class="vcto-total" id="vcto-total"></div>
+      </div>
+    </div>
+
+    <!-- STEP 6 – Standalone Add-ons -->
+    <div class="card">
+      <div class="card-title"><span class="step-badge">6</span> Standalone Add-on Services</div>
+      <p class="section-sub">Mix and match to complete your security stack.</p>
+
+      <p style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:.6rem;">User-based (per user / month)</p>
+      <div class="addon-grid" style="margin-bottom:1.1rem;">
+        <label class="addon-item">
+          <input type="checkbox" value="saas-backup" onchange="updatePanel()" />
+          <div class="addon-label">
+            <div class="addon-name">SaaS Backup</div>
+            <div class="addon-price">£3.00 / user / month</div>
+            <div class="addon-base">Microsoft 365 Exchange, OneDrive &amp; SharePoint backup</div>
+          </div>
+        </label>
+        <label class="addon-item">
+          <input type="checkbox" value="email-security" onchange="updatePanel()" />
+          <div class="addon-label">
+            <div class="addon-name">Email Security</div>
+            <div class="addon-price">£2.00 / user / month</div>
+            <div class="addon-base">Advanced threat protection &amp; anti-phishing</div>
+          </div>
+        </label>
+        <label class="addon-item">
+          <input type="checkbox" value="ispm" onchange="updatePanel()" />
+          <div class="addon-label">
+            <div class="addon-name">ISPM</div>
+            <div class="addon-price">£1.50 / user / month</div>
+            <div class="addon-base">Identity security posture management</div>
+          </div>
+        </label>
+      </div>
+
+      <p style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:.6rem;">Device-based (per device / month)</p>
+      <div class="addon-grid">
+        <label class="addon-item">
+          <input type="checkbox" value="edr" onchange="updatePanel()" />
+          <div class="addon-label">
+            <div class="addon-name">EDR</div>
+            <div class="addon-price">£1.50 / device / month</div>
+            <div class="addon-base">Endpoint detection &amp; response</div>
+          </div>
+        </label>
+        <label class="addon-item">
+          <input type="checkbox" value="xdr" onchange="updatePanel()" />
+          <div class="addon-label">
+            <div class="addon-name">XDR</div>
+            <div class="addon-price">£2.50 / device / month</div>
+            <div class="addon-base">Extended detection &amp; response</div>
+          </div>
+        </label>
+        <label class="addon-item">
+          <input type="checkbox" value="mdr" onchange="updatePanel()" />
+          <div class="addon-label">
+            <div class="addon-name">24×7 MDR</div>
+            <div class="addon-price">£5.00 / device / month</div>
+            <div class="addon-base">Fully managed detection &amp; response — round-the-clock SOC coverage</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- STEP 7 – Onboarding -->
+    <div class="card">
+      <div class="card-title"><span class="step-badge">7</span> Onboarding</div>
+      <p class="section-sub">One-off upfront cost covering account setup, device enrolment, Microsoft 365 configuration and project management. Calculated automatically from your user count.</p>
+      <div class="onboarding-display">
+        <div class="ob-cost" id="ob-cost-display">—</div>
+        <div class="ob-meta" id="ob-band-display">Enter your user count above to calculate</div>
+      </div>
+      <div class="vcm-note" style="margin-top:.75rem;">
+        ℹ️ 150+ users? Please <strong>contact us directly</strong> for a bespoke onboarding quote.
+      </div>
+    </div>
+
+    <!-- STEP 8 – Contract Term -->
+    <div class="card">
+      <div class="card-title"><span class="step-badge">8</span> Contract Term</div>
+      <div class="term-grid">
+        <div class="term-tile">
+          <input type="radio" name="term" id="term-monthly" value="Rolling Monthly" onchange="updatePanel()" />
+          <label for="term-monthly">Rolling Monthly</label>
+        </div>
+        <div class="term-tile">
+          <input type="radio" name="term" id="term-annual" value="Annual" checked onchange="updatePanel()" />
+          <label for="term-annual">Annual</label>
+        </div>
+        <div class="term-tile">
+          <input type="radio" name="term" id="term-36" value="36 Month" onchange="updatePanel()" />
+          <label for="term-36">36 Month</label>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /form-col -->
+
+  <!-- ══ RIGHT COLUMN – LIVE QUOTE PANEL ══ -->
+  <div>
+    <div class="quote-panel">
+      <div class="qp-header">📋 Your Quote Summary</div>
+      <div class="qp-body">
+        <div id="qp-lines">
+          <div class="qp-empty">Select services above to see your live pricing.</div>
+        </div>
+        <hr class="qp-divider" />
+        <div class="qp-total-row">
+          <div>
+            <div class="qp-total-label">Monthly Total</div>
+            <div class="qp-sub" id="qp-term-label">—</div>
+          </div>
+          <div class="qp-total-val" id="qp-total">£0</div>
+        </div>
+        <div class="qp-total-row" style="margin-top:.4rem;" id="qp-onboarding-row" style="display:none">
+          <div class="qp-total-label" style="font-size:.78rem;">One-off Onboarding</div>
+          <div style="font-size:1rem;font-weight:700;color:#94a3b8;" id="qp-onboarding-val">—</div>
+        </div>
+
+        <button class="btn-generate" id="btn-generate" onclick="generateQuote()">
+          ⬇ Generate &amp; Download Quote
+        </button>
+        <div id="status-banner"></div>
+        <p class="qp-note">Your quote will be sent to our team automatically. We'll follow up within 1 business day.</p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- ════════════════════════ SCRIPT ════════════════════════ -->
+<script>
+// ══════════════════════════════════════════════════════════
+//  ⚙️  CONFIGURATION — update these values before deploying
+// ══════════════════════════════════════════════════════════
+const CONFIG = {
+  // EmailJS — create a free account at https://www.emailjs.com
+  // Then create a service + template and paste the IDs below
+  emailjs_public_key:  'YOUR_EMAILJS_PUBLIC_KEY',   // e.g. 'user_abc123'
+  emailjs_service_id:  'YOUR_SERVICE_ID',            // e.g. 'service_xyz'
+  emailjs_template_id: 'YOUR_TEMPLATE_ID',           // e.g. 'template_abc'
+
+  // Your notification email
+  notify_email: 'chris@unleashedsolutions.co.uk',
+
+  // ── VCM Pricing bands (update when confirmed) ──
+  // Format: { '1-10': price, '10-25': price, '25-50': price, '50-100': price }
+  vcm_std: { '1-10': 150, '10-25': 250, '25-50': 400, '50-100': 600 },
+  vcm_prem:{ '1-10': 200, '10-25': 350, '25-50': 550, '50-100': 800 },
+};
+// ══════════════════════════════════════════════════════════
+
+// Initialise EmailJS
+if (CONFIG.emailjs_public_key !== 'YOUR_EMAILJS_PUBLIC_KEY') {
+  emailjs.init(CONFIG.emailjs_public_key);
+}
+
+// Bundle prices
+const BUNDLES = {
+  'none':     { name: null, price: 0 },
+  'ms-std':   { name: 'Microsoft Managed – Standard', price: 20 },
+  'ms-prem':  { name: 'Microsoft Managed – Premium',  price: 30 },
+  'bic-std':  { name: 'Best in Class – Standard',     price: 30 },
+  'bic-prem': { name: 'Best in Class – Premium',      price: 40 },
+};
+
+// Addon prices
+const ADDONS = {
+  'saas-backup':   { name: 'SaaS Backup',    price: 3.00,  basis: 'user' },
+  'email-security':{ name: 'Email Security', price: 2.00,  basis: 'user' },
+  'ispm':          { name: 'ISPM',           price: 1.50,  basis: 'user' },
+  'edr':           { name: 'EDR',            price: 1.50,  basis: 'device' },
+  'xdr':           { name: 'XDR',            price: 2.50,  basis: 'device' },
+  'mdr':           { name: '24×7 MDR',       price: 5.00,  basis: 'device' },
+};
+
+function getUsers()   { return Math.max(0, parseInt(document.getElementById('num-users').value)   || 0); }
+function getDevices() { return Math.max(0, parseInt(document.getElementById('num-devices').value) || 0); }
+
+function getOnboarding(users) {
+  if (users <= 0)   return { cost: 0,    label: 'Enter your user count above to calculate' };
+  if (users <= 10)  return { cost: 1000, label: '1–10 users band' };
+  if (users <= 25)  return { cost: 2000, label: '11–25 users band' };
+  if (users <= 50)  return { cost: 3500, label: '26–50 users band' };
+  if (users <= 149) return { cost: 5000, label: '51–149 users band' };
+  return { cost: null, label: '150+ users — contact us for a bespoke quote' };
+}
+  if (users >=  1 && users <= 10)  return '1-10';
+  if (users > 10 && users <= 25)  return '10-25';
+  if (users > 25 && users <= 50)  return '25-50';
+  if (users > 50 && users <= 100) return '50-100';
+  return null;
+}
+
+function fmt(n) {
+  return '£' + n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function updatePanel() {
+  const users   = getUsers();
+  const devices = getDevices();
+  const lines   = [];
+  let monthly   = 0;
+
+  // Bundle
+  const bundleVal = document.querySelector('input[name=bundle]:checked')?.value || 'none';
+  const bundle = BUNDLES[bundleVal];
+  if (bundle.price > 0 && users > 0) {
+    const cost = bundle.price * users;
+    monthly += cost;
+    lines.push({ label: bundle.name, sub: `${users} users × ${fmt(bundle.price)}`, val: fmt(cost) });
+  }
+
+  // VCM
+  const vcmVal = document.querySelector('input[name=vcm]:checked')?.value || 'none';
+  const vcmNote = document.getElementById('vcm-note');
+  const band = getVcmBand(users);
+
+  if (vcmVal !== 'none') {
+    vcmNote.style.display = 'block';
+    const table = vcmVal === 'vcm-std' ? CONFIG.vcm_std : CONFIG.vcm_prem;
+    const vcmName = vcmVal === 'vcm-std' ? 'VCM – Standard' : 'VCM – Premium';
+    if (band && table[band]) {
+      const cost = table[band];
+      monthly += cost;
+      lines.push({ label: vcmName, sub: `Band: ${band} users (indicative)`, val: fmt(cost) });
+    } else if (users === 0) {
+      lines.push({ label: vcmName, sub: 'Enter user count for pricing', val: '—' });
+    } else {
+      lines.push({ label: vcmName, sub: 'Outside standard bands — contact us', val: 'TBC' });
+    }
+    // Update tile price labels
+    if (band) {
+      document.getElementById('vcm-std-price').textContent  = fmt(CONFIG.vcm_std[band])  + '/mo (indicative)';
+      document.getElementById('vcm-prem-price').textContent = fmt(CONFIG.vcm_prem[band]) + '/mo (indicative)';
+    }
+  } else {
+    vcmNote.style.display = 'none';
+  }
+
+  // vCTO
+  const vctoDays = parseInt(document.getElementById('vcto-days').value) || 0;
+  if (vctoDays > 0) {
+    const cost = vctoDays * 1000;
+    monthly += cost;
+    lines.push({ label: 'Virtual CTO', sub: `${vctoDays} day${vctoDays !== 1 ? 's' : ''} × £1,000`, val: fmt(cost) });
+    document.getElementById('vcto-total').textContent = fmt(cost) + '/month';
+  } else {
+    document.getElementById('vcto-total').textContent = '';
+  }
+
+  // Addons
+  document.querySelectorAll('.addon-item input[type=checkbox]:checked').forEach(cb => {
+    const key = cb.value;
+    const addon = ADDONS[key];
+    const qty = addon.basis === 'user' ? users : devices;
+    if (qty > 0) {
+      const cost = addon.price * qty;
+      monthly += cost;
+      lines.push({ label: addon.name, sub: `${qty} ${addon.basis}s × ${fmt(addon.price)}`, val: fmt(cost) });
+    } else {
+      lines.push({ label: addon.name, sub: `Enter ${addon.basis} count above`, val: '—' });
+    }
+  });
+
+  // Render lines
+  const container = document.getElementById('qp-lines');
+  if (lines.length === 0) {
+    container.innerHTML = '<div class="qp-empty">Select services above to see your live pricing.</div>';
+  } else {
+    container.innerHTML = lines.map(l => `
+      <div class="qp-line">
+        <div class="qp-label">
+          <div style="color:#e2e8f0;font-weight:600;font-size:.84rem;">${l.label}</div>
+          <div style="color:#64748b;font-size:.74rem;">${l.sub}</div>
+        </div>
+        <div class="qp-val">${l.val}</div>
+      </div>
+    `).join('');
+  }
+
+  // Total
+  document.getElementById('qp-total').textContent = fmt(monthly);
+
+  // Term label
+  const term = document.querySelector('input[name=term]:checked')?.value || 'Annual';
+  document.getElementById('qp-term-label').textContent = term + ' contract';
+
+  // Onboarding (auto-calculated by user band)
+  const ob = getOnboarding(users);
+  const obCostEl = document.getElementById('ob-cost-display');
+  const obBandEl = document.getElementById('ob-band-display');
+  if (ob.cost === null) {
+    obCostEl.textContent = 'Contact us';
+  } else if (ob.cost > 0) {
+    obCostEl.textContent = fmt(ob.cost);
+  } else {
+    obCostEl.textContent = '—';
+  }
+  obBandEl.textContent = ob.label;
+
+  const obRow = document.getElementById('qp-onboarding-row');
+  if (ob.cost === null) {
+    document.getElementById('qp-onboarding-val').textContent = 'Contact us';
+    obRow.style.display = 'flex';
+  } else if (ob.cost > 0) {
+    document.getElementById('qp-onboarding-val').textContent = fmt(ob.cost);
+    obRow.style.display = 'flex';
+  } else {
+    obRow.style.display = 'none';
+  }
+
+  // Store for PDF
+  const onboarding = ob.cost || 0;
+  window._quoteState = { users, devices, bundle, vcmVal, band, vctoDays, monthly, lines, onboarding, ob, term };
+}
+
+// ── Generate Quote (PDF + Email) ──
+async function generateQuote() {
+  const company = document.getElementById('client-company').value.trim();
+  const name    = document.getElementById('client-name').value.trim();
+  const email   = document.getElementById('client-email').value.trim();
+
+  if (!company || !name || !email) {
+    showStatus('Please fill in your Company Name, Your Name and Email Address before generating a quote.', 'error');
+    return;
+  }
+  if (!window._quoteState || window._quoteState.monthly === 0) {
+    showStatus('Please select at least one service before generating a quote.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btn-generate');
+  btn.disabled = true;
+  btn.textContent = 'Generating…';
+
+  try {
+    const pdfBlob = buildPDF();
+    downloadBlob(pdfBlob, `Unleashed-Quote-${company.replace(/\s+/g,'-')}-${today()}.pdf`);
+    await sendEmail(company, name, email);
+    showStatus('✅ Quote downloaded! Our team has been notified and will be in touch within 1 business day.', 'success');
+  } catch(e) {
+    console.error(e);
+    showStatus('Quote downloaded. (Email notification failed — please contact us directly.)', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '⬇ Generate & Download Quote';
+  }
+}
+
+// ── Build PDF ──
+function buildPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const W = 210, margin = 18;
+  let y = 0;
+
+  const navy   = [15, 39, 68];
+  const orange = [232, 100, 10];
+  const white  = [255, 255, 255];
+  const light  = [244, 247, 251];
+  const muted  = [100, 116, 139];
+  const text   = [30, 41, 59];
+
+  const state   = window._quoteState;
+  const company = document.getElementById('client-company').value.trim();
+  const cname   = document.getElementById('client-name').value.trim();
+  const cemail  = document.getElementById('client-email').value.trim();
+  const cphone  = document.getElementById('client-phone').value.trim();
+  const cnotes  = document.getElementById('client-notes').value.trim();
+  const term    = document.querySelector('input[name=term]:checked')?.value || 'Annual';
+
+  // ── Header block ──
+  doc.setFillColor(...navy);
+  doc.rect(0, 0, W, 42, 'F');
+
+  // Orange accent bar
+  doc.setFillColor(...orange);
+  doc.rect(0, 42, W, 4, 'F');
+
+  // Logo square
+  doc.setFillColor(...orange);
+  doc.roundedRect(margin, 10, 22, 22, 3, 3, 'F');
+  doc.setTextColor(...white);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text('U', margin + 11, 25, { align: 'center' });
+
+  // Company name
+  doc.setFontSize(16);
+  doc.text('UNLEASHED SOLUTIONS', margin + 26, 20);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(148, 163, 184);
+  doc.text('Protecting your data, people and reputation without complexity', margin + 26, 27);
+  doc.text('Unleash Your Potential', margin + 26, 33);
+
+  // Quote label (top right)
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(...white);
+  doc.text('BUDGETARY QUOTATION', W - margin, 20, { align: 'right' });
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(148, 163, 184);
+  doc.text(`Date: ${today()}`, W - margin, 27, { align: 'right' });
+  doc.text(`Ref: UNL-${Date.now().toString().slice(-6)}`, W - margin, 33, { align: 'right' });
+
+  y = 54;
+
+  // ── Client block ──
+  doc.setFillColor(...light);
+  doc.rect(margin, y, W - margin * 2, 28, 'F');
+  doc.setTextColor(...navy);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text('PREPARED FOR', margin + 5, y + 7);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text(company, margin + 5, y + 15);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(...muted);
+  doc.text(`${cname}${cemail ? '  |  ' + cemail : ''}${cphone ? '  |  ' + cphone : ''}`, margin + 5, y + 22);
+  y += 36;
+
+  // ── Services table ──
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(...navy);
+  doc.text('Services & Pricing', margin, y);
+  y += 6;
+
+  // Table header
+  doc.setFillColor(...navy);
+  doc.rect(margin, y, W - margin * 2, 8, 'F');
+  doc.setTextColor(...white);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Service', margin + 4, y + 5.5);
+  doc.text('Detail', margin + 90, y + 5.5);
+  doc.text('Monthly Cost', W - margin - 4, y + 5.5, { align: 'right' });
+  y += 8;
+
+  // Rows
+  let rowAlt = false;
+  state.lines.forEach(line => {
+    if (rowAlt) {
+      doc.setFillColor(244, 247, 251);
+      doc.rect(margin, y, W - margin * 2, 9, 'F');
+    }
+    doc.setTextColor(...text);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.text(line.label, margin + 4, y + 6);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(...muted);
+    doc.text(line.sub || '', margin + 90, y + 6);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.setTextColor(...text);
+    doc.text(line.val, W - margin - 4, y + 6, { align: 'right' });
+    rowAlt = !rowAlt;
+    y += 9;
+  });
+
+  // Total row
+  doc.setFillColor(...navy);
+  doc.rect(margin, y, W - margin * 2, 11, 'F');
+  doc.setTextColor(...white);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.text('MONTHLY TOTAL', margin + 4, y + 7.5);
+  doc.setTextColor(...[255,165,80]);
+  doc.setFontSize(11);
+  doc.text(fmt(state.monthly), W - margin - 4, y + 7.5, { align: 'right' });
+  y += 16;
+
+  // Onboarding
+  if (state.ob && state.ob.cost !== null && state.ob.cost > 0) {
+    doc.setFillColor(255, 248, 238);
+    doc.rect(margin, y, W - margin * 2, 9, 'F');
+    doc.setTextColor(...navy);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.text('One-off Onboarding Fee', margin + 4, y + 6);
+    doc.text(fmt(state.ob.cost), W - margin - 4, y + 6, { align: 'right' });
+    y += 13;
+  } else if (state.ob && state.ob.cost === null) {
+    doc.setFillColor(255, 248, 238);
+    doc.rect(margin, y, W - margin * 2, 9, 'F');
+    doc.setTextColor(...navy);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.text('One-off Onboarding Fee', margin + 4, y + 6);
+    doc.text('Contact us (150+ users)', W - margin - 4, y + 6, { align: 'right' });
+    y += 13;
+  }
+
+  // Contract term
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(...muted);
+  doc.text(`Contract term: ${term}`, margin, y);
+  y += 10;
+
+  // Notes
+  if (cnotes) {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(...navy);
+    doc.text('Notes', margin, y);
+    y += 5;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(...text);
+    const noteLines = doc.splitTextToSize(cnotes, W - margin * 2);
+    doc.text(noteLines, margin, y);
+    y += noteLines.length * 4.5 + 6;
+  }
+
+  // Disclaimer box
+  y = Math.max(y, 220);
+  doc.setFillColor(255, 248, 238);
+  doc.rect(margin, y, W - margin * 2, 20, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+  doc.setTextColor(146, 64, 14);
+  doc.text('Important', margin + 4, y + 6);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  const disc = 'This is a budgetary quotation only and is indicative of likely costs. VCM pricing shown is subject to confirmation by our team. All prices are exclusive of VAT. A formal proposal will follow subject to a discovery session.';
+  const discLines = doc.splitTextToSize(disc, W - margin * 2 - 8);
+  doc.text(discLines, margin + 4, y + 12);
+  y += 26;
+
+  // Footer
+  doc.setFillColor(...navy);
+  doc.rect(0, 275, W, 22, 'F');
+  doc.setTextColor(148, 163, 184);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.text('Unleashed Solutions  |  hello@unleashedsolutions.co.uk  |  www.unleashedsolutions.co.uk', W / 2, 284, { align: 'center' });
+  doc.setTextColor(...[255,165,80]);
+  doc.text('Unleash Your Potential', W / 2, 291, { align: 'center' });
+
+  return doc.output('blob');
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+async function sendEmail(company, name, email) {
+  if (CONFIG.emailjs_public_key === 'YOUR_EMAILJS_PUBLIC_KEY') return; // skip if not configured
+  const state = window._quoteState;
+  const linesSummary = state.lines.map(l => `${l.label}: ${l.val}`).join('\n');
+  await emailjs.send(CONFIG.emailjs_service_id, CONFIG.emailjs_template_id, {
+    to_email:      CONFIG.notify_email,
+    client_company: company,
+    client_name:   name,
+    client_email:  email,
+    client_phone:  document.getElementById('client-phone').value || '—',
+    monthly_total: fmt(state.monthly),
+    onboarding:    state.onboarding > 0 ? fmt(state.onboarding) : 'None',
+    contract_term: document.querySelector('input[name=term]:checked')?.value || '—',
+    services_list: linesSummary,
+    quote_date:    today(),
+  });
+}
+
+function showStatus(msg, type) {
+  const el = document.getElementById('status-banner');
+  el.textContent = msg;
+  el.className = type;
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 8000);
+}
+
+function today() {
+  return new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+}
+
+// Init
+updatePanel();
+</script>
+</body>
+</html>
