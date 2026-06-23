@@ -46,17 +46,21 @@
     header {
       background: linear-gradient(135deg, var(--navy3) 0%, var(--navy) 60%, var(--navy2) 100%);
       color: var(--white);
-      padding: 2.5rem 2rem 2rem;
-      text-align: center;
+      padding: 0 2.5rem;
+      height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       box-shadow: 0 4px 24px rgba(0,0,0,.3);
     }
-    .header-center { max-width: 640px; margin: 0 auto; }
-    .logo-img { height: 260px; max-width: 600px; width: auto; display: block; margin: 0 auto 1.25rem; }
-    .logo-text { line-height: 1.3; margin-top: .15rem; }
-    .logo-text strong { font-size: .88rem; letter-spacing: 1.5px; font-weight: 700; color: rgba(255,255,255,.85); }
-    .header-tagline { font-size: .8rem; color: #94b8d8; line-height: 1.5; margin-top: .35rem; }
+    .header-left { display: flex; align-items: center; }
+    .logo-img { height: 90px; width: auto; display: block; }
+    .header-right { text-align: right; }
+    .logo-text { line-height: 1.3; }
+    .logo-text strong { font-size: .9rem; letter-spacing: 1.5px; font-weight: 700; color: rgba(255,255,255,.85); }
+    .header-tagline { font-size: .78rem; color: #94b8d8; line-height: 1.5; margin-top: .3rem; }
     .header-badge {
-      display: inline-block; margin-top: .55rem;
+      display: inline-block; margin-top: .4rem;
       background: var(--accent); color: var(--white);
       font-size: .64rem; font-weight: 700; letter-spacing: .5px;
       padding: .22rem .7rem; border-radius: 20px;
@@ -334,12 +338,14 @@
 
 <!-- ════════════════════════ HEADER ════════════════════════ -->
 <header>
-  <div class="header-center">
+  <div class="header-left">
     <img class="logo-img"
       src="https://unleashed2025.github.io/unleashed-quote-builder/logo.png"
       alt="Unleashed Solutions" />
+  </div>
+  <div class="header-right">
     <div class="logo-text"><strong>QUOTE BUILDER</strong></div>
-    <div class="header-tagline">Protecting your data, people and reputation without complexity</div>
+    <div class="header-tagline">Protecting your data, people and reputation<br>without complexity</div>
     <span class="header-badge">Unleash Your Potential</span>
   </div>
 </header>
