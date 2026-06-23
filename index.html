@@ -408,18 +408,16 @@
       </div>
     </div>
 
-    <!-- STEP 2 – Users & Devices -->
+    <!-- STEP 2 – Service Units -->
     <div class="card">
-      <div class="card-title"><span class="step-badge">2</span> Users &amp; Devices</div>
-      <p class="section-sub">These numbers drive your pricing — enter your best estimate.</p>
-      <div class="form-row">
+      <div class="card-title"><span class="step-badge">2</span> How Many Service Units Do You Require?</div>
+      <div class="vcm-note" style="margin-bottom:1rem;">
+        💡 Our managed services are quoted as <strong>1 service unit = 1 user with 1 corporate device</strong>. Enter the total number of users (and their devices) you need to cover.
+      </div>
+      <div class="form-row single">
         <div>
-          <label for="num-users">Number of Users *</label>
-          <input type="number" id="num-users" min="1" placeholder="e.g. 25" oninput="updatePanel()" />
-        </div>
-        <div>
-          <label for="num-devices">Number of Devices</label>
-          <input type="number" id="num-devices" min="0" placeholder="e.g. 30" oninput="updatePanel()" />
+          <label for="num-units">Number of Service Units *</label>
+          <input type="number" id="num-units" min="1" placeholder="e.g. 25" oninput="updatePanel()" />
         </div>
       </div>
     </div>
@@ -613,7 +611,7 @@
     <!-- STEP 7 – Standalone Add-on Services (both paths) -->
     <div class="card conditional-section section-addons" id="card-addons">
       <div class="card-title"><span class="step-badge" id="addons-step-num">7</span> <span id="addons-title">Standalone Add-on Services</span></div>
-      <p class="section-sub" id="addons-sub">Enter a custom quantity for each service, or leave blank to use your user / device count from Step 2.</p>
+      <p class="section-sub" id="addons-sub">We understand you may have additional devices, mailboxes or users who require support — please use the services below to calculate any additional requirements. Enter a custom quantity for each service, or leave blank to use your service unit count.</p>
 
       <!-- Telephony -->
       <div class="addon-group-header">📞 Telephony</div>
@@ -975,8 +973,8 @@ const ADDONS = {
   'public-ip':     { name: "Public IP's",                       price: 1.80,  basis: 'qty',    unit: 'IP' },
 };
 
-function getUsers()   { return Math.max(0, parseInt(document.getElementById('num-users').value)   || 0); }
-function getDevices() { return Math.max(0, parseInt(document.getElementById('num-devices').value) || 0); }
+function getUsers()   { return Math.max(0, parseInt(document.getElementById('num-units').value)   || 0); }
+function getDevices() { return Math.max(0, parseInt(document.getElementById('num-units').value)   || 0); }
 
 function getOnboarding(users) {
   if (users <= 0)   return { cost: 0,    label: 'Enter your user count above to calculate' };
