@@ -474,7 +474,7 @@
           <label for="org-nonprofit">
             <div class="route-icon">🤝</div>
             <div class="route-name">Non-Profit / School</div>
-            <div class="route-desc">Charity, academy, school or non-profit organisation. Eligible for a 5% discount on all IT services.</div>
+            <div class="route-desc">Charity, academy, school or non-profit organisation. Eligible for a 10% discount on all Unleashed IT services.</div>
           </label>
         </div>
       </div>
@@ -530,6 +530,11 @@
           </label>
         </div>
 
+      </div>
+      <div id="standalone-disclaimer" style="display:none;margin-top:1rem;padding:.85rem 1.1rem;background:#fff3cd;border:1.5px solid #f59e0b;border-radius:8px;font-size:.83rem;color:#92400e;line-height:1.6;">
+        <strong>&#9888;&#65039; Important &ndash; Standalone Services Notice</strong><br/>
+        Standalone services are supplied and licensed by Unleashed Solutions but are <strong>not managed or monitored</strong> by our team. You will be responsible for the day-to-day management, configuration and oversight of these services.<br/>
+        To have Unleashed fully manage these on your behalf, please also select a <strong>Managed IT Bundle</strong>.
       </div>
     </div>
 
@@ -1291,7 +1296,7 @@ function getLineCostInfo(line) {
 
 function getLineDiscount(line, orgType = currentOrgType) {
   if (!line || !line.amount || orgType !== 'nonprofit' || line.noDiscount) return 0;
-  return line.amount * 0.05;
+  return line.amount * 0.10;
 }
 
 function getFinancialSummary(lines, orgType = currentOrgType) {
@@ -1338,6 +1343,8 @@ function getVcmBand(users) {
 
 // -- Service type routing --
 function setServiceType(type) {
+  const disclaimer = document.getElementById('standalone-disclaimer');
+  if (disclaimer) disclaimer.style.display = type === 'standalone' ? 'block' : 'none';
   const managedCards = document.querySelectorAll('.section-managed');
   const addonCard    = document.querySelector('.section-addons');
   const commonCards  = document.querySelectorAll('.section-common');
@@ -1505,7 +1512,7 @@ function updatePanel() {
     `).join('') + (discountTotal > 0 ? `
       <div class="qp-line">
         <div class="qp-label">
-          <div style="color:#e2e8f0;font-weight:600;font-size:.84rem;">🎓 Non-Profit Discount (5%)</div>
+          <div style="color:#e2e8f0;font-weight:600;font-size:.84rem;">🎓 Non-Profit Discount (10%)</div>
           <div style="color:#64748b;font-size:.74rem;">Applied to eligible IT services only</div>
         </div>
         <div class="qp-val">-${fmt(discountTotal)}</div>
@@ -1778,7 +1785,7 @@ function buildPDF() {
     doc.setTextColor(...navy);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8.5);
-    doc.text('Non-Profit Discount (5%)', margin + 4, y + 6);
+    doc.text('Non-Profit Discount (10%)', margin + 4, y + 6);
     doc.text(pdfSafe('-' + fmt(state.discountTotal)), W - margin - 4, y + 6, { align: 'right' });
     y += 11;
 
@@ -2190,6 +2197,24 @@ function buildSalesPDF() {
     docL.setTextColor(253, 230, 138); docL.setFontSize(7); docL.setFont('helvetica', 'italic');
     docL.text('* Some service costs are TBC \u2013 totals are partial.', margin, sy + 47);
   }
+
+  // -- Commission box --
+  const monthlyComm   = financials.profit * 0.25;
+  const onboardComm   = obProfit != null ? obProfit * 0.25 : null;
+  const totalFirstMo  = monthlyComm + (onboardComm || 0);
+  const commY = sy + 64;
+  docL.setFillColor(4, 14, 26);
+  docL.roundedRect(margin, commY, pW - margin * 2, 32, 3, 3, 'F');
+  docL.setTextColor(253, 224, 71); docL.setFontSize(8.5); docL.setFont('helvetica', 'bold');
+  docL.text('\uD83D\uDCB0  SALESPERSON COMMISSION (25% of GP)', margin + 6, commY + 9);
+  docL.setTextColor(147, 197, 253); docL.setFontSize(7.5); docL.setFont('helvetica', 'normal');
+  docL.text('Monthly Recurring Comm.', col1, commY + 17);
+  docL.text('One-off Onboarding Comm.', col2, commY + 17);
+  docL.text('Total First-Month Comm.',  col3, commY + 17);
+  docL.setTextColor(253, 224, 71); docL.setFontSize(10); docL.setFont('helvetica', 'bold');
+  docL.text(gbp(monthlyComm) + tbc,                              col1, commY + 25);
+  docL.text(onboardComm != null ? gbp(onboardComm) : '\u2013',   col2, commY + 25);
+  docL.text(gbp(totalFirstMo) + tbc,                             col3, commY + 25);
 
   // -- Footer --
   docL.setTextColor(100, 116, 139); docL.setFontSize(7); docL.setFont('helvetica', 'normal');
