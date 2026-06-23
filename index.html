@@ -466,7 +466,7 @@
     <!-- STEP 4 – Managed Service Bundle (managed path only) -->
     <div class="card conditional-section section-managed" id="card-bundle">
       <div class="card-title"><span class="step-badge">4</span> Managed IT Service Bundle</div>
-      <p class="section-sub">Select the bundle that best fits your needs. Prices shown per user / per month.</p>
+      <p class="section-sub">Select the bundle that best fits your needs. All bundles are priced per user per month, based on <strong style="color:#7fb3e8">1 user with 1 corporate device</strong>.</p>
       <div class="bundle-grid">
 
         <div class="radio-tile">
@@ -556,7 +556,7 @@
     <!-- STEP 5 – Virtual Compliance Manager (managed path only) -->
     <div class="card conditional-section section-managed" id="card-vcm">
       <div class="card-title"><span class="step-badge">5</span> Unleashed Virtual Compliance Manager (VCM)</div>
-      <p class="section-sub">Fractional compliance support tailored to your organisation's size. Priced per device band per month.</p>
+      <p class="section-sub">Priced by device band per month — based on your total number of <strong style="color:#7fb3e8">user devices</strong> (laptops, desktops, tablets).</p>
       <div class="radio-grid">
 
         <div class="radio-tile none-tile">
@@ -613,18 +613,21 @@
     <!-- STEP 7 – Standalone Add-on Services (both paths) -->
     <div class="card conditional-section section-addons" id="card-addons">
       <div class="card-title"><span class="step-badge" id="addons-step-num">7</span> <span id="addons-title">Standalone Add-on Services</span></div>
-      <p class="section-sub" id="addons-sub">Mix and match to complete your security stack.</p>
+      <p class="section-sub" id="addons-sub">Enter a custom quantity for each service, or leave blank to use your user / device count from Step 2.</p>
 
       <!-- Telephony -->
       <div class="addon-group-header">📞 Telephony</div>
-      <div class="addon-group-sub">Per user / month</div>
       <div class="addon-grid" style="margin-bottom:1.1rem;">
         <label class="addon-item">
           <input type="checkbox" value="teams-telephony" onchange="updatePanel()" />
           <div class="addon-label">
             <div class="addon-name">Microsoft Teams Telephony</div>
             <div class="addon-price">£12.50 / user / month</div>
-            <div class="addon-base">Full PSTN calling via Microsoft Teams — replace traditional phone lines with cloud-based telephony, managed by Unleashed</div>
+            <div class="addon-base">Full PSTN calling via Microsoft Teams — cloud telephony managed by Unleashed</div>
+            <div class="addon-qty-row">
+              <input type="number" class="addon-qty" data-key="teams-telephony" placeholder="users" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
+              <span class="addon-qty-label">users</span>
+            </div>
           </div>
         </label>
       </div>
@@ -638,6 +641,10 @@
           <div class="addon-label">
             <div class="addon-name">Security Awareness Training (SAT)</div>
             <div class="addon-price">£1.23 / user / month</div>
+            <div class="addon-qty-row">
+              <input type="number" class="addon-qty" data-key="sat" placeholder="users" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
+              <span class="addon-qty-label">users</span>
+            </div>
           </div>
         </label>
         <label class="addon-item">
@@ -646,6 +653,10 @@
             <div class="addon-name">Email Security</div>
             <div class="addon-price">£1.76 / mailbox / month</div>
             <div class="addon-base">Advanced threat protection &amp; anti-phishing</div>
+            <div class="addon-qty-row">
+              <input type="number" class="addon-qty" data-key="email-security" placeholder="mailboxes" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
+              <span class="addon-qty-label">mailboxes</span>
+            </div>
           </div>
         </label>
         <label class="addon-item">
@@ -653,6 +664,10 @@
           <div class="addon-label">
             <div class="addon-name">M365 App Security</div>
             <div class="addon-price">£1.23 / user / month</div>
+            <div class="addon-qty-row">
+              <input type="number" class="addon-qty" data-key="m365-app-sec" placeholder="users" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
+              <span class="addon-qty-label">users</span>
+            </div>
           </div>
         </label>
         <label class="addon-item">
@@ -660,6 +675,10 @@
           <div class="addon-label">
             <div class="addon-name">Data Loss Prevention (DLP)</div>
             <div class="addon-price">£1.76 / user / month</div>
+            <div class="addon-qty-row">
+              <input type="number" class="addon-qty" data-key="dlp" placeholder="users" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
+              <span class="addon-qty-label">users</span>
+            </div>
           </div>
         </label>
         <label class="addon-item">
@@ -667,6 +686,10 @@
           <div class="addon-label">
             <div class="addon-name">M365 Security Posture Management (SPM)</div>
             <div class="addon-price">£1.12 / user / month</div>
+            <div class="addon-qty-row">
+              <input type="number" class="addon-qty" data-key="spm" placeholder="users" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
+              <span class="addon-qty-label">users</span>
+            </div>
           </div>
         </label>
         <label class="addon-item">
@@ -675,6 +698,10 @@
             <div class="addon-name">ISPM</div>
             <div class="addon-price">£1.50 / user / month</div>
             <div class="addon-base">Identity Security Posture Management</div>
+            <div class="addon-qty-row">
+              <input type="number" class="addon-qty" data-key="ispm" placeholder="users" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
+              <span class="addon-qty-label">users</span>
+            </div>
           </div>
         </label>
       </div>
@@ -687,6 +714,10 @@
             <div class="addon-name">EDR</div>
             <div class="addon-price">£0.68 / device / month</div>
             <div class="addon-base">Endpoint detection &amp; response</div>
+            <div class="addon-qty-row">
+              <input type="number" class="addon-qty" data-key="edr" placeholder="devices" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
+              <span class="addon-qty-label">devices</span>
+            </div>
           </div>
         </label>
         <label class="addon-item">
@@ -695,6 +726,10 @@
             <div class="addon-name">XDR</div>
             <div class="addon-price">£1.20 / device / month</div>
             <div class="addon-base">Extended detection &amp; response</div>
+            <div class="addon-qty-row">
+              <input type="number" class="addon-qty" data-key="xdr" placeholder="devices" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
+              <span class="addon-qty-label">devices</span>
+            </div>
           </div>
         </label>
         <label class="addon-item">
@@ -702,6 +737,10 @@
           <div class="addon-label">
             <div class="addon-name">MDR – Standard <span class="addon-note">*Requires EDR or XDR</span></div>
             <div class="addon-price">£1.96 / device / month</div>
+            <div class="addon-qty-row">
+              <input type="number" class="addon-qty" data-key="mdr-std" placeholder="devices" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
+              <span class="addon-qty-label">devices</span>
+            </div>
           </div>
         </label>
         <label class="addon-item">
@@ -709,6 +748,10 @@
           <div class="addon-label">
             <div class="addon-name">MDR – Advanced <span class="addon-note">*Requires EDR or XDR</span></div>
             <div class="addon-price">£3.24 / device / month</div>
+            <div class="addon-qty-row">
+              <input type="number" class="addon-qty" data-key="mdr-adv" placeholder="devices" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
+              <span class="addon-qty-label">devices</span>
+            </div>
           </div>
         </label>
       </div>
@@ -722,6 +765,10 @@
           <div class="addon-label">
             <div class="addon-name">M365 Backup</div>
             <div class="addon-price">£1.42 / seat / month</div>
+            <div class="addon-qty-row">
+              <input type="number" class="addon-qty" data-key="m365-backup" placeholder="seats" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
+              <span class="addon-qty-label">seats</span>
+            </div>
           </div>
         </label>
         <label class="addon-item">
@@ -729,6 +776,10 @@
           <div class="addon-label">
             <div class="addon-name">GWS Backup</div>
             <div class="addon-price">£0.81 / seat / month</div>
+            <div class="addon-qty-row">
+              <input type="number" class="addon-qty" data-key="gws-backup" placeholder="seats" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
+              <span class="addon-qty-label">seats</span>
+            </div>
           </div>
         </label>
       </div>
@@ -900,28 +951,28 @@ const BUNDLES = {
 // Addon prices
 const ADDONS = {
   // Telephony
-  'teams-telephony': { name: 'Microsoft Teams Telephony', price: 12.50, basis: 'user' },
+  'teams-telephony': { name: 'Microsoft Teams Telephony', price: 12.50, basis: 'user',   unit: 'users' },
   // Cyber Security — per user
-  'sat':           { name: 'Security Awareness Training (SAT)', price: 1.23,  basis: 'user' },
-  'email-security':{ name: 'Email Security',                    price: 1.76,  basis: 'user' },
-  'm365-app-sec':  { name: 'M365 App Security',                 price: 1.23,  basis: 'user' },
-  'dlp':           { name: 'Data Loss Prevention (DLP)',        price: 1.76,  basis: 'user' },
-  'spm':           { name: 'M365 Security Posture Mgmt (SPM)',  price: 1.12,  basis: 'user' },
-  'ispm':          { name: 'ISPM',                              price: 1.50,  basis: 'user' },
+  'sat':           { name: 'Security Awareness Training (SAT)', price: 1.23,  basis: 'user',   unit: 'users' },
+  'email-security':{ name: 'Email Security',                    price: 1.76,  basis: 'user',   unit: 'mailboxes' },
+  'm365-app-sec':  { name: 'M365 App Security',                 price: 1.23,  basis: 'user',   unit: 'users' },
+  'dlp':           { name: 'Data Loss Prevention (DLP)',        price: 1.76,  basis: 'user',   unit: 'users' },
+  'spm':           { name: 'M365 Security Posture Mgmt (SPM)',  price: 1.12,  basis: 'user',   unit: 'users' },
+  'ispm':          { name: 'ISPM',                              price: 1.50,  basis: 'user',   unit: 'users' },
   // Cyber Security — per device
-  'edr':           { name: 'EDR',                               price: 0.68,  basis: 'device' },
-  'xdr':           { name: 'XDR',                               price: 1.20,  basis: 'device' },
-  'mdr-std':       { name: 'MDR - Standard',                    price: 1.96,  basis: 'device' },
-  'mdr-adv':       { name: 'MDR - Advanced',                    price: 3.24,  basis: 'device' },
+  'edr':           { name: 'EDR',                               price: 0.68,  basis: 'device', unit: 'devices' },
+  'xdr':           { name: 'XDR',                               price: 1.20,  basis: 'device', unit: 'devices' },
+  'mdr-std':       { name: 'MDR - Standard',                    price: 1.96,  basis: 'device', unit: 'devices' },
+  'mdr-adv':       { name: 'MDR - Advanced',                    price: 3.24,  basis: 'device', unit: 'devices' },
   // Data Protection — per seat (user)
-  'm365-backup':   { name: 'M365 Backup',                       price: 1.42,  basis: 'user' },
-  'gws-backup':    { name: 'GWS Backup',                        price: 0.81,  basis: 'user' },
+  'm365-backup':   { name: 'M365 Backup',                       price: 1.42,  basis: 'user',   unit: 'seats' },
+  'gws-backup':    { name: 'GWS Backup',                        price: 0.81,  basis: 'user',   unit: 'seats' },
   // Data Protection — custom qty
-  'data-bucket':   { name: 'Data Bucket',                       price: 0.07,  basis: 'qty', unit: 'GB' },
+  'data-bucket':   { name: 'Data Bucket',                       price: 0.07,  basis: 'qty',    unit: 'GB' },
   // Disaster Recovery — custom qty
-  'dr-hot':        { name: 'DR Data (Hot Storage)',             price: 0.05,  basis: 'qty', unit: 'GB' },
-  'compute':       { name: 'Compute Points',                    price: 0.05,  basis: 'qty', unit: 'CP' },
-  'public-ip':     { name: "Public IP's",                       price: 1.80,  basis: 'qty', unit: 'IP' },
+  'dr-hot':        { name: 'DR Data (Hot Storage)',             price: 0.05,  basis: 'qty',    unit: 'GB' },
+  'compute':       { name: 'Compute Points',                    price: 0.05,  basis: 'qty',    unit: 'CP' },
+  'public-ip':     { name: "Public IP's",                       price: 1.80,  basis: 'qty',    unit: 'IP' },
 };
 
 function getUsers()   { return Math.max(0, parseInt(document.getElementById('num-users').value)   || 0); }
@@ -1041,7 +1092,19 @@ function updatePanel() {
     document.getElementById('vcto-total').textContent = '';
   }
 
-  // Addons
+  // Addons — update placeholders then calculate
+  const globalDefaults = { user: users, device: devices };
+  document.querySelectorAll('.addon-item').forEach(item => {
+    const qtyEl = item.querySelector('.addon-qty');
+    const cb    = item.querySelector('input[type=checkbox]');
+    if (!qtyEl || !cb) return;
+    const key   = cb.value;
+    const addon = ADDONS[key];
+    if (!addon || addon.basis === 'qty') return;
+    const def = globalDefaults[addon.basis] || users;
+    if (!qtyEl.value) qtyEl.placeholder = def > 0 ? String(def) : qtyEl.getAttribute('placeholder') || '0';
+  });
+
   document.querySelectorAll('.addon-item input[type=checkbox]:checked').forEach(cb => {
     const key = cb.value;
     const addon = ADDONS[key];
@@ -1052,15 +1115,19 @@ function updatePanel() {
       qty = qtyEl ? (parseInt(qtyEl.value) || 0) : 0;
       subLabel = `${qty} ${addon.unit}`;
     } else {
-      qty = addon.basis === 'user' ? users : devices;
-      subLabel = `${qty} ${addon.basis}s`;
+      const qtyEl  = document.querySelector(`.addon-qty[data-key="${key}"]`);
+      const custom = qtyEl ? (parseInt(qtyEl.value) || 0) : 0;
+      const global = addon.basis === 'user' ? users : devices;
+      qty = custom > 0 ? custom : global;
+      const unitLabel = addon.unit || (addon.basis + 's');
+      subLabel = `${qty} ${unitLabel}`;
     }
     if (qty > 0) {
       const cost = addon.price * qty;
       monthly += cost;
       lines.push({ label: addon.name, sub: `${subLabel} x ${fmt(addon.price)}`, val: fmt(cost) });
     } else {
-      const hint = addon.basis === 'qty' ? `Enter ${addon.unit} quantity` : `Enter ${addon.basis} count above`;
+      const hint = addon.basis === 'qty' ? `Enter ${addon.unit} quantity` : `Enter quantity or set count in Step 2`;
       lines.push({ label: addon.name, sub: hint, val: '—' });
     }
   });
