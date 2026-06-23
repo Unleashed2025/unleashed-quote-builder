@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -21,8 +21,8 @@
       --navy:   #0e2440;
       --navy2:  #163557;
       --navy3:  #071524;
-      --orange: #e8640a;
-      --orange2:#f57c2a;
+      --accent: #2563eb;
+      --accent2:#3b82f6;
       --light:  #132035;
       --border: rgba(100,160,220,0.18);
       --text:   #e2eaf4;
@@ -67,7 +67,7 @@
     .header-tagline { font-size: .75rem; color: #7fb3e8; line-height: 1.5; }
     .header-badge {
       display: inline-block; margin-top: .3rem;
-      background: var(--orange); color: var(--white);
+      background: var(--accent); color: var(--white);
       font-size: .65rem; font-weight: 700; letter-spacing: .5px;
       padding: .2rem .6rem; border-radius: 20px;
       text-transform: uppercase;
@@ -82,11 +82,11 @@
       border-bottom: 1px solid rgba(100,160,220,0.1);
     }
     .hero h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: .5rem; }
-    .hero h1 span { color: var(--orange); }
+    .hero h1 span { color: var(--accent); }
     .hero p { font-size: .9rem; color: #94a3b8; max-width: 560px; margin: 0 auto .8rem; line-height: 1.7; }
     .hero-steps { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; margin-top: .75rem; }
     .hero-step { font-size: .75rem; color: #cbd5e1; display: flex; align-items: center; gap: .4rem; }
-    .hero-step .hs-num { background: var(--orange); color: var(--white); border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: .65rem; font-weight: 700; flex-shrink: 0; }
+    .hero-step .hs-num { background: var(--accent); color: var(--white); border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: .65rem; font-weight: 700; flex-shrink: 0; }
 
     /* ── Layout ── */
     .page { max-width: 1140px; margin: 0 auto; padding: 2rem 1.5rem 4rem; display: grid; grid-template-columns: 1fr 350px; gap: 2rem; align-items: start; }
@@ -107,11 +107,11 @@
       color: var(--white);
       margin-bottom: 1.25rem;
       padding-bottom: .65rem;
-      border-bottom: 2px solid var(--orange);
+      border-bottom: 2px solid var(--accent);
       display: flex; align-items: center; gap: .6rem;
     }
     .card-title .step-badge {
-      background: var(--orange);
+      background: var(--accent);
       color: var(--white);
       border-radius: 50%;
       width: 26px; height: 26px;
@@ -135,7 +135,7 @@
       background: var(--input);
       transition: border .2s;
     }
-    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--orange); }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
     textarea { resize: vertical; min-height: 70px; }
     select option { background: var(--input); color: var(--text); }
 
@@ -154,12 +154,12 @@
       margin: 0;
     }
     .radio-tile input[type=radio]:checked + label {
-      border-color: var(--orange);
-      background: rgba(232,100,10,.12);
-      box-shadow: 0 0 0 3px rgba(232,100,10,.15);
+      border-color: var(--accent);
+      background: rgba(37,99,235,.15);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.18);
     }
     .tile-name { font-weight: 700; font-size: .95rem; color: var(--white); margin-top: .1rem; }
-    .tile-price { font-size: .82rem; color: var(--orange); font-weight: 600; margin-top: .2rem; margin-bottom: .1rem; }
+    .tile-price { font-size: .82rem; color: var(--accent); font-weight: 600; margin-top: .2rem; margin-bottom: .1rem; }
     .tile-desc { font-size: .75rem; color: var(--muted); margin-top: .25rem; line-height: 1.4; }
     .tile-tag {
       display: inline-block; font-size: .65rem; font-weight: 700;
@@ -168,7 +168,7 @@
     .tile-tag.ms  { background: rgba(26,86,219,0.25); color: #7fb3e8; }
     .tile-tag.bic { background: rgba(22,163,74,0.2);  color: #4ade80; }
     .tile-features { list-style: none; margin-top: .55rem; padding-top: .55rem; border-top: 1px solid rgba(100,160,220,0.15); }
-    .radio-tile input[type=radio]:checked + label .tile-features { border-top-color: rgba(232,100,10,0.25); }
+    .radio-tile input[type=radio]:checked + label .tile-features { border-top-color: rgba(37,99,235,.2); }
     .tile-features li {
       font-size: .73rem; color: #b8d4ec; padding: .18rem 0;
       display: flex; gap: .4rem; line-height: 1.35; align-items: flex-start;
@@ -181,18 +181,18 @@
 
     /* ── Onboarding display ── */
     .onboarding-display { display: flex; align-items: baseline; gap: 1rem; padding: 1.1rem 1.25rem; background: var(--navy); border-radius: 8px; margin-top: .5rem; flex-wrap: wrap; border: 1px solid var(--border); }
-    .ob-cost { font-size: 2rem; font-weight: 800; color: var(--orange); }
+    .ob-cost { font-size: 2rem; font-weight: 800; color: var(--accent); }
     .ob-meta { font-size: .82rem; color: var(--muted); line-height: 1.5; }
 
     /* ── Checkbox addon ── */
     .addon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
     @media(max-width:500px){ .addon-grid { grid-template-columns: 1fr; } }
     .addon-item { display: flex; align-items: flex-start; gap: .6rem; padding: .7rem .9rem; border: 1.5px solid var(--border); border-radius: 7px; cursor: pointer; transition: all .18s; background: var(--input); }
-    .addon-item:has(input:checked) { border-color: var(--orange); background: rgba(232,100,10,.1); }
-    .addon-item input[type=checkbox] { margin-top: 2px; accent-color: var(--orange); width: 16px; height: 16px; flex-shrink: 0; }
+    .addon-item:has(input:checked) { border-color: var(--accent); background: rgba(37,99,235,.12); }
+    .addon-item input[type=checkbox] { margin-top: 2px; accent-color: var(--accent); width: 16px; height: 16px; flex-shrink: 0; }
     .addon-label { font-size: .85rem; flex: 1; }
     .addon-name { font-weight: 600; color: var(--white); }
-    .addon-price { font-size: .75rem; color: var(--orange); }
+    .addon-price { font-size: .75rem; color: var(--accent); }
     .addon-base { font-size: .72rem; color: var(--muted); }
     .addon-note { font-size: .7rem; color: var(--muted); font-weight: 400; }
     .addon-group-header { font-size: .82rem; font-weight: 700; color: #b8d4ec; margin: 1rem 0 .4rem; padding-bottom: .3rem; border-bottom: 1.5px solid rgba(100,160,220,0.15); }
@@ -204,7 +204,7 @@
     /* ── vCTO ── */
     .vcto-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
     .vcto-row input[type=number] { width: 110px; }
-    .vcto-total { font-size: .9rem; font-weight: 700; color: var(--orange); }
+    .vcto-total { font-size: .9rem; font-weight: 700; color: var(--accent); }
 
     /* ── Contract term ── */
     .term-grid { display: flex; gap: .75rem; flex-wrap: wrap; }
@@ -215,7 +215,7 @@
       cursor: pointer; font-size: .85rem; font-weight: 600;
       color: var(--muted); transition: all .18s; background: var(--input);
     }
-    .term-tile input[type=radio]:checked + label { border-color: var(--orange); background: var(--orange); color: var(--white); }
+    .term-tile input[type=radio]:checked + label { border-color: var(--accent); background: var(--accent); color: var(--white); }
 
     /* ── Sticky quote panel ── */
     .quote-panel {
@@ -229,7 +229,8 @@
       border: 1px solid rgba(100,160,220,0.12);
     }
     .qp-header {
-      background: var(--orange);
+      background: linear-gradient(135deg, #0a1d33 0%, #0e2440 100%);
+      border-bottom: 2px solid var(--accent);
       padding: 1rem 1.5rem;
       font-weight: 700;
       font-size: 1rem;
@@ -244,14 +245,14 @@
     .qp-divider { border: none; border-top: 1px solid rgba(255,255,255,.1); margin: .85rem 0; }
     .qp-total-row { display: flex; justify-content: space-between; align-items: center; margin-top: .5rem; }
     .qp-total-label { font-size: .85rem; color: #94a3b8; }
-    .qp-total-val { font-size: 1.6rem; font-weight: 800; color: var(--orange); }
+    .qp-total-val { font-size: 1.6rem; font-weight: 800; color: var(--accent); }
     .qp-sub { font-size: .72rem; color: #64748b; margin-top: .15rem; }
     .qp-empty { color: #4a7a9b; font-size: .85rem; font-style: italic; padding: .5rem 0; }
 
     /* ── Buttons ── */
     .btn-generate {
       display: block; width: 100%;
-      background: var(--orange); color: var(--white);
+      background: var(--accent); color: var(--white);
       border: none; border-radius: 8px;
       padding: .9rem 1.5rem;
       font-size: 1rem; font-weight: 700;
@@ -259,7 +260,7 @@
       transition: background .2s, transform .1s;
       letter-spacing: .3px;
     }
-    .btn-generate:hover { background: var(--orange2); }
+    .btn-generate:hover { background: var(--accent2); }
     .btn-generate:active { transform: scale(.98); }
     .btn-generate:disabled { background: #2a4060; color: #4a7a9b; cursor: not-allowed; }
 
@@ -279,7 +280,7 @@
     #status-banner.error   { background: rgba(248,113,113,.12); color: var(--red);   border: 1px solid rgba(248,113,113,.25); }
 
     /* ── VCM note ── */
-    .vcm-note { background: rgba(232,100,10,.1); border: 1px solid rgba(232,100,10,.3); border-radius: 7px; padding: .7rem 1rem; font-size: .8rem; color: #fbb97e; margin-top: .75rem; }
+    .vcm-note { background: rgba(37,99,235,.12); border: 1px solid rgba(37,99,235,.3); border-radius: 7px; padding: .7rem 1rem; font-size: .8rem; color: #93c5fd; margin-top: .75rem; }
 
     /* ── Section subtitle ── */
     .section-sub { font-size: .8rem; color: var(--muted); margin-bottom: 1rem; margin-top: -.5rem; }
@@ -302,8 +303,8 @@
       background: var(--input);
     }
     .route-tile input[type=radio]:checked + label {
-      border-color: var(--orange); background: rgba(232,100,10,.12);
-      box-shadow: 0 0 0 4px rgba(232,100,10,.15);
+      border-color: var(--accent); background: rgba(37,99,235,.15);
+      box-shadow: 0 0 0 4px rgba(37,99,235,.18);
     }
     .route-icon { font-size: 2.4rem; margin-bottom: .7rem; }
     .route-name { font-weight: 700; font-size: 1rem; color: var(--white); margin-bottom: .4rem; }
@@ -328,7 +329,7 @@
     }
 
     /* ── Mode label on add-ons card ── */
-    .addons-mode-label { font-size: .75rem; font-weight: 700; color: var(--orange); margin-bottom: .25rem; }
+    .addons-mode-label { font-size: .75rem; font-weight: 700; color: var(--accent); margin-bottom: .25rem; }
 
     /* ── Bundle overview blurb ── */
     .tile-overview { font-size: .74rem; color: #7da5c8; line-height: 1.5; margin: .4rem 0 .55rem; padding-bottom: .5rem; border-bottom: 1px solid rgba(100,160,220,0.12); }
@@ -847,7 +848,7 @@
 <footer style="background:var(--navy3);color:#64748b;text-align:center;padding:1.5rem 1rem;font-size:.75rem;margin-top:2rem;">
   <img src="https://static.wixstatic.com/media/9aafc7_8e42cb6a010543249ece18aea477e809%7Emv2.png/v1/fill/w_120,h_34,q_95,usm_0.66_1.00_0.01/9aafc7_8e42cb6a010543249ece18aea477e809%7Emv2.png"
     alt="Unleashed Solutions" style="height:30px;width:auto;margin-bottom:.6rem;display:block;margin-left:auto;margin-right:auto;opacity:.7;" />
-  <div style="color:#475569;">Unleashed Solutions &nbsp;|&nbsp; <a href="https://www.teamunleashed.co.uk" target="_blank" style="color:var(--orange);text-decoration:none;">www.teamunleashed.co.uk</a> &nbsp;|&nbsp; This is a budgetary quote only — all prices exclude VAT</div>
+  <div style="color:#475569;">Unleashed Solutions &nbsp;|&nbsp; <a href="https://www.teamunleashed.co.uk" target="_blank" style="color:var(--accent);text-decoration:none;">www.teamunleashed.co.uk</a> &nbsp;|&nbsp; This is a budgetary quote only — all prices exclude VAT</div>
 </footer>
 
 <!-- ════════════════════════ SCRIPT ════════════════════════ -->
@@ -1173,7 +1174,7 @@ function buildPDF() {
   let y = 0;
 
   const navy   = [15, 39, 68];
-  const orange = [232, 100, 10];
+  const accent = [37, 99, 235];
   const white  = [255, 255, 255];
   const light  = [244, 247, 251];
   const muted  = [100, 116, 139];
@@ -1192,11 +1193,11 @@ function buildPDF() {
   doc.rect(0, 0, W, 42, 'F');
 
   // Orange accent bar
-  doc.setFillColor(...orange);
+  doc.setFillColor(...accent);
   doc.rect(0, 42, W, 4, 'F');
 
   // Logo square
-  doc.setFillColor(...orange);
+  doc.setFillColor(...accent);
   doc.roundedRect(margin, 10, 22, 22, 3, 3, 'F');
   doc.setTextColor(...white);
   doc.setFont('helvetica', 'bold');
