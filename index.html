@@ -1038,10 +1038,10 @@ const CONFIG = {
   // PIN to unlock internal deal summary PDF (change this to your preferred PIN)
   sales_pin: 'SalesTeamOnly!%!',
 
-  // -- VCM Pricing bands (update when confirmed) --
-  // Format: { '1-10': price, '10-25': price, '25-50': price, '50-100': price }
-  vcm_std: { '1-10': 103, '10-20': 134, '20-49': 229, '50-99': 321 },
-  vcm_prem:{ '1-10': 200, '10-20': 300, '20-49': 400, '50-99': 500 },
+  // -- VCM Pricing bands --
+  // Format: { '1-9': price, '10-19': price, '20-49': price, '50-99': price }
+  vcm_std: { '1-9': 103, '10-19': 134, '20-49': 229, '50-99': 321 },
+  vcm_prem:{ '1-9': 200, '10-19': 300, '20-49': 400, '50-99': 500 },
 };
 // ----------------------------------------------------------
 
@@ -1084,7 +1084,7 @@ const ADDONS = {
   // Data Protection – custom qty
   'data-bucket':   { name: 'Data Bucket',                       price: 0.08,  basis: 'qty',    unit: 'GB' },
   // Disaster Recovery – custom qty
-  'dr-hot':        { name: 'DR Data (Hot Storage)',             price: 0.08,  basis: 'qty',    unit: 'GB' },
+  'dr-hot':        { name: 'DR Data (Hot Storage)',             price: 0.10,  basis: 'qty',    unit: 'GB' },
   'compute':       { name: 'Compute Points',                    price: 0.08,  basis: 'qty',    unit: 'CP' },
   'public-ip':     { name: "Public IP's",                       price: 1.50,  basis: 'qty',    unit: 'IP' },
 };
@@ -1117,24 +1117,30 @@ const COST_PRICES = {
   'vcto':             400,   // per day (sell: £1,000, profit: £600)
 };
 
+// VCM internal cost bands (per month, by user band)
+const VCM_COST_BANDS = {
+  'vcm-std':  { '1-9': 76, '10-19': 102, '20-49': 141, '50-99': 196 },
+  'vcm-prem': { '1-9': 76, '10-19': 102, '20-49': 141, '50-99': 196 },
+};
+
 function getUsers()   { return Math.max(0, parseInt(document.getElementById('num-units').value)   || 0); }
 function getDevices() { return Math.max(0, parseInt(document.getElementById('num-units').value)   || 0); }
 
 function getOnboarding(units) {
-  if (units <= 0)   return { cost: 0,    label: 'Enter your service unit count above to calculate' };
-  if (units <= 10)  return { cost: 1000, label: '1-10 service units' };
-  if (units <= 25)  return { cost: 2000, label: '11-25 service units' };
-  if (units <= 50)  return { cost: 3500, label: '26-50 service units' };
-  if (units <= 100) return { cost: 5000, label: '51-100 service units' };
-  if (units <= 150) return { cost: 7000, label: '101-150 service units' };
-  return { cost: null, label: '150+ service units \u2013 contact us for a bespoke quote' };
+  if (units <= 0)   return { cost: 0,    internalCost: 0,    label: 'Enter your service unit count above to calculate' };
+  if (units <=  9)  return { cost: 1000, internalCost: 800,  label: '1-9 users' };
+  if (units <= 19)  return { cost: 2000, internalCost: 1200, label: '10-19 users' };
+  if (units <= 49)  return { cost: 3500, internalCost: 2000, label: '20-49 users' };
+  if (units <= 99)  return { cost: 5000, internalCost: 2800, label: '50-99 users' };
+  if (units <= 149) return { cost: 7000, internalCost: 4000, label: '100-149 users' };
+  return { cost: null, internalCost: null, label: '150+ users \u2013 contact us for a bespoke quote' };
 }
 
 function getVcmBand(users) {
-  if (users >=  1 && users <= 10) return '1-10';
-  if (users > 10 && users <= 20)  return '10-20';
-  if (users > 20 && users <= 49)  return '20-49';
-  if (users > 49 && users <= 99)  return '50-99';
+  if (users >=  1 && users <=  9) return '1-9';
+  if (users >= 10 && users <= 19) return '10-19';
+  if (users >= 20 && users <= 49) return '20-49';
+  if (users >= 50 && users <= 99) return '50-99';
   return null;
 }
 
@@ -1205,11 +1211,11 @@ function updatePanel() {
   if (vcmVal !== 'none') {
     if (vcmNote) vcmNote.style.display = 'none';
     const table = vcmVal === 'vcm-std' ? CONFIG.vcm_std : CONFIG.vcm_prem;
-    const vcmName = vcmVal === 'vcm-std' ? 'VCM - Standard' : 'VCM - Premium';
+    const vcmName = vcmVal === 'vcm-std' ? 'Virtual Compliance Manager – Standard' : 'Virtual Compliance Manager – Premium';
     if (band && table[band]) {
       const cost = table[band];
       monthly += cost;
-      lines.push({ key: vcmVal, label: vcmName, sub: `Device band: ${band}`, val: fmt(cost), qty: 1, unitPrice: cost });
+      lines.push({ key: vcmVal, label: vcmName, sub: `Device band: ${band}`, val: fmt(cost), qty: 1, unitPrice: cost, vcmBand: band });
     } else if (devices === 0) {
       lines.push({ key: vcmVal, label: vcmName, sub: 'Enter your device count for pricing', val: '\u2013' });
     } else {
@@ -1849,7 +1855,11 @@ function buildSalesPDF() {
 
   const tableBody = state.lines.filter(l => l.qty > 0 && l.unitPrice > 0).map(l => {
     const rev     = l.unitPrice * l.qty;
-    const cpUnit  = COST_PRICES[l.key];
+    // VCM costs are band-based, not flat — look up from VCM_COST_BANDS
+    let cpUnit = COST_PRICES[l.key];
+    if (cpUnit == null && l.vcmBand && VCM_COST_BANDS[l.key]) {
+      cpUnit = VCM_COST_BANDS[l.key][l.vcmBand];
+    }
     const costTot = cpUnit != null ? cpUnit * l.qty : null;
     const profit  = costTot != null ? rev - costTot : null;
     const marginP = costTot != null ? ((rev - costTot) / rev * 100).toFixed(1) + '%' : 'TBC';
@@ -1895,13 +1905,15 @@ function buildSalesPDF() {
   const annualRev    = totalRevenue * 12;
   const annualProfit = totalProfit * 12;
   const ob           = state.onboarding || 0;
+  const obCost       = (state.ob && state.ob.internalCost != null) ? state.ob.internalCost : null;
+  const obProfit     = (ob > 0 && obCost != null) ? ob - obCost : null;
   const tbc          = allCostKnown ? '' : '*';
 
   let sy = docL.lastAutoTable.finalY + 8;
 
-  // totals background
+  // totals background — taller to fit onboarding row
   docL.setFillColor(30, 58, 95);
-  docL.roundedRect(margin, sy, pW - margin * 2, 38, 3, 3, 'F');
+  docL.roundedRect(margin, sy, pW - margin * 2, 52, 3, 3, 'F');
 
   const col1 = margin + 6, col2 = margin + 80, col3 = margin + 148, col4 = margin + 220;
   docL.setTextColor(147, 197, 253); docL.setFontSize(7.5); docL.setFont('helvetica', 'normal');
@@ -1922,16 +1934,26 @@ function buildSalesPDF() {
 
   // Row 2 labels
   docL.setTextColor(147, 197, 253); docL.setFontSize(7.5); docL.setFont('helvetica', 'normal');
-  docL.text('Annual Revenue',          col1, sy + 26);
-  docL.text('Annual Profit',           col2, sy + 26);
-  docL.text('Onboarding (one-off)',     col3, sy + 26);
+  docL.text('Annual Revenue',  col1, sy + 28);
+  docL.text('Annual Profit',   col2, sy + 28);
 
   // Row 2 values
   docL.setTextColor(134, 239, 172); docL.setFontSize(10); docL.setFont('helvetica', 'bold');
-  docL.text(gbp(annualRev),                              col1, sy + 34);
-  docL.text(gbp(annualProfit) + tbc,                     col2, sy + 34);
-  docL.setTextColor(255, 255, 255);
-  docL.text(ob > 0 ? gbp(ob) : '\u2013',                col3, sy + 34);
+  docL.text(gbp(annualRev),            col1, sy + 36);
+  docL.text(gbp(annualProfit) + tbc,   col2, sy + 36);
+
+  // Row 3 labels — onboarding
+  docL.setTextColor(147, 197, 253); docL.setFontSize(7.5); docL.setFont('helvetica', 'normal');
+  docL.text('Onboarding (Sell)',   col1, sy + 44);
+  docL.text('Onboarding (Cost)',   col2, sy + 44);
+  docL.text('Onboarding (Profit)', col3, sy + 44);
+
+  // Row 3 values — onboarding
+  docL.setTextColor(255, 255, 255); docL.setFontSize(10); docL.setFont('helvetica', 'bold');
+  docL.text(ob > 0 ? gbp(ob) : '\u2013',                          col1, sy + 52);
+  docL.text(obCost != null ? gbp(obCost) : '\u2013',              col2, sy + 52);
+  docL.setTextColor(134, 239, 172);
+  docL.text(obProfit != null ? gbp(obProfit) : '\u2013',          col3, sy + 52);
 
   if (!allCostKnown) {
     docL.setTextColor(253, 230, 138); docL.setFontSize(7); docL.setFont('helvetica', 'italic');
