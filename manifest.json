@@ -1,0 +1,25 @@
+﻿{
+  "name": "Unleashed Quote Builder",
+  "short_name": "Quote Builder",
+  "description": "Build and download IT service proposals from Unleashed Solutions.",
+  "start_url": "/unleashed-quote-builder/",
+  "scope": "/unleashed-quote-builder/",
+  "display": "standalone",
+  "background_color": "#040e1a",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://static.wixstatic.com/media/9aafc7_8e42cb6a010543249ece18aea477e809~mv2.png/v1/fill/w_192,h_192,lg_1/9aafc7_8e42cb6a010543249ece18aea477e809~mv2.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://static.wixstatic.com/media/9aafc7_8e42cb6a010543249ece18aea477e809~mv2.png/v1/fill/w_512,h_512,lg_1/9aafc7_8e42cb6a010543249ece18aea477e809~mv2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
