@@ -2155,7 +2155,7 @@ function buildSalesPDF() {
   let sy = docL.lastAutoTable.finalY + 8;
 
   docL.setFillColor(30, 58, 95);
-  docL.roundedRect(margin, sy, pW - margin * 2, 54, 3, 3, 'F');
+  docL.roundedRect(margin, sy, pW - margin * 2, 68, 3, 3, 'F');
 
   const col1 = margin + 6, col2 = margin + 76, col3 = margin + 146, col4 = margin + 216;
   docL.setTextColor(147, 197, 253); docL.setFontSize(7.5); docL.setFont('helvetica', 'normal');
@@ -2202,7 +2202,8 @@ function buildSalesPDF() {
   const monthlyComm   = financials.profit * 0.25;
   const onboardComm   = obProfit != null ? obProfit * 0.25 : null;
   const totalFirstMo  = monthlyComm + (onboardComm || 0);
-  const commY = sy + 64;
+  const commY = sy + 78;
+  if (commY + 36 > pH - 15) { docL.addPage(); }
   docL.setFillColor(4, 14, 26);
   docL.roundedRect(margin, commY, pW - margin * 2, 32, 3, 3, 'F');
   docL.setTextColor(253, 224, 71); docL.setFontSize(8.5); docL.setFont('helvetica', 'bold');
