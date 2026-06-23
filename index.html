@@ -89,6 +89,7 @@
     /* -- Layout -- */
     .page { max-width: 1140px; margin: 0 auto; padding: 2rem 1.5rem 4rem; display: grid; grid-template-columns: 1fr 350px; gap: 2rem; align-items: start; }
     @media(max-width:900px){ .page { grid-template-columns: 1fr; } }
+    .sidebar-col { align-self: start; position: sticky; top: 20px; }
 
     /* -- Card -- */
     .card {
@@ -974,7 +975,7 @@
   </div><!-- /form-col -->
 
   <!-- -- RIGHT COLUMN – LIVE QUOTE PANEL -- -->
-  <div style="align-self: start; position: sticky; top: 20px;">
+  <div class="sidebar-col">
     <div class="quote-panel">
       <div class="qp-header">📋 Your Quote Summary</div>
       <div class="qp-body">
