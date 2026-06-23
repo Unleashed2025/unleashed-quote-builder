@@ -594,8 +594,7 @@
       *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
     }
     /* -- Install App button -- */
-    #installBtn { display: none; }
-    #installBtn.visible { display: inline-flex; align-items: center; gap: 8px; }
+    #installBtn { display: inline-flex; align-items: center; gap: 8px; }
     .btn-install {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 9px 20px;
@@ -2471,22 +2470,22 @@ updatePanel();
   }
   let deferredInstallPrompt = null;
   function installPwa() {
-    if (!deferredInstallPrompt) return;
-    deferredInstallPrompt.prompt();
-    deferredInstallPrompt.userChoice.then(() => {
-      deferredInstallPrompt = null;
-      document.getElementById("installBtn").classList.remove("visible");
-    });
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      deferredInstallPrompt.userChoice.then(() => { deferredInstallPrompt = null; });
+    } else {
+      // Fallback: show browser-specific instructions
+      const ua = navigator.userAgent;
+      let msg = 'To install: open this page in Chrome or Edge, click the \u22EE menu (top-right) and choose \u201cInstall app\u201d or \u201cAdd to Home screen\u201d.';
+      if (/iPhone|iPad/.test(ua)) msg = 'To install on iOS: tap the Share button (\u{1F4E4}) then "Add to Home Screen".';
+      alert(msg);
+    }
   }
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
     deferredInstallPrompt = e;
-    document.getElementById("installBtn").classList.add("visible");
   });
-  window.addEventListener("appinstalled", () => {
-    deferredInstallPrompt = null;
-    document.getElementById("installBtn").classList.remove("visible");
-  });
+  window.addEventListener("appinstalled", () => { deferredInstallPrompt = null; });
 </script>
 </body>
 </html>
