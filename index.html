@@ -870,10 +870,10 @@
     <!-- STEP 8 – Onboarding (both paths) -->
     <div class="card conditional-section section-common" id="card-onboarding">
       <div class="card-title"><span class="step-badge" id="onboarding-step-num">8</span> Onboarding</div>
-      <p class="section-sub">One-off upfront cost covering account setup, device enrolment, Microsoft 365 configuration and project management. Calculated automatically from your user count.</p>
+      <p class="section-sub">One-off upfront cost covering account setup, device enrolment, Microsoft 365 configuration and project management. Calculated automatically from your service unit count.</p>
       <div class="onboarding-display">
         <div class="ob-cost" id="ob-cost-display">—</div>
-        <div class="ob-meta" id="ob-band-display">Enter your user count above to calculate</div>
+        <div class="ob-meta" id="ob-band-display">Enter your service unit count above to calculate</div>
       </div>
       <div class="vcm-note" style="margin-top:.75rem;">
         ℹ️ 150+ users? Please <strong>contact us directly</strong> for a bespoke onboarding quote.
@@ -1009,13 +1009,13 @@ const ADDONS = {
 function getUsers()   { return Math.max(0, parseInt(document.getElementById('num-units').value)   || 0); }
 function getDevices() { return Math.max(0, parseInt(document.getElementById('num-units').value)   || 0); }
 
-function getOnboarding(users) {
-  if (users <= 0)   return { cost: 0,    label: 'Enter your user count above to calculate' };
-  if (users <= 10)  return { cost: 1000, label: '1-10 users band' };
-  if (users <= 25)  return { cost: 2000, label: '11-25 users band' };
-  if (users <= 50)  return { cost: 3500, label: '26-50 users band' };
-  if (users <= 149) return { cost: 5000, label: '51-149 users band' };
-  return { cost: null, label: '150+ users - contact us for a bespoke quote' };
+function getOnboarding(units) {
+  if (units <= 0)   return { cost: 0,    label: 'Enter your service unit count above to calculate' };
+  if (units <= 10)  return { cost: 1000, label: '1-10 service units' };
+  if (units <= 25)  return { cost: 2000, label: '11-25 service units' };
+  if (units <= 50)  return { cost: 3500, label: '26-50 service units' };
+  if (units <= 149) return { cost: 5000, label: '51-149 service units' };
+  return { cost: null, label: '150+ service units — contact us for a bespoke quote' };
 }
 
 function getVcmBand(users) {
