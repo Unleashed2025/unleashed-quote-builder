@@ -217,8 +217,6 @@
 
     /* -- Sticky quote panel -- */
     .quote-panel {
-      position: sticky;
-      top: 20px;
       background: linear-gradient(170deg, #040e1a 0%, var(--navy) 100%);
       color: #e2eaf4;
       border-radius: var(--radius);
@@ -980,7 +978,7 @@
   </div><!-- /form-col -->
 
   <!-- -- RIGHT COLUMN – LIVE QUOTE PANEL -- -->
-  <div>
+  <div style="align-self: start; position: sticky; top: 20px;">
     <div class="quote-panel">
       <div class="qp-header">📋 Your Quote Summary</div>
       <div class="qp-body">
