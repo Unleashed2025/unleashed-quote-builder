@@ -473,8 +473,8 @@
           <input type="radio" name="orgtype" id="org-nonprofit" value="nonprofit" onchange="setOrgType('nonprofit')" />
           <label for="org-nonprofit">
             <div class="route-icon">🤝</div>
-            <div class="route-name">Non-Profit / School</div>
-            <div class="route-desc">Charity, academy, school or non-profit organisation. Eligible for a 10% discount on all Unleashed IT services.</div>
+            <div class="route-name">Non-Profit</div>
+            <div class="route-desc">Registered charity or non-profit organisation. Eligible for a 10% discount on all Unleashed IT services.</div>
           </label>
         </div>
       </div>
@@ -1665,7 +1665,7 @@ function buildPDF() {
   const cphone  = document.getElementById('client-phone').value.trim();
   const cnotes  = document.getElementById('client-notes').value.trim();
   const term    = document.querySelector('input[name=term]:checked')?.value || 'Annual';
-  const orgTypeLabel = state.currentOrgType === 'nonprofit' ? 'Non-Profit / School' : 'Commercial';
+  const orgTypeLabel = state.currentOrgType === 'nonprofit' ? 'Non-Profit' : 'Commercial';
   const financials = getFinancialSummary(state.lines, state.currentOrgType);
 
   // -- Header block --
@@ -1908,7 +1908,7 @@ function buildSalesSummaryHtml(company, name, email, phone) {
   const td = (content, align) => `<td style="padding:6px 10px;border:1px solid #dde8f4;${align ? 'text-align:' + align + ';' : ''}">${content}</td>`;
   const gbp = n => '\u00a3' + n.toFixed(2);
   const term = document.querySelector('input[name=term]:checked')?.value || 'Annual';
-  const orgTypeLabel = state.currentOrgType === 'nonprofit' ? 'Non-Profit / School' : 'Commercial';
+  const orgTypeLabel = state.currentOrgType === 'nonprofit' ? 'Non-Profit' : 'Commercial';
   const tbc = financials.allCostKnown ? '' : '*';
 
   const rows = financials.rows.map(({ line, gross, discount, net, unitCost, totalCost, profit, marginPct }) => {
@@ -2065,7 +2065,7 @@ function buildSalesPDF() {
   const phone   = document.getElementById('client-phone').value.trim() || '\u2013';
   const term    = document.querySelector('input[name=term]:checked')?.value || 'Annual';
   const margin  = 14;
-  const orgTypeLabel = state.currentOrgType === 'nonprofit' ? 'Non-Profit / School' : 'Commercial';
+  const orgTypeLabel = state.currentOrgType === 'nonprofit' ? 'Non-Profit' : 'Commercial';
   const financials = getFinancialSummary(state.lines, state.currentOrgType);
 
   const docL = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'landscape' });
