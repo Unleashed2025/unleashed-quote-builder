@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Unleashed Solutions – Quote Builder</title>
+  <link rel="icon" href="https://static.wixstatic.com/media/9aafc7_8e42cb6a010543249ece18aea477e809%7Emv2.png/v1/fill/w_32,h_32,lg_1/9aafc7_8e42cb6a010543249ece18aea477e809%7Emv2.png" type="image/png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -14,11 +18,12 @@
     /* ── Reset & base ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --navy:   #0f2744;
-      --navy2:  #1a3a5c;
+      --navy:   #162641;
+      --navy2:  #1e3a5f;
+      --navy3:  #0d1b2e;
       --orange: #e8640a;
-      --orange2:#f97b2a;
-      --light:  #f4f7fb;
+      --orange2:#f57c2a;
+      --light:  #f0f4f8;
       --border: #d1dae8;
       --text:   #1e293b;
       --muted:  #64748b;
@@ -26,10 +31,10 @@
       --green:  #16a34a;
       --red:    #dc2626;
       --radius: 10px;
-      --shadow: 0 4px 24px rgba(15,39,68,.10);
+      --shadow: 0 4px 24px rgba(22,38,65,.10);
     }
     body {
-      font-family: 'Segoe UI', Arial, sans-serif;
+      font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
       background: var(--light);
       color: var(--text);
       min-height: 100vh;
@@ -37,43 +42,60 @@
 
     /* ── Header ── */
     header {
-      background: var(--navy);
+      background: linear-gradient(135deg, var(--navy3) 0%, var(--navy) 60%, var(--navy2) 100%);
       color: var(--white);
-      padding: 0 2rem;
+      padding: 0 2.5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 70px;
+      height: 76px;
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: 0 2px 12px rgba(0,0,0,.3);
+      box-shadow: 0 3px 20px rgba(0,0,0,.35);
     }
-    .logo-block { display: flex; align-items: center; gap: 14px; }
-    .logo-icon {
-      width: 42px; height: 42px;
-      background: var(--orange);
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 900; font-size: 1.3rem; color: var(--white);
-      letter-spacing: -1px;
+    .logo-block { display: flex; align-items: center; gap: 0; }
+    .logo-img { height: 48px; width: auto; object-fit: contain; }
+    .logo-divider { width: 1px; height: 36px; background: rgba(255,255,255,.2); margin: 0 1.25rem; }
+    .logo-text { line-height: 1.2; }
+    .logo-text strong { font-size: .9rem; letter-spacing: 1px; font-weight: 700; color: var(--white); }
+    .logo-text span { font-size: .72rem; color: #7fb3e8; font-weight: 400; }
+    .header-right { text-align: right; }
+    .header-tagline { font-size: .75rem; color: #7fb3e8; line-height: 1.5; }
+    .header-badge {
+      display: inline-block; margin-top: .3rem;
+      background: var(--orange); color: var(--white);
+      font-size: .65rem; font-weight: 700; letter-spacing: .5px;
+      padding: .2rem .6rem; border-radius: 20px;
+      text-transform: uppercase;
     }
-    .logo-text { line-height: 1.15; }
-    .logo-text strong { font-size: 1.1rem; letter-spacing: .5px; }
-    .logo-text span { font-size: .75rem; color: #94a3b8; }
-    .header-tagline { font-size: .78rem; color: #7fb3e8; text-align: right; line-height: 1.4; max-width: 260px; }
+
+    /* ── Hero banner ── */
+    .hero {
+      background: linear-gradient(135deg, var(--navy3) 0%, var(--navy) 100%);
+      color: var(--white);
+      padding: 2.5rem 2rem;
+      text-align: center;
+    }
+    .hero h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: .5rem; }
+    .hero h1 span { color: var(--orange); }
+    .hero p { font-size: .9rem; color: #94a3b8; max-width: 560px; margin: 0 auto .8rem; line-height: 1.7; }
+    .hero-steps { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; margin-top: .75rem; }
+    .hero-step { font-size: .75rem; color: #cbd5e1; display: flex; align-items: center; gap: .4rem; }
+    .hero-step .hs-num { background: var(--orange); color: var(--white); border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: .65rem; font-weight: 700; flex-shrink: 0; }
 
     /* ── Layout ── */
-    .page { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; display: grid; grid-template-columns: 1fr 340px; gap: 2rem; align-items: start; }
+    .page { max-width: 1140px; margin: 0 auto; padding: 2rem 1.5rem 4rem; display: grid; grid-template-columns: 1fr 350px; gap: 2rem; align-items: start; }
     @media(max-width:900px){ .page { grid-template-columns: 1fr; } }
 
     /* ── Card ── */
     .card {
       background: var(--white);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      box-shadow: 0 2px 16px rgba(22,38,65,.08);
       padding: 1.75rem 2rem;
       margin-bottom: 1.25rem;
+      border: 1px solid rgba(209,218,232,.6);
     }
     .card-title {
       font-size: 1rem;
@@ -82,15 +104,15 @@
       margin-bottom: 1.25rem;
       padding-bottom: .65rem;
       border-bottom: 2px solid var(--orange);
-      display: flex; align-items: center; gap: .5rem;
+      display: flex; align-items: center; gap: .6rem;
     }
     .card-title .step-badge {
-      background: var(--orange);
+      background: var(--navy);
       color: var(--white);
       border-radius: 50%;
-      width: 24px; height: 24px;
+      width: 26px; height: 26px;
       display: flex; align-items: center; justify-content: center;
-      font-size: .78rem; font-weight: 700; flex-shrink: 0;
+      font-size: .75rem; font-weight: 700; flex-shrink: 0;
     }
 
     /* ── Form elements ── */
@@ -187,14 +209,23 @@
     /* ── Sticky quote panel ── */
     .quote-panel {
       position: sticky;
-      top: 86px;
-      background: var(--navy);
+      top: 92px;
+      background: linear-gradient(170deg, var(--navy3) 0%, var(--navy) 100%);
       color: var(--white);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      box-shadow: 0 8px 32px rgba(22,38,65,.22);
       overflow: hidden;
+      border: 1px solid rgba(255,255,255,.06);
     }
-    .qp-header { background: var(--orange); padding: 1rem 1.5rem; font-weight: 700; font-size: 1rem; }
+    .qp-header {
+      background: var(--orange);
+      padding: 1rem 1.5rem;
+      font-weight: 700;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
     .qp-body { padding: 1.25rem 1.5rem; }
     .qp-line { display: flex; justify-content: space-between; align-items: flex-start; gap:.5rem; font-size: .83rem; margin-bottom: .55rem; color: #cbd5e1; }
     .qp-line .qp-label { flex: 1; }
@@ -255,14 +286,32 @@
 <!-- ════════════════════════ HEADER ════════════════════════ -->
 <header>
   <div class="logo-block">
-    <div class="logo-icon">U</div>
+    <img class="logo-img"
+      src="https://static.wixstatic.com/media/9aafc7_8e42cb6a010543249ece18aea477e809%7Emv2.png/v1/fill/w_220,h_60,q_95,usm_0.66_1.00_0.01/9aafc7_8e42cb6a010543249ece18aea477e809%7Emv2.png"
+      alt="Unleashed Solutions" />
+    <div class="logo-divider"></div>
     <div class="logo-text">
-      <strong>UNLEASHED SOLUTIONS</strong><br>
-      <span>Quote Builder</span>
+      <strong>QUOTE BUILDER</strong><br>
+      <span>Build your bespoke proposal</span>
     </div>
   </div>
-  <div class="header-tagline">Protecting your data, people and<br>reputation without complexity</div>
+  <div class="header-right">
+    <div class="header-tagline">Protecting your data, people and reputation<br>without complexity</div>
+    <span class="header-badge">Unleash Your Potential</span>
+  </div>
 </header>
+
+<!-- ════════════════════════ HERO ════════════════════════ -->
+<div class="hero">
+  <h1>Build Your <span>Custom Quote</span></h1>
+  <p>Select the services that fit your organisation and download a branded proposal in seconds. Our team will follow up within 1 business day.</p>
+  <div class="hero-steps">
+    <div class="hero-step"><span class="hs-num">1</span> Your details</div>
+    <div class="hero-step"><span class="hs-num">2</span> Users &amp; devices</div>
+    <div class="hero-step"><span class="hs-num">3</span> Choose services</div>
+    <div class="hero-step"><span class="hs-num">4</span> Download PDF</div>
+  </div>
+</div>
 
 <!-- ════════════════════════ PAGE ════════════════════════ -->
 <div class="page">
@@ -594,6 +643,13 @@
   </div>
 
 </div><!-- /page -->
+
+<!-- ════════════════════════ FOOTER ════════════════════════ -->
+<footer style="background:var(--navy3);color:#64748b;text-align:center;padding:1.5rem 1rem;font-size:.75rem;margin-top:2rem;">
+  <img src="https://static.wixstatic.com/media/9aafc7_8e42cb6a010543249ece18aea477e809%7Emv2.png/v1/fill/w_120,h_34,q_95,usm_0.66_1.00_0.01/9aafc7_8e42cb6a010543249ece18aea477e809%7Emv2.png"
+    alt="Unleashed Solutions" style="height:30px;width:auto;margin-bottom:.6rem;display:block;margin-left:auto;margin-right:auto;opacity:.7;" />
+  <div style="color:#475569;">Unleashed Solutions &nbsp;|&nbsp; <a href="https://www.teamunleashed.co.uk" target="_blank" style="color:var(--orange);text-decoration:none;">www.teamunleashed.co.uk</a> &nbsp;|&nbsp; This is a budgetary quote only — all prices exclude VAT</div>
+</footer>
 
 <!-- ════════════════════════ SCRIPT ════════════════════════ -->
 <script>
@@ -1008,7 +1064,7 @@ function buildPDF() {
   doc.setTextColor(148, 163, 184);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.5);
-  doc.text('Unleashed Solutions  |  hello@unleashedsolutions.co.uk  |  www.unleashedsolutions.co.uk', W / 2, 284, { align: 'center' });
+  doc.text('Unleashed Solutions  |  hello@unleashedsolutions.co.uk  |  www.teamunleashed.co.uk', W / 2, 284, { align: 'center' });
   doc.setTextColor(...[255,165,80]);
   doc.text('Unleash Your Potential', W / 2, 291, { align: 'center' });
 
