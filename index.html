@@ -11,6 +11,7 @@
 
   <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   <!-- EmailJS -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
@@ -335,9 +336,63 @@
     .feature-list { list-style: none; padding: 0; margin-top: .6rem; padding-top: .6rem; border-top: 1px solid var(--border); }
     .feature-list li { font-size: .73rem; color: #334155; padding: .15rem 0; display: flex; gap: .4rem; align-items: flex-start; }
     .feature-list li::before { content: '?'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+
+    /* -- Internal Sales Summary button -- */
+    .btn-sales-internal {
+      display: block; width: 100%; margin-top: .6rem;
+      padding: .55rem 1rem; border: 1px dashed #475569; border-radius: 8px;
+      background: transparent; color: #64748b; font-size: .75rem; font-weight: 600;
+      cursor: pointer; letter-spacing: .04em; transition: all .2s;
+    }
+    .btn-sales-internal:hover { background: #1e3a5f; color: #93c5fd; border-color: #1e3a5f; }
+
+    /* -- PIN modal -- */
+    .pin-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55);
+      z-index: 9999; align-items: center; justify-content: center;
+    }
+    .pin-overlay.active { display: flex; }
+    .pin-box {
+      background: #fff; border-radius: 12px; padding: 2rem; width: 340px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.3); text-align: center;
+    }
+    .pin-box h3 { color: #1e3a5f; font-size: 1rem; margin-bottom: .3rem; }
+    .pin-box p  { color: #64748b; font-size: .78rem; margin-bottom: 1.2rem; }
+    .pin-input {
+      width: 100%; padding: .65rem 1rem; border: 2px solid #dde8f4; border-radius: 8px;
+      font-size: 1rem; color: #1e3a5f; text-align: center; letter-spacing: .15em;
+      outline: none; margin-bottom: .5rem;
+    }
+    .pin-input:focus { border-color: var(--accent); }
+    .pin-error { color: #dc2626; font-size: .76rem; min-height: 1.1rem; margin-bottom: .5rem; }
+    .pin-actions { display: flex; gap: .6rem; }
+    .pin-btn-unlock {
+      flex: 1; padding: .6rem; background: #1e3a5f; color: #fff;
+      border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: .88rem;
+    }
+    .pin-btn-unlock:hover { background: #2563eb; }
+    .pin-btn-cancel {
+      flex: 1; padding: .6rem; background: #f1f5f9; color: #475569;
+      border: 1px solid #dde8f4; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: .88rem;
+    }
   </style>
 </head>
 <body>
+
+<!-- PIN Modal (internal use only – not visible to client) -->
+<div class="pin-overlay" id="pin-overlay">
+  <div class="pin-box">
+    <h3>&#x1F512; Internal Access</h3>
+    <p>Enter the sales team PIN to download the deal summary.</p>
+    <input class="pin-input" type="password" id="pin-input" placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
+      onkeydown="if(event.key==='Enter') verifySalesPin()" autocomplete="off" />
+    <div class="pin-error" id="pin-error"></div>
+    <div class="pin-actions">
+      <button class="pin-btn-unlock" onclick="verifySalesPin()">Unlock</button>
+      <button class="pin-btn-cancel" onclick="closePinModal()">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <!-- ------------------------ HEADER ------------------------ -->
 <header>
@@ -946,7 +1001,10 @@
         </div>
 
         <button class="btn-generate" id="btn-generate" onclick="generateQuote()">
-          ? Generate &amp; Download Quote
+          &#x1F4C4; Generate &amp; Download Quote
+        </button>
+        <button class="btn-sales-internal" onclick="showSalesPinModal()" title="Internal use only">
+          &#x1F512; Sales Deal Summary (Internal)
         </button>
         <div id="status-banner"></div>
         <p class="qp-note">Your quote will be sent to our team automatically. We'll follow up within 1 business day.</p>
@@ -981,6 +1039,9 @@ const CONFIG = {
   // Internal sales summary email (never shown to client)
   sales_email: 'chris.burgess@teamunleashed.co.uk',
   emailjs_sales_template_id: 'YOUR_SALES_TEMPLATE_ID', // separate template for sales summary
+
+  // PIN to unlock internal deal summary PDF (change this to your preferred PIN)
+  sales_pin: 'SalesTeamOnly!%!',
 
   // -- VCM Pricing bands (update when confirmed) --
   // Format: { '1-10': price, '10-25': price, '25-50': price, '50-100': price }
@@ -1690,6 +1751,187 @@ function showStatus(msg, type) {
   el.className = type;
   el.style.display = 'block';
   setTimeout(() => { el.style.display = 'none'; }, 8000);
+}
+
+// -- Sales PIN modal --
+function showSalesPinModal() {
+  if (!window._quoteState || window._quoteState.monthly === 0) {
+    alert('Please select at least one service before generating a sales summary.');
+    return;
+  }
+  document.getElementById('pin-input').value = '';
+  document.getElementById('pin-error').textContent = '';
+  document.getElementById('pin-overlay').classList.add('active');
+  setTimeout(() => document.getElementById('pin-input').focus(), 100);
+}
+
+function closePinModal() {
+  document.getElementById('pin-overlay').classList.remove('active');
+}
+
+function verifySalesPin() {
+  const entered = document.getElementById('pin-input').value;
+  if (entered === CONFIG.sales_pin) {
+    closePinModal();
+    buildSalesPDF();
+  } else {
+    document.getElementById('pin-error').textContent = 'Incorrect PIN – please try again.';
+    document.getElementById('pin-input').value = '';
+    document.getElementById('pin-input').focus();
+  }
+}
+
+// -- Internal Sales Summary PDF --
+function buildSalesPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const state   = window._quoteState;
+  const company = document.getElementById('client-company').value.trim() || 'Unknown';
+  const name    = document.getElementById('client-name').value.trim() || '';
+  const email   = document.getElementById('client-email').value.trim() || '';
+  const phone   = document.getElementById('client-phone').value.trim() || '\u2013';
+  const term    = document.querySelector('input[name=term]:checked')?.value || 'Annual';
+  const margin  = 14;
+  const pageW   = 297; // landscape A4
+
+  // Landscape for wider table
+  const docL = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'landscape' });
+  const pW = 297, pH = 210;
+
+  // -- Header bar --
+  docL.setFillColor(30, 58, 95);
+  docL.rect(0, 0, pW, 22, 'F');
+
+  // Logo
+  if (_logoDataUrl) {
+    docL.addImage(_logoDataUrl, 'PNG', margin, 2, 30, 18);
+  }
+
+  docL.setTextColor(255, 255, 255);
+  docL.setFontSize(13); docL.setFont('helvetica', 'bold');
+  docL.text('INTERNAL DEAL SUMMARY  \u2013  CONFIDENTIAL', pW / 2, 10, { align: 'center' });
+  docL.setFontSize(8); docL.setFont('helvetica', 'normal');
+  docL.setTextColor(147, 197, 253);
+  docL.text('Not for distribution to clients', pW / 2, 16, { align: 'center' });
+
+  // -- Client info block --
+  let y = 30;
+  docL.setTextColor(30, 58, 95);
+  docL.setFontSize(9); docL.setFont('helvetica', 'bold');
+  docL.text('Client:', margin, y);
+  docL.setFont('helvetica', 'normal');
+  docL.text(company + (name ? '  \u2013  ' + name : ''), margin + 22, y);
+  y += 6;
+  docL.setFont('helvetica', 'bold'); docL.text('Contact:', margin, y);
+  docL.setFont('helvetica', 'normal'); docL.text(email + '   |   ' + phone, margin + 22, y);
+  y += 6;
+  docL.setFont('helvetica', 'bold'); docL.text('Date:', margin, y);
+  docL.setFont('helvetica', 'normal'); docL.text(today(), margin + 22, y);
+  docL.setFont('helvetica', 'bold'); docL.text('Term:', margin + 80, y);
+  docL.setFont('helvetica', 'normal'); docL.text(term, margin + 102, y);
+  y += 10;
+
+  // -- Build table rows --
+  let totalRevenue = 0, totalCost = 0, allCostKnown = true;
+  const gbp = n => '\u00a3' + n.toFixed(2);
+
+  const tableBody = state.lines.filter(l => l.qty > 0 && l.unitPrice > 0).map(l => {
+    const rev     = l.unitPrice * l.qty;
+    const cpUnit  = COST_PRICES[l.key];
+    const costTot = cpUnit != null ? cpUnit * l.qty : null;
+    const profit  = costTot != null ? rev - costTot : null;
+    const marginP = costTot != null ? ((rev - costTot) / rev * 100).toFixed(1) + '%' : 'TBC';
+    totalRevenue += rev;
+    if (costTot != null) totalCost += costTot; else allCostKnown = false;
+    return [
+      l.label,
+      String(l.qty),
+      gbp(l.unitPrice),
+      cpUnit != null ? gbp(cpUnit) : 'TBC',
+      gbp(rev),
+      costTot != null ? gbp(costTot) : 'TBC',
+      profit != null ? gbp(profit) : 'TBC',
+      marginP
+    ];
+  });
+
+  // -- AutoTable --
+  docL.autoTable({
+    startY: y,
+    head: [['Service', 'Qty', 'Unit Sell', 'Unit Cost', 'Mo. Revenue', 'Mo. Cost', 'Mo. Profit', 'Margin']],
+    body: tableBody,
+    theme: 'grid',
+    styles: { fontSize: 8, cellPadding: 2.5, textColor: [30, 58, 95] },
+    headStyles: { fillColor: [30, 58, 95], textColor: 255, fontStyle: 'bold', halign: 'center' },
+    columnStyles: {
+      0: { cellWidth: 72 },
+      1: { halign: 'center', cellWidth: 14 },
+      2: { halign: 'right', cellWidth: 22 },
+      3: { halign: 'right', cellWidth: 22 },
+      4: { halign: 'right', cellWidth: 26 },
+      5: { halign: 'right', cellWidth: 24 },
+      6: { halign: 'right', cellWidth: 24 },
+      7: { halign: 'right', cellWidth: 20 },
+    },
+    alternateRowStyles: { fillColor: [240, 245, 251] },
+    margin: { left: margin, right: margin },
+  });
+
+  // -- Totals summary box --
+  const totalProfit  = totalRevenue - totalCost;
+  const totalMarginP = totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100).toFixed(1) : '0.0';
+  const annualRev    = totalRevenue * 12;
+  const annualProfit = totalProfit * 12;
+  const ob           = state.onboarding || 0;
+  const tbc          = allCostKnown ? '' : '*';
+
+  let sy = docL.lastAutoTable.finalY + 8;
+
+  // totals background
+  docL.setFillColor(30, 58, 95);
+  docL.roundedRect(margin, sy, pW - margin * 2, 38, 3, 3, 'F');
+
+  const col1 = margin + 6, col2 = margin + 80, col3 = margin + 148, col4 = margin + 220;
+  docL.setTextColor(147, 197, 253); docL.setFontSize(7.5); docL.setFont('helvetica', 'normal');
+  const lh = 6.5;
+
+  // Row 1 labels
+  docL.text('Monthly Revenue', col1, sy + 9);
+  docL.text('Monthly Cost',    col2, sy + 9);
+  docL.text('Monthly Profit',  col3, sy + 9);
+  docL.text('Gross Margin',    col4, sy + 9);
+
+  // Row 1 values
+  docL.setTextColor(255, 255, 255); docL.setFontSize(10); docL.setFont('helvetica', 'bold');
+  docL.text(gbp(totalRevenue),        col1, sy + 17);
+  docL.text(gbp(totalCost) + tbc,     col2, sy + 17);
+  docL.text(gbp(totalProfit) + tbc,   col3, sy + 17);
+  docL.text(totalMarginP + '%' + tbc, col4, sy + 17);
+
+  // Row 2 labels
+  docL.setTextColor(147, 197, 253); docL.setFontSize(7.5); docL.setFont('helvetica', 'normal');
+  docL.text('Annual Revenue',          col1, sy + 26);
+  docL.text('Annual Profit',           col2, sy + 26);
+  docL.text('Onboarding (one-off)',     col3, sy + 26);
+
+  // Row 2 values
+  docL.setTextColor(134, 239, 172); docL.setFontSize(10); docL.setFont('helvetica', 'bold');
+  docL.text(gbp(annualRev),                              col1, sy + 34);
+  docL.text(gbp(annualProfit) + tbc,                     col2, sy + 34);
+  docL.setTextColor(255, 255, 255);
+  docL.text(ob > 0 ? gbp(ob) : '\u2013',                col3, sy + 34);
+
+  if (!allCostKnown) {
+    docL.setTextColor(253, 230, 138); docL.setFontSize(7); docL.setFont('helvetica', 'italic');
+    docL.text('* Some service costs are TBC \u2013 totals are partial.', margin, sy + 44);
+  }
+
+  // -- Footer --
+  docL.setTextColor(100, 116, 139); docL.setFontSize(7); docL.setFont('helvetica', 'normal');
+  docL.text('UNLEASHED SOLUTIONS  |  INTERNAL USE ONLY  |  Generated ' + today(), pW / 2, pH - 6, { align: 'center' });
+
+  const blob = docL.output('blob');
+  downloadBlob(blob, `Unleashed-INTERNAL-DealSummary-${company.replace(/[^a-zA-Z0-9]/g, '-')}-${today()}.pdf`);
 }
 
 function today() {
