@@ -978,6 +978,10 @@ const CONFIG = {
   // Your notification email
   notify_email: 'chris@unleashedsolutions.co.uk',
 
+  // Internal sales summary email (never shown to client)
+  sales_email: 'chris.burgess@teamunleashed.co.uk',
+  emailjs_sales_template_id: 'YOUR_SALES_TEMPLATE_ID', // separate template for sales summary
+
   // -- VCM Pricing bands (update when confirmed) --
   // Format: { '1-10': price, '10-25': price, '25-50': price, '50-100': price }
   vcm_std: { '1-10': 120, '10-25': 170, '25-50': 250, '50-100': 350 },
@@ -1027,6 +1031,33 @@ const ADDONS = {
   'dr-hot':        { name: 'DR Data (Hot Storage)',             price: 0.08,  basis: 'qty',    unit: 'GB' },
   'compute':       { name: 'Compute Points',                    price: 0.08,  basis: 'qty',    unit: 'CP' },
   'public-ip':     { name: "Public IP's",                       price: 2.70,  basis: 'qty',    unit: 'IP' },
+};
+
+// Internal cost prices (not shown to client – used for sales summary email only)
+const COST_PRICES = {
+  'ms-std':           6.80,
+  'ms-prem':         16.25,
+  'bic-std':         18.44,
+  'bic-prem':        23.96,
+  'add-user-mailbox': 6.00,
+  'add-user-o365':    6.00,
+  'teams-telephony':  8.50,
+  'sat':              0.91,
+  'email-security':   1.30,
+  'm365-app-sec':     0.91,
+  'dlp':              1.30,
+  'spm':              0.83,
+  'ispm':             null,  // cost TBC
+  'edr':              0.50,
+  'xdr':              0.89,
+  'mdr-std':          1.45,
+  'mdr-adv':          2.40,
+  'm365-backup':      1.05,
+  'gws-backup':       0.60,
+  'data-bucket':      0.05,
+  'dr-hot':           0.04,
+  'compute':          0.04,
+  'public-ip':        1.33,
 };
 
 function getUsers()   { return Math.max(0, parseInt(document.getElementById('num-units').value)   || 0); }
@@ -1105,7 +1136,7 @@ function updatePanel() {
   if (bundle.price > 0 && users > 0) {
     const cost = bundle.price * users;
     monthly += cost;
-    lines.push({ label: bundle.name, sub: `${users} users – ${fmt(bundle.price)}`, val: fmt(cost) });
+    lines.push({ key: bundleVal, label: bundle.name, sub: `${users} users \u2013 ${fmt(bundle.price)}`, val: fmt(cost), qty: users, unitPrice: bundle.price });
   }
 
   // VCM
@@ -1120,11 +1151,11 @@ function updatePanel() {
     if (band && table[band]) {
       const cost = table[band];
       monthly += cost;
-      lines.push({ label: vcmName, sub: `Device band: ${band}`, val: fmt(cost) });
+      lines.push({ key: vcmVal, label: vcmName, sub: `Device band: ${band}`, val: fmt(cost), qty: 1, unitPrice: cost });
     } else if (devices === 0) {
-      lines.push({ label: vcmName, sub: 'Enter your device count for pricing', val: '–' });
+      lines.push({ key: vcmVal, label: vcmName, sub: 'Enter your device count for pricing', val: '\u2013' });
     } else {
-      lines.push({ label: vcmName, sub: 'Outside standard bands – contact us', val: 'TBC' });
+      lines.push({ key: vcmVal, label: vcmName, sub: 'Outside standard bands \u2013 contact us', val: 'TBC' });
     }
     // Update tile price labels
     if (band) {
@@ -1140,7 +1171,7 @@ function updatePanel() {
   if (vctoDays > 0) {
     const cost = vctoDays * 1000;
     monthly += cost;
-    lines.push({ label: 'Virtual CTO', sub: `${vctoDays} day${vctoDays !== 1 ? 's' : ''} – £1,000`, val: fmt(cost) });
+    lines.push({ key: 'vcto', label: 'Virtual CTO', sub: `${vctoDays} day${vctoDays !== 1 ? 's' : ''} \u2013 \u00a31,000`, val: fmt(cost), qty: vctoDays, unitPrice: 1000 });
     document.getElementById('vcto-total').textContent = fmt(cost) + '/month';
   } else {
     document.getElementById('vcto-total').textContent = '';
@@ -1179,7 +1210,7 @@ function updatePanel() {
     if (qty > 0) {
       const cost = addon.price * qty;
       monthly += cost;
-      lines.push({ label: addon.name, sub: `${subLabel} x ${fmt(addon.price)}`, val: fmt(cost) });
+      lines.push({ key: key, label: addon.name, sub: `${subLabel} x ${fmt(addon.price)}`, val: fmt(cost), qty: qty, unitPrice: addon.price });
     } else {
       const hint = addon.basis === 'qty' ? `Enter ${addon.unit} quantity` : `Enter quantity or set count in Step 2`;
       lines.push({ label: addon.name, sub: hint, val: '–' });
@@ -1282,6 +1313,7 @@ async function generateQuote() {
 
   try {
     await sendEmail(company, name, email);
+    await sendSalesSummaryEmail(company, name, email);
   } catch(e) {
     console.error('Email notification error:', e);
     // Don't surface this – quote already downloaded successfully
@@ -1542,6 +1574,113 @@ async function sendEmail(company, name, email) {
     contract_term: document.querySelector('input[name=term]:checked')?.value || '–',
     services_list: linesSummary,
     quote_date:    today(),
+  });
+}
+
+function buildSalesSummaryHtml(company, name, email, phone) {
+  const state = window._quoteState;
+  let totalRevenue = 0, totalCost = 0, costKnown = true;
+  const td = (content, align) => `<td style="padding:6px 10px;border:1px solid #dde8f4;${align ? 'text-align:' + align + ';' : ''}">${content}</td>`;
+  const gbp = n => '\u00a3' + n.toFixed(2);
+
+  let rows = state.lines.filter(l => l.qty > 0 && l.unitPrice > 0).map(l => {
+    const rev  = l.unitPrice * l.qty;
+    const cost = COST_PRICES[l.key] != null ? COST_PRICES[l.key] * l.qty : null;
+    const profit = cost != null ? rev - cost : null;
+    const margin = cost != null ? ((rev - cost) / rev * 100).toFixed(1) + '%' : 'TBC';
+    totalRevenue += rev;
+    if (cost != null) totalCost += cost; else costKnown = false;
+    return `<tr>
+      ${td(l.label)}
+      ${td(l.qty, 'center')}
+      ${td(gbp(l.unitPrice), 'right')}
+      ${td(COST_PRICES[l.key] != null ? gbp(COST_PRICES[l.key]) : 'TBC', 'right')}
+      ${td(gbp(rev), 'right')}
+      ${td(cost != null ? gbp(cost) : 'TBC', 'right')}
+      ${td(profit != null ? gbp(profit) : 'TBC', 'right')}
+      ${td(margin, 'right')}
+    </tr>`;
+  }).join('');
+
+  const totalProfit  = totalRevenue - totalCost;
+  const totalMargin  = totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100).toFixed(1) : '0.0';
+  const annualRevenue = totalRevenue * 12;
+  const annualProfit  = totalProfit * 12;
+  const ob = state.onboarding || 0;
+  const term = document.querySelector('input[name=term]:checked')?.value || 'Annual';
+
+  return `<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;color:#1e3a5f;max-width:900px;margin:0 auto;padding:20px;">
+  <div style="background:#1e3a5f;padding:16px 24px;border-radius:6px 6px 0 0;">
+    <h2 style="color:#ffffff;margin:0;font-size:18px;">&#x1F512; INTERNAL DEAL SUMMARY &ndash; CONFIDENTIAL</h2>
+    <p style="color:#93c5fd;margin:4px 0 0;font-size:13px;">Not for distribution to clients</p>
+  </div>
+  <div style="background:#f0f5fb;padding:14px 24px;border:1px solid #dde8f4;border-top:none;">
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <tr><td style="padding:3px 0;width:160px;color:#64748b;">Client</td><td><strong>${company}</strong> &ndash; ${name}</td></tr>
+      <tr><td style="padding:3px 0;color:#64748b;">Contact</td><td>${email} &nbsp;|&nbsp; ${phone || '&ndash;'}</td></tr>
+      <tr><td style="padding:3px 0;color:#64748b;">Quote Date</td><td>${today()}</td></tr>
+      <tr><td style="padding:3px 0;color:#64748b;">Contract Term</td><td>${term}</td></tr>
+    </table>
+  </div>
+
+  <h3 style="margin:20px 0 8px;font-size:14px;color:#1e3a5f;">Line-by-Line Breakdown</h3>
+  <table style="width:100%;border-collapse:collapse;font-size:12px;">
+    <thead>
+      <tr style="background:#1e3a5f;color:#ffffff;">
+        <th style="padding:8px 10px;text-align:left;border:1px solid #1e3a5f;">Service</th>
+        <th style="padding:8px 10px;text-align:center;border:1px solid #1e3a5f;">Qty</th>
+        <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Unit Sell</th>
+        <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Unit Cost</th>
+        <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Mo. Revenue</th>
+        <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Mo. Cost</th>
+        <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Mo. Profit</th>
+        <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Margin</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>
+
+  <div style="background:#1e3a5f;color:#ffffff;padding:14px 24px;border-radius:0 0 6px 6px;margin-top:20px;">
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <tr>
+        <td style="padding:4px 0;width:50%;"><strong>Monthly Revenue</strong></td>
+        <td style="text-align:right;">${gbp(totalRevenue)}</td>
+        <td style="padding:4px 0 4px 30px;width:50%;"><strong>Annual Revenue</strong></td>
+        <td style="text-align:right;">${gbp(annualRevenue)}</td>
+      </tr>
+      <tr>
+        <td style="padding:4px 0;"><strong>Monthly Cost</strong></td>
+        <td style="text-align:right;">${costKnown ? gbp(totalCost) : gbp(totalCost) + '*'}</td>
+        <td style="padding:4px 0 4px 30px;"><strong>Onboarding (one-off)</strong></td>
+        <td style="text-align:right;">${ob > 0 ? gbp(ob) : '&ndash;'}</td>
+      </tr>
+      <tr style="font-size:15px;">
+        <td style="padding:6px 0;"><strong>Monthly Profit</strong></td>
+        <td style="text-align:right;color:#86efac;"><strong>${costKnown ? gbp(totalProfit) : gbp(totalProfit) + '*'}</strong></td>
+        <td style="padding:6px 0 6px 30px;"><strong>Annual Profit</strong></td>
+        <td style="text-align:right;color:#86efac;"><strong>${costKnown ? gbp(annualProfit) : gbp(annualProfit) + '*'}</strong></td>
+      </tr>
+      <tr>
+        <td style="padding:4px 0;" colspan="2"><strong>Gross Margin</strong></td>
+        <td style="text-align:right;color:#fde68a;" colspan="2"><strong>${totalMargin}%${costKnown ? '' : '*'}</strong></td>
+      </tr>
+    </table>
+    ${!costKnown ? '<p style="color:#fde68a;font-size:11px;margin:8px 0 0;">* Some service costs marked TBC \u2013 totals are partial.</p>' : ''}
+  </div>
+</body></html>`;
+}
+
+async function sendSalesSummaryEmail(company, name, email) {
+  if (CONFIG.emailjs_public_key === 'YOUR_EMAILJS_PUBLIC_KEY') return;
+  if (CONFIG.emailjs_sales_template_id === 'YOUR_SALES_TEMPLATE_ID') return;
+  const phone = document.getElementById('client-phone').value || '';
+  const html  = buildSalesSummaryHtml(company, name, email, phone);
+  await emailjs.send(CONFIG.emailjs_service_id, CONFIG.emailjs_sales_template_id, {
+    to_email:       CONFIG.sales_email,
+    client_company: company,
+    client_name:    name,
+    quote_date:     today(),
+    summary_html:   html,
   });
 }
 
