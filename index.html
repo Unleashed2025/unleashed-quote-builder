@@ -279,6 +279,44 @@
     /* ── Bundle radio-grid full width ── */
     .bundle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
     @media(max-width:580px){ .bundle-grid { grid-template-columns: 1fr; } }
+
+    /* ── Routing question ── */
+    .route-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media(max-width:560px){ .route-grid { grid-template-columns: 1fr; } }
+    .route-tile input[type=radio] { display: none; }
+    .route-tile label {
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      border: 2px solid var(--border); border-radius: 10px;
+      padding: 1.6rem 1.25rem; cursor: pointer; transition: all .2s;
+      background: var(--white);
+    }
+    .route-tile input[type=radio]:checked + label {
+      border-color: var(--orange); background: #fff5ee;
+      box-shadow: 0 0 0 4px rgba(232,100,10,.12);
+    }
+    .route-icon { font-size: 2.4rem; margin-bottom: .7rem; }
+    .route-name { font-weight: 700; font-size: 1rem; color: var(--navy); margin-bottom: .4rem; }
+    .route-desc { font-size: .78rem; color: var(--muted); line-height: 1.55; }
+    .route-includes { margin-top: .75rem; padding-top: .65rem; border-top: 1px solid var(--border); width: 100%; }
+    .route-includes span {
+      display: inline-block; background: var(--light); color: var(--navy);
+      font-size: .67rem; font-weight: 600; border-radius: 4px;
+      padding: .18rem .45rem; margin: .15rem .1rem;
+    }
+
+    /* ── Conditional sections ── */
+    .conditional-section { display: none; }
+    .conditional-section.visible {
+      display: block;
+      animation: revealCard .3s ease both;
+    }
+    @keyframes revealCard {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Mode label on add-ons card ── */
+    .addons-mode-label { font-size: .75rem; font-weight: 700; color: var(--orange); margin-bottom: .25rem; }
   </style>
 </head>
 <body>
@@ -308,7 +346,7 @@
   <div class="hero-steps">
     <div class="hero-step"><span class="hs-num">1</span> Your details</div>
     <div class="hero-step"><span class="hs-num">2</span> Users &amp; devices</div>
-    <div class="hero-step"><span class="hs-num">3</span> Choose services</div>
+    <div class="hero-step"><span class="hs-num">3</span> Choose your path</div>
     <div class="hero-step"><span class="hs-num">4</span> Download PDF</div>
   </div>
 </div>
@@ -370,9 +408,48 @@
       </div>
     </div>
 
-    <!-- STEP 3 – Managed Service Bundle -->
-    <div class="card">
-      <div class="card-title"><span class="step-badge">3</span> Managed IT Service Bundle</div>
+    <!-- STEP 3 – What are you looking for? -->
+    <div class="card" id="routing-card">
+      <div class="card-title"><span class="step-badge">3</span> What are you looking for?</div>
+      <p class="section-sub">Select your path — the form will show only what's relevant to you.</p>
+      <div class="route-grid">
+
+        <div class="route-tile">
+          <input type="radio" name="svctype" id="st-managed" value="managed" onchange="setServiceType('managed')" />
+          <label for="st-managed">
+            <div class="route-icon">🛡️</div>
+            <div class="route-name">Fully Managed IT Service</div>
+            <div class="route-desc">A complete, end-to-end managed service — helpdesk, security, compliance and strategic leadership support.</div>
+            <div class="route-includes">
+              <span>Managed IT Bundle</span>
+              <span>Virtual Compliance Manager</span>
+              <span>Virtual CTO</span>
+              <span>+ Optional Add-ons</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="route-tile">
+          <input type="radio" name="svctype" id="st-standalone" value="standalone" onchange="setServiceType('standalone')" />
+          <label for="st-standalone">
+            <div class="route-icon">⚙️</div>
+            <div class="route-name">Standalone Services Only</div>
+            <div class="route-desc">Individual security and productivity tools — no full managed contract required.</div>
+            <div class="route-includes">
+              <span>SaaS Backup</span>
+              <span>Email Security</span>
+              <span>ISPM</span>
+              <span>EDR / XDR / MDR</span>
+            </div>
+          </label>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- STEP 4 – Managed Service Bundle (managed path only) -->
+    <div class="card conditional-section section-managed" id="card-bundle">
+      <div class="card-title"><span class="step-badge">4</span> Managed IT Service Bundle</div>
       <p class="section-sub">Select the bundle that best fits your needs. Prices shown per user / per month.</p>
       <div class="bundle-grid">
 
@@ -463,11 +540,11 @@
         </div>
 
       </div>
-    </div>
+    </div><!-- /card-bundle -->
 
-    <!-- STEP 4 – Virtual Compliance Manager -->
-    <div class="card">
-      <div class="card-title"><span class="step-badge">4</span> Unleashed Virtual Compliance Manager (VCM)</div>
+    <!-- STEP 5 – Virtual Compliance Manager (managed path only) -->
+    <div class="card conditional-section section-managed" id="card-vcm">
+      <div class="card-title"><span class="step-badge">5</span> Unleashed Virtual Compliance Manager (VCM)</div>
       <p class="section-sub">Fractional compliance support tailored to your organisation's size.</p>
       <div class="radio-grid">
 
@@ -501,11 +578,11 @@
       <div class="vcm-note" id="vcm-note" style="display:none">
         ⚠️ VCM pricing is indicative — our team will confirm the exact monthly cost for your user band before issuing a formal proposal.
       </div>
-    </div>
+    </div><!-- /card-vcm -->
 
-    <!-- STEP 5 – Virtual CTO -->
-    <div class="card">
-      <div class="card-title"><span class="step-badge">5</span> Unleashed Virtual CTO</div>
+    <!-- STEP 6 – Virtual CTO (managed path only) -->
+    <div class="card conditional-section section-managed" id="card-vcto">
+      <div class="card-title"><span class="step-badge">6</span> Unleashed Virtual CTO</div>
       <p class="section-sub">Strategic technology leadership on a fractional day-rate basis. £1,000 per day.</p>
       <div class="vcto-row">
         <div>
@@ -514,12 +591,12 @@
         </div>
         <div class="vcto-total" id="vcto-total"></div>
       </div>
-    </div>
+    </div><!-- /card-vcto -->
 
-    <!-- STEP 6 – Standalone Add-ons -->
-    <div class="card">
-      <div class="card-title"><span class="step-badge">6</span> Standalone Add-on Services</div>
-      <p class="section-sub">Mix and match to complete your security stack.</p>
+    <!-- STEP 7 – Standalone Add-on Services (both paths) -->
+    <div class="card conditional-section section-addons" id="card-addons">
+      <div class="card-title"><span class="step-badge" id="addons-step-num">7</span> <span id="addons-title">Standalone Add-on Services</span></div>
+      <p class="section-sub" id="addons-sub">Mix and match to complete your security stack.</p>
 
       <p style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:.6rem;">User-based (per user / month)</p>
       <div class="addon-grid" style="margin-bottom:1.1rem;">
@@ -570,17 +647,17 @@
         <label class="addon-item">
           <input type="checkbox" value="mdr" onchange="updatePanel()" />
           <div class="addon-label">
-            <div class="addon-name">24×7 MDR</div>
+            <div class="addon-name">24x7 MDR</div>
             <div class="addon-price">£5.00 / device / month</div>
             <div class="addon-base">Fully managed detection &amp; response — round-the-clock SOC coverage</div>
           </div>
         </label>
       </div>
-    </div>
+    </div><!-- /card-addons -->
 
-    <!-- STEP 7 – Onboarding -->
-    <div class="card">
-      <div class="card-title"><span class="step-badge">7</span> Onboarding</div>
+    <!-- STEP 8 – Onboarding (both paths) -->
+    <div class="card conditional-section section-common" id="card-onboarding">
+      <div class="card-title"><span class="step-badge" id="onboarding-step-num">8</span> Onboarding</div>
       <p class="section-sub">One-off upfront cost covering account setup, device enrolment, Microsoft 365 configuration and project management. Calculated automatically from your user count.</p>
       <div class="onboarding-display">
         <div class="ob-cost" id="ob-cost-display">—</div>
@@ -589,11 +666,11 @@
       <div class="vcm-note" style="margin-top:.75rem;">
         ℹ️ 150+ users? Please <strong>contact us directly</strong> for a bespoke onboarding quote.
       </div>
-    </div>
+    </div><!-- /card-onboarding -->
 
-    <!-- STEP 8 – Contract Term -->
-    <div class="card">
-      <div class="card-title"><span class="step-badge">8</span> Contract Term</div>
+    <!-- STEP 9 – Contract Term (both paths) -->
+    <div class="card conditional-section section-common" id="card-term">
+      <div class="card-title"><span class="step-badge" id="term-step-num">9</span> Contract Term</div>
       <div class="term-grid">
         <div class="term-tile">
           <input type="radio" name="term" id="term-monthly" value="Rolling Monthly" onchange="updatePanel()" />
@@ -608,7 +685,7 @@
           <label for="term-36">36 Month</label>
         </div>
       </div>
-    </div>
+    </div><!-- /card-term -->
 
   </div><!-- /form-col -->
 
@@ -702,17 +779,59 @@ function getDevices() { return Math.max(0, parseInt(document.getElementById('num
 
 function getOnboarding(users) {
   if (users <= 0)   return { cost: 0,    label: 'Enter your user count above to calculate' };
-  if (users <= 10)  return { cost: 1000, label: '1–10 users band' };
-  if (users <= 25)  return { cost: 2000, label: '11–25 users band' };
-  if (users <= 50)  return { cost: 3500, label: '26–50 users band' };
-  if (users <= 149) return { cost: 5000, label: '51–149 users band' };
-  return { cost: null, label: '150+ users — contact us for a bespoke quote' };
+  if (users <= 10)  return { cost: 1000, label: '1-10 users band' };
+  if (users <= 25)  return { cost: 2000, label: '11-25 users band' };
+  if (users <= 50)  return { cost: 3500, label: '26-50 users band' };
+  if (users <= 149) return { cost: 5000, label: '51-149 users band' };
+  return { cost: null, label: '150+ users - contact us for a bespoke quote' };
 }
+
+function getVcmBand(users) {
   if (users >=  1 && users <= 10)  return '1-10';
   if (users > 10 && users <= 25)  return '10-25';
   if (users > 25 && users <= 50)  return '25-50';
   if (users > 50 && users <= 100) return '50-100';
   return null;
+}
+
+// ── Service type routing ──
+function setServiceType(type) {
+  const managedCards = document.querySelectorAll('.section-managed');
+  const addonCard    = document.querySelector('.section-addons');
+  const commonCards  = document.querySelectorAll('.section-common');
+
+  document.querySelectorAll('.conditional-section').forEach(el => el.classList.remove('visible'));
+
+  if (type === 'managed') {
+    managedCards.forEach(el => el.classList.add('visible'));
+    addonCard.classList.add('visible');
+    commonCards.forEach(el => el.classList.add('visible'));
+    document.getElementById('addons-title').textContent = 'Optional Add-on Services';
+    document.getElementById('addons-sub').textContent = 'Enhance your managed bundle with additional standalone services.';
+    document.getElementById('addons-step-num').textContent = '7';
+    document.getElementById('onboarding-step-num').textContent = '8';
+    document.getElementById('term-step-num').textContent = '9';
+  } else {
+    // Standalone: show add-ons, onboarding, contract term only
+    addonCard.classList.add('visible');
+    commonCards.forEach(el => el.classList.add('visible'));
+    // Reset managed selections
+    document.getElementById('bundle-none').checked = true;
+    document.getElementById('vcm-none').checked = true;
+    document.getElementById('vcto-days').value = '';
+    document.getElementById('addons-title').textContent = 'Select Your Services';
+    document.getElementById('addons-sub').textContent = 'Choose the individual services you need. Mix and match across user and device-based options.';
+    document.getElementById('addons-step-num').textContent = '4';
+    document.getElementById('onboarding-step-num').textContent = '5';
+    document.getElementById('term-step-num').textContent = '6';
+  }
+
+  updatePanel();
+
+  setTimeout(() => {
+    const first = document.querySelector('.conditional-section.visible');
+    if (first) first.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 80);
 }
 
 function fmt(n) {
@@ -853,25 +972,53 @@ async function generateQuote() {
     return;
   }
 
+  // Check jsPDF loaded
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    showStatus('PDF library not loaded — please refresh the page and try again.', 'error');
+    return;
+  }
+
   const btn = document.getElementById('btn-generate');
   btn.disabled = true;
   btn.textContent = 'Generating…';
 
+  // ── Step 1: Build & download PDF ──
   try {
     const pdfBlob = buildPDF();
-    downloadBlob(pdfBlob, `Unleashed-Quote-${company.replace(/\s+/g,'-')}-${today()}.pdf`);
-    await sendEmail(company, name, email);
-    showStatus('✅ Quote downloaded! Our team has been notified and will be in touch within 1 business day.', 'success');
+    downloadBlob(pdfBlob, `Unleashed-Quote-${company.replace(/[^a-zA-Z0-9]/g,'-')}-${today()}.pdf`);
   } catch(e) {
-    console.error(e);
-    showStatus('Quote downloaded. (Email notification failed — please contact us directly.)', 'error');
-  } finally {
+    console.error('PDF generation error:', e);
+    showStatus('Could not generate PDF: ' + e.message + ' — please contact us directly.', 'error');
     btn.disabled = false;
     btn.textContent = '⬇ Generate & Download Quote';
+    return;
+  }
+
+  // ── Step 2: Notify team (non-blocking — PDF already downloaded) ──
+  showStatus('✅ Quote downloaded! Our team has been notified and will be in touch within 1 business day.', 'success');
+  btn.disabled = false;
+  btn.textContent = '⬇ Generate & Download Quote';
+
+  try {
+    await sendEmail(company, name, email);
+  } catch(e) {
+    console.error('Email notification error:', e);
+    // Don't surface this — quote already downloaded successfully
   }
 }
 
 // ── Build PDF ──
+function pdfSafe(str) {
+  // Replace characters outside Latin-1 that Helvetica can't render
+  if (!str) return '';
+  return String(str)
+    .replace(/\u2013|\u2014/g, '-')   // en/em dash → hyphen
+    .replace(/\u00d7/g, 'x')          // multiplication sign × → x
+    .replace(/[\u2018\u2019]/g, "'")  // smart single quotes
+    .replace(/[\u201c\u201d]/g, '"')  // smart double quotes
+    .replace(/[^\x00-\xFF]/g, '?');   // anything else outside Latin-1
+}
+
 function buildPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
@@ -911,7 +1058,7 @@ function buildPDF() {
 
   // Company name
   doc.setFontSize(16);
-  doc.text('UNLEASHED SOLUTIONS', margin + 26, 20);
+  doc.text(pdfSafe('UNLEASHED SOLUTIONS'), margin + 26, 20);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
   doc.setTextColor(148, 163, 184);
@@ -975,15 +1122,15 @@ function buildPDF() {
     doc.setTextColor(...text);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8.5);
-    doc.text(line.label, margin + 4, y + 6);
+    doc.text(pdfSafe(line.label), margin + 4, y + 6);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(...muted);
-    doc.text(line.sub || '', margin + 90, y + 6);
+    doc.text(pdfSafe(line.sub || ''), margin + 90, y + 6);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8.5);
     doc.setTextColor(...text);
-    doc.text(line.val, W - margin - 4, y + 6, { align: 'right' });
+    doc.text(pdfSafe(line.val), W - margin - 4, y + 6, { align: 'right' });
     rowAlt = !rowAlt;
     y += 9;
   });
@@ -997,7 +1144,7 @@ function buildPDF() {
   doc.text('MONTHLY TOTAL', margin + 4, y + 7.5);
   doc.setTextColor(...[255,165,80]);
   doc.setFontSize(11);
-  doc.text(fmt(state.monthly), W - margin - 4, y + 7.5, { align: 'right' });
+  doc.text(pdfSafe(fmt(state.monthly)), W - margin - 4, y + 7.5, { align: 'right' });
   y += 16;
 
   // Onboarding
@@ -1008,7 +1155,7 @@ function buildPDF() {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8.5);
     doc.text('One-off Onboarding Fee', margin + 4, y + 6);
-    doc.text(fmt(state.ob.cost), W - margin - 4, y + 6, { align: 'right' });
+    doc.text(pdfSafe(fmt(state.ob.cost)), W - margin - 4, y + 6, { align: 'right' });
     y += 13;
   } else if (state.ob && state.ob.cost === null) {
     doc.setFillColor(255, 248, 238);
@@ -1025,7 +1172,7 @@ function buildPDF() {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
   doc.setTextColor(...muted);
-  doc.text(`Contract term: ${term}`, margin, y);
+  doc.text(pdfSafe(`Contract term: ${term}`), margin, y);
   y += 10;
 
   // Notes
