@@ -664,6 +664,7 @@
           <div class="addon-label">
             <div class="addon-name">Security Awareness Training (SAT)</div>
             <div class="addon-price">£1.23 / user / month</div>
+            <div class="addon-base">Phishing simulations &amp; interactive training to build a human firewall</div>
             <div class="addon-qty-row">
               <input type="number" class="addon-qty" data-key="sat" placeholder="users" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
               <span class="addon-qty-label">users</span>
@@ -675,7 +676,7 @@
           <div class="addon-label">
             <div class="addon-name">Email Security</div>
             <div class="addon-price">£1.76 / mailbox / month</div>
-            <div class="addon-base">Advanced threat protection &amp; anti-phishing</div>
+            <div class="addon-base">Multi-layer protection against spam, phishing, malware &amp; business email compromise</div>
             <div class="addon-qty-row">
               <input type="number" class="addon-qty" data-key="email-security" placeholder="mailboxes" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
               <span class="addon-qty-label">mailboxes</span>
@@ -687,6 +688,7 @@
           <div class="addon-label">
             <div class="addon-name">M365 App Security</div>
             <div class="addon-price">£1.23 / user / month</div>
+            <div class="addon-base">Threat detection across Teams, SharePoint &amp; OneDrive — stops malicious files &amp; links</div>
             <div class="addon-qty-row">
               <input type="number" class="addon-qty" data-key="m365-app-sec" placeholder="users" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
               <span class="addon-qty-label">users</span>
@@ -698,6 +700,7 @@
           <div class="addon-label">
             <div class="addon-name">Data Loss Prevention (DLP)</div>
             <div class="addon-price">£1.76 / user / month</div>
+            <div class="addon-base">Monitors &amp; blocks sensitive data leaving the organisation via email, cloud or removable media</div>
             <div class="addon-qty-row">
               <input type="number" class="addon-qty" data-key="dlp" placeholder="users" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
               <span class="addon-qty-label">users</span>
@@ -709,6 +712,7 @@
           <div class="addon-label">
             <div class="addon-name">M365 Security Posture Management (SPM)</div>
             <div class="addon-price">£1.12 / user / month</div>
+            <div class="addon-base">Continuous assessment of your M365 configuration against security best practices</div>
             <div class="addon-qty-row">
               <input type="number" class="addon-qty" data-key="spm" placeholder="users" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
               <span class="addon-qty-label">users</span>
@@ -718,9 +722,9 @@
         <label class="addon-item">
           <input type="checkbox" value="ispm" onchange="updatePanel()" />
           <div class="addon-label">
-            <div class="addon-name">ISPM</div>
+            <div class="addon-name">Identity Security Posture Management (ISPM)</div>
             <div class="addon-price">£1.50 / user / month</div>
-            <div class="addon-base">Identity Security Posture Management</div>
+            <div class="addon-base">Reduces identity-based attack surface by detecting risky accounts &amp; permission gaps</div>
             <div class="addon-qty-row">
               <input type="number" class="addon-qty" data-key="ispm" placeholder="users" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
               <span class="addon-qty-label">users</span>
@@ -734,9 +738,9 @@
         <label class="addon-item">
           <input type="checkbox" value="edr" onchange="updatePanel()" />
           <div class="addon-label">
-            <div class="addon-name">EDR</div>
+            <div class="addon-name">EDR – Endpoint Detection &amp; Response</div>
             <div class="addon-price">£0.68 / device / month</div>
-            <div class="addon-base">Endpoint detection &amp; response</div>
+            <div class="addon-base">Real-time behavioural analysis to detect, contain &amp; remediate endpoint threats</div>
             <div class="addon-qty-row">
               <input type="number" class="addon-qty" data-key="edr" placeholder="devices" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
               <span class="addon-qty-label">devices</span>
@@ -746,9 +750,9 @@
         <label class="addon-item">
           <input type="checkbox" value="xdr" onchange="updatePanel()" />
           <div class="addon-label">
-            <div class="addon-name">XDR</div>
+            <div class="addon-name">XDR – Extended Detection &amp; Response</div>
             <div class="addon-price">£1.20 / device / month</div>
-            <div class="addon-base">Extended detection &amp; response</div>
+            <div class="addon-base">Unified threat detection across endpoints, email, identity &amp; cloud in one platform</div>
             <div class="addon-qty-row">
               <input type="number" class="addon-qty" data-key="xdr" placeholder="devices" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
               <span class="addon-qty-label">devices</span>
@@ -805,6 +809,7 @@
           <div class="addon-label">
             <div class="addon-name">M365 Backup</div>
             <div class="addon-price">£1.42 / seat / month</div>
+            <div class="addon-base">Automated backup of Exchange, Teams, SharePoint &amp; OneDrive with point-in-time recovery</div>
             <div class="addon-qty-row">
               <input type="number" class="addon-qty" data-key="m365-backup" placeholder="seats" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
               <span class="addon-qty-label">seats</span>
@@ -814,8 +819,9 @@
         <label class="addon-item">
           <input type="checkbox" value="gws-backup" onchange="updatePanel()" />
           <div class="addon-label">
-            <div class="addon-name">GWS Backup</div>
+            <div class="addon-name">Google Workspace Backup</div>
             <div class="addon-price">£0.81 / seat / month</div>
+            <div class="addon-base">Automated backup of Gmail, Drive, Contacts &amp; Calendar with granular restore</div>
             <div class="addon-qty-row">
               <input type="number" class="addon-qty" data-key="gws-backup" placeholder="seats" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
               <span class="addon-qty-label">seats</span>
@@ -831,7 +837,7 @@
           <div class="addon-label">
             <div class="addon-name">Data Bucket</div>
             <div class="addon-price">£0.07 / GB / month</div>
-            <div class="addon-base">Servers, Machines, M365, GWS</div>
+            <div class="addon-base">Scalable cloud storage for backups — covers servers, machines, M365 &amp; Google Workspace</div>
             <div class="addon-qty-row">
               <input type="number" class="addon-qty" data-key="data-bucket" placeholder="0" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
               <span class="addon-qty-label">GB</span>
@@ -848,6 +854,7 @@
           <div class="addon-label">
             <div class="addon-name">DR Data (Hot Storage)</div>
             <div class="addon-price">£0.05 / GB / month</div>
+            <div class="addon-base">Always-on storage for rapid failover — keeps your DR environment ready to spin up instantly</div>
             <div class="addon-qty-row">
               <input type="number" class="addon-qty" data-key="dr-hot" placeholder="0" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
               <span class="addon-qty-label">GB</span>
@@ -859,6 +866,7 @@
           <div class="addon-label">
             <div class="addon-name">Compute Points</div>
             <div class="addon-price">£0.05 / CP / month</div>
+            <div class="addon-base">Cloud compute resources allocated to run your workloads during a disaster recovery failover</div>
             <div class="addon-qty-row">
               <input type="number" class="addon-qty" data-key="compute" placeholder="0" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
               <span class="addon-qty-label">Compute Points</span>
@@ -870,6 +878,7 @@
           <div class="addon-label">
             <div class="addon-name">Public IP's</div>
             <div class="addon-price">£1.80 / IP / month</div>
+            <div class="addon-base">Dedicated public IP addresses for failed-over workloads to remain accessible during a DR event</div>
             <div class="addon-qty-row">
               <input type="number" class="addon-qty" data-key="public-ip" placeholder="0" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
               <span class="addon-qty-label">IPs</span>
