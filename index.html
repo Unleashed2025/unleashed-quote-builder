@@ -330,7 +330,9 @@
     /* ── Mode label on add-ons card ── */
     .addons-mode-label { font-size: .75rem; font-weight: 700; color: var(--orange); margin-bottom: .25rem; }
 
-    /* ── Feature list ── */
+    /* ── Bundle overview blurb ── */
+    .tile-overview { font-size: .74rem; color: #7da5c8; line-height: 1.5; margin: .4rem 0 .55rem; padding-bottom: .5rem; border-bottom: 1px solid rgba(100,160,220,0.12); }
+    .tile-requirement { display: inline-flex; align-items: center; gap: .3rem; font-size: .7rem; font-weight: 700; color: #7fb3e8; background: rgba(26,86,219,0.18); border: 1px solid rgba(100,160,220,0.25); border-radius: 4px; padding: .2rem .5rem; margin-bottom: .45rem; }
     .feature-list { list-style: none; padding: 0; margin-top: .6rem; padding-top: .6rem; border-top: 1px solid rgba(100,160,220,0.12); }
     .feature-list li { font-size: .73rem; color: #b8d4ec; padding: .15rem 0; display: flex; gap: .4rem; align-items: flex-start; }
     .feature-list li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
@@ -470,21 +472,13 @@
       <p class="section-sub">Select the bundle that best fits your needs. Prices shown per user / per month.</p>
       <div class="bundle-grid">
 
-        <div class="radio-tile none-tile">
-          <input type="radio" name="bundle" id="bundle-none" value="none" checked onchange="updatePanel()" />
-          <label for="bundle-none">
-            <div class="tile-name">No Bundle</div>
-            <div class="tile-price">—</div>
-            <div class="tile-desc">I'll choose standalone services only.</div>
-          </label>
-        </div>
-
         <div class="radio-tile">
           <input type="radio" name="bundle" id="bundle-ms-std" value="ms-std" onchange="updatePanel()" />
           <label for="bundle-ms-std">
             <span class="tile-tag ms">MICROSOFT MANAGED</span>
-            <div class="tile-name">Standard</div>
-            <div class="tile-price">£20 / user / month</div>
+            <div class="tile-name">Standard &nbsp;–&nbsp; £20 / user / month</div>
+            <div class="tile-requirement">⚠️ Requires Microsoft 365 Business Standard</div>
+            <div class="tile-overview">A single-vendor approach that consolidates your IT support, Microsoft 365 management and core security into one simple monthly cost. Reduce complexity, eliminate multiple supplier invoices and benefit from a dedicated team who know your environment inside-out.</div>
             <ul class="tile-features">
               <li><span class="fc">✓</span> Unlimited remote support (9:00–17:30)</li>
               <li><span class="fc">✓</span> Office 365, Windows &amp; Mac support</li>
@@ -501,8 +495,9 @@
           <input type="radio" name="bundle" id="bundle-ms-prem" value="ms-prem" onchange="updatePanel()" />
           <label for="bundle-ms-prem">
             <span class="tile-tag ms">MICROSOFT MANAGED</span>
-            <div class="tile-name">Premium</div>
-            <div class="tile-price">£30 / user / month</div>
+            <div class="tile-name">Premium &nbsp;–&nbsp; £30 / user / month</div>
+            <div class="tile-requirement">⚠️ Requires Microsoft 365 Business Premium</div>
+            <div class="tile-overview">Everything in Standard, with the full power of Microsoft 365 Business Premium unlocked. Advanced device management, endpoint security and cloud-native threat protection — all delivered and monitored by Unleashed as one consolidated, cost-efficient service.</div>
             <ul class="tile-features">
               <li><span class="fc">✓</span> Everything in Standard, plus:</li>
               <li><span class="fc">✓</span> Device monitoring, reporting &amp; patching</li>
@@ -521,16 +516,17 @@
           <input type="radio" name="bundle" id="bundle-bic-std" value="bic-std" onchange="updatePanel()" />
           <label for="bundle-bic-std">
             <span class="tile-tag bic">BEST IN CLASS</span>
-            <div class="tile-name">Standard</div>
-            <div class="tile-price">£30 / user / month</div>
+            <div class="tile-name">Standard &nbsp;–&nbsp; £30 / user / month</div>
+            <div class="tile-requirement">⚠️ Requires Microsoft 365 Business Standard</div>
+            <div class="tile-overview">Combines the breadth of Microsoft 365 with best-in-class third-party security technology. Rather than relying on a single vendor, we select the right tool for each security layer — all centrally managed by Unleashed for rapid detection, response and remediation from a single pane of glass.</div>
             <ul class="tile-features">
               <li><span class="fc">✓</span> Unlimited remote support (9:00–17:30)</li>
               <li><span class="fc">✓</span> Office 365, Windows &amp; Mac support</li>
               <li><span class="fc">✓</span> Bi-annual health check</li>
               <li><span class="fc">✓</span> ISPM &amp; breach alerts</li>
               <li><span class="fc">✓</span> MFA / Conditional Access</li>
-              <li><span class="fc">✓</span> Anti-Virus / XDR &amp; MDR — threat hunting across endpoints</li>
-              <li><span class="fc">✓</span> SaaS Backup &amp; email security</li>
+              <li><span class="fc">✓</span> Best-in-class XDR &amp; MDR — 24/7 threat hunting across endpoints</li>
+              <li><span class="fc">✓</span> SaaS Backup &amp; advanced email security</li>
               <li><span class="fc">✓</span> Dedicated success manager &amp; service reviews</li>
             </ul>
           </label>
@@ -540,14 +536,15 @@
           <input type="radio" name="bundle" id="bundle-bic-prem" value="bic-prem" onchange="updatePanel()" />
           <label for="bundle-bic-prem">
             <span class="tile-tag bic">BEST IN CLASS</span>
-            <div class="tile-name">Premium</div>
-            <div class="tile-price">£40 / user / month</div>
+            <div class="tile-name">Premium &nbsp;–&nbsp; £40 / user / month</div>
+            <div class="tile-requirement">⚠️ Requires Microsoft 365 Business Premium</div>
+            <div class="tile-overview">Our most comprehensive protection. Microsoft 365 Business Premium combined with market-leading third-party tools — each selected for its strength in a specific domain. Every tool is centrally managed by Unleashed, giving you faster service, quicker threat response and full-lifecycle remediation without managing multiple vendors.</div>
             <ul class="tile-features">
               <li><span class="fc">✓</span> Everything in Standard, plus:</li>
               <li><span class="fc">✓</span> Device monitoring, reporting &amp; patching</li>
               <li><span class="fc">✓</span> Asset &amp; inventory reporting</li>
               <li><span class="fc">✓</span> Intune, Conditional Access &amp; Entra ID</li>
-              <li><span class="fc">✓</span> Email security &amp; phishing training</li>
+              <li><span class="fc">✓</span> Email security &amp; phishing awareness training</li>
               <li><span class="fc">✓</span> DLP — data loss prevention across email, endpoints &amp; cloud</li>
               <li><span class="fc">✓</span> Microsoft 365 Application Protection</li>
               <li><span class="fc">✓</span> Digital &amp; cyber security roadmap</li>
@@ -956,7 +953,7 @@ function setServiceType(type) {
     addonCard.classList.add('visible');
     commonCards.forEach(el => el.classList.add('visible'));
     // Reset managed selections
-    document.getElementById('bundle-none').checked = true;
+    document.querySelectorAll('input[name=bundle]').forEach(r => r.checked = false);
     document.getElementById('vcm-none').checked = true;
     document.getElementById('vcto-days').value = '';
     document.getElementById('addons-title').textContent = 'Select Your Services';
