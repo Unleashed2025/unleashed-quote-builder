@@ -413,9 +413,10 @@
   <p>Select the services that fit your organisation and download a branded proposal in seconds. Our team will follow up within 1 business day.</p>
   <div class="hero-steps">
     <div class="hero-step"><span class="hs-num">1</span> Your details</div>
-    <div class="hero-step"><span class="hs-num">2</span> Users &amp; devices</div>
-    <div class="hero-step"><span class="hs-num">3</span> Choose your path</div>
-    <div class="hero-step"><span class="hs-num">4</span> Download PDF</div>
+    <div class="hero-step"><span class="hs-num">2</span> Organisation type</div>
+    <div class="hero-step"><span class="hs-num">3</span> Users &amp; devices</div>
+    <div class="hero-step"><span class="hs-num">4</span> Choose services</div>
+    <div class="hero-step"><span class="hs-num">5</span> Download PDF</div>
   </div>
 </div>
 
@@ -456,11 +457,34 @@
       </div>
     </div>
 
-    <!-- STEP 2 – Service Units -->
-    <div class="card">
-      <div class="card-title"><span class="step-badge">2</span> How Many Service Units Do You Require?</div>
-      <div class="vcm-note" style="margin-bottom:1rem;">
-        ?? Our managed services are quoted as <strong>1 service unit = 1 user with 1 corporate device</strong>. Enter the total number of users (and their devices) you need to cover.
+    <!-- STEP 2 – Company Type -->
+    <div class="card" id="card-company-type">
+      <div class="card-title"><span class="step-badge">2</span> What type of organisation are you?</div>
+      <div class="route-grid">
+        <div class="route-tile">
+          <input type="radio" name="orgtype" id="org-commercial" value="commercial" checked onchange="setOrgType('commercial')" />
+          <label for="org-commercial">
+            <div class="route-icon">🏢</div>
+            <div class="route-name">Commercial</div>
+            <div class="route-desc">PLC, LTD company or Sole Trader.</div>
+          </label>
+        </div>
+        <div class="route-tile">
+          <input type="radio" name="orgtype" id="org-nonprofit" value="nonprofit" onchange="setOrgType('nonprofit')" />
+          <label for="org-nonprofit">
+            <div class="route-icon">🤝</div>
+            <div class="route-name">Non-Profit / School</div>
+            <div class="route-desc">Charity, academy, school or non-profit organisation. Eligible for a 5% discount on all IT services.</div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3 – Service Units -->
+    <div class="card" id="card-service-units">
+      <div class="card-title"><span class="step-badge">3</span> How Many Service Units Do You Require?</div>
+      <div class="vcm-note" id="service-unit-note" style="margin-bottom:1rem;">
+        💡 Our managed services are priced per <strong>service unit</strong> — 1 service unit = 1 user + 1 corporate device.
       </div>
       <div class="form-row single">
         <div>
@@ -470,9 +494,9 @@
       </div>
     </div>
 
-    <!-- STEP 3 – What are you looking for? -->
+    <!-- STEP 4 – What are you looking for? -->
     <div class="card" id="routing-card">
-      <div class="card-title"><span class="step-badge">3</span> What are you looking for?</div>
+      <div class="card-title"><span class="step-badge">4</span> What are you looking for?</div>
       <p class="section-sub">Select your path – the form will show only what's relevant to you.</p>
       <div class="route-grid">
 
@@ -509,9 +533,90 @@
       </div>
     </div>
 
-    <!-- STEP 4 – Managed Service Bundle (managed path only) -->
+    <div class="card conditional-section section-common" id="card-ms365">
+      <div class="card-title"><span class="step-badge">5</span> Microsoft 365 Licensing (Optional)</div>
+      <p class="section-sub">Add Microsoft 365 licensing to your quote and we’ll price it separately based on your organisation type.</p>
+      <label class="addon-item" style="margin-bottom:1rem;">
+        <input type="checkbox" id="ms365-enabled" onchange="toggleMs365Options(); updatePanel()" />
+        <div class="addon-label">
+          <div class="addon-name">Add Microsoft 365 licensing to your quote?</div>
+          <div class="addon-base">Commercial and non-profit pricing is shown automatically when you change organisation type.</div>
+        </div>
+      </label>
+      <div id="ms365-options" style="display:none;">
+        <div class="radio-grid" style="margin-bottom:1rem;">
+          <div class="radio-tile">
+            <input type="radio" name="ms365-license" id="ms365-license-std" value="std" onchange="updatePanel()" />
+            <label for="ms365-license-std">
+              <div class="tile-name">Microsoft 365 Business Standard</div>
+              <div class="tile-price" id="ms365-std-price">£9.00/user/mo</div>
+              <div class="tile-desc">Ideal for organisations needing desktop Office apps, Exchange, Teams and SharePoint.</div>
+            </label>
+          </div>
+          <div class="radio-tile">
+            <input type="radio" name="ms365-license" id="ms365-license-prem" value="prem" onchange="updatePanel()" />
+            <label for="ms365-license-prem">
+              <div class="tile-name">Microsoft 365 Business Premium</div>
+              <div class="tile-price" id="ms365-prem-price">£16.00/user/mo</div>
+              <div class="tile-desc">Adds advanced security, device management and compliance capabilities.</div>
+            </label>
+          </div>
+        </div>
+        <div class="form-row single">
+          <div>
+            <label for="ms365-license-qty">Number of users / licences</label>
+            <input type="number" id="ms365-license-qty" min="0" placeholder="e.g. 25" oninput="updatePanel()" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card conditional-section section-common" id="card-network">
+      <div class="card-title"><span class="step-badge">6</span> Managed Network (Optional)</div>
+      <p class="section-sub">Add fully managed network hardware as monthly line items on your quote.</p>
+      <div class="addon-grid">
+        <label class="addon-item">
+          <input type="checkbox" value="net-firewall" onchange="updatePanel()" />
+          <div class="addon-label">
+            <div class="addon-name">Managed Firewall</div>
+            <div class="addon-price">£25.00 / device / month</div>
+            <div class="addon-base">Managed perimeter security, updates and monitoring.</div>
+            <div class="addon-qty-row">
+              <input type="number" class="addon-qty" data-key="net-firewall" placeholder="devices" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
+              <span class="addon-qty-label">devices</span>
+            </div>
+          </div>
+        </label>
+        <label class="addon-item">
+          <input type="checkbox" value="net-switch" onchange="updatePanel()" />
+          <div class="addon-label">
+            <div class="addon-name">Managed Switch</div>
+            <div class="addon-price">£20.00 / device / month</div>
+            <div class="addon-base">Managed switching with monitoring and lifecycle oversight.</div>
+            <div class="addon-qty-row">
+              <input type="number" class="addon-qty" data-key="net-switch" placeholder="devices" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
+              <span class="addon-qty-label">devices</span>
+            </div>
+          </div>
+        </label>
+        <label class="addon-item">
+          <input type="checkbox" value="net-wifi" onchange="updatePanel()" />
+          <div class="addon-label">
+            <div class="addon-name">Managed Wi-Fi Access Point</div>
+            <div class="addon-price">£10.00 / AP / month</div>
+            <div class="addon-base">Managed wireless coverage, monitoring and support.</div>
+            <div class="addon-qty-row">
+              <input type="number" class="addon-qty" data-key="net-wifi" placeholder="APs" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
+              <span class="addon-qty-label">APs</span>
+            </div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- STEP 7 – Managed Service Bundle (managed path only) -->
     <div class="card conditional-section section-managed" id="card-bundle">
-      <div class="card-title"><span class="step-badge">4</span> Managed IT Service Bundle</div>
+      <div class="card-title"><span class="step-badge">7</span> Managed IT Service Bundle</div>
       <p class="section-sub">Select the bundle that best fits your needs. All bundles are priced per user per month, based on <strong style="color:#7fb3e8">1 user with 1 corporate device</strong>.</p>
       <div class="bundle-grid">
 
@@ -519,7 +624,7 @@
           <input type="radio" name="bundle" id="bundle-ms-std" value="ms-std" onchange="updatePanel()" />
           <label for="bundle-ms-std">
             <span class="tile-tag ms">MICROSOFT MANAGED</span>
-            <div class="tile-name">Standard &nbsp;–&nbsp; £20 / user / month</div>
+            <div class="tile-name">Standard &nbsp;–&nbsp; £22.50 / user / month</div>
             <div class="tile-requirement">⚠️ Requires Microsoft 365 Business Standard</div>
             <div class="tile-overview">A single-vendor approach that consolidates your IT support, Microsoft 365 management and core security into one simple monthly cost. Reduce complexity, eliminate multiple supplier invoices and benefit from a dedicated team who know your environment inside-out.</div>
             <ul class="tile-features">
@@ -538,7 +643,7 @@
           <input type="radio" name="bundle" id="bundle-ms-prem" value="ms-prem" onchange="updatePanel()" />
           <label for="bundle-ms-prem">
             <span class="tile-tag ms">MICROSOFT MANAGED</span>
-            <div class="tile-name">Premium &nbsp;–&nbsp; £30 / user / month</div>
+            <div class="tile-name">Premium &nbsp;–&nbsp; £35.00 / user / month</div>
             <div class="tile-requirement">⚠️ Requires Microsoft 365 Business Premium</div>
             <div class="tile-overview">Everything in Standard, with the full power of Microsoft 365 Business Premium unlocked. Advanced device management, endpoint security and cloud-native threat protection – all delivered and monitored by Unleashed as one consolidated, cost-efficient service.</div>
             <ul class="tile-features">
@@ -559,7 +664,7 @@
           <input type="radio" name="bundle" id="bundle-bic-std" value="bic-std" onchange="updatePanel()" />
           <label for="bundle-bic-std">
             <span class="tile-tag bic">BEST IN CLASS</span>
-            <div class="tile-name">Standard &nbsp;–&nbsp; £30 / user / month</div>
+            <div class="tile-name">Standard &nbsp;–&nbsp; £37.50 / user / month</div>
             <div class="tile-requirement">⚠️ Requires Microsoft 365 Business Standard</div>
             <div class="tile-overview">Combines the breadth of Microsoft 365 with best-in-class third-party security technology. Rather than relying on a single vendor, we select the right tool for each security layer – all centrally managed by Unleashed for rapid detection, response and remediation from a single pane of glass.</div>
             <ul class="tile-features">
@@ -580,7 +685,7 @@
           <input type="radio" name="bundle" id="bundle-bic-prem" value="bic-prem" onchange="updatePanel()" />
           <label for="bundle-bic-prem">
             <span class="tile-tag bic">BEST IN CLASS</span>
-            <div class="tile-name">Premium &nbsp;–&nbsp; £40 / user / month</div>
+            <div class="tile-name">Premium &nbsp;–&nbsp; £50.00 / user / month</div>
             <div class="tile-requirement">⚠️ Requires Microsoft 365 Business Premium</div>
             <div class="tile-overview">Our most comprehensive protection. Microsoft 365 Business Premium combined with market-leading third-party tools – each selected for its strength in a specific domain. Every tool is centrally managed by Unleashed, giving you faster service, quicker threat response and full-lifecycle remediation without managing multiple vendors.</div>
             <ul class="tile-features">
@@ -603,7 +708,7 @@
 
     <!-- STEP 5 – Virtual Compliance Manager (managed path only) -->
     <div class="card conditional-section section-managed" id="card-vcm">
-      <div class="card-title"><span class="step-badge">5</span> Unleashed Virtual Compliance Manager (VCM)</div>
+      <div class="card-title"><span class="step-badge">8</span> Unleashed Virtual Compliance Manager (VCM)</div>
       <p class="section-sub">Priced by device band per month – based on your total number of <strong style="color:#7fb3e8">user devices</strong> (laptops, desktops, tablets).</p>
       <div class="radio-grid">
 
@@ -648,7 +753,7 @@
 
     <!-- STEP 6 – Virtual CTO (managed path only) -->
     <div class="card conditional-section section-managed" id="card-vcto">
-      <div class="card-title"><span class="step-badge">6</span> Unleashed Virtual CTO</div>
+      <div class="card-title"><span class="step-badge">9</span> Unleashed Virtual CTO</div>
       <p class="section-sub">Strategic technology leadership on a fractional day-rate basis. £1,000 per day.</p>
       <div class="vcto-row">
         <div>
@@ -661,7 +766,7 @@
 
     <!-- STEP 7 – Standalone Add-on Services (both paths) -->
     <div class="card conditional-section section-addons" id="card-addons">
-      <div class="card-title"><span class="step-badge" id="addons-step-num">7</span> <span id="addons-title">Standalone Add-on Services</span></div>
+      <div class="card-title"><span class="step-badge" id="addons-step-num">10</span> <span id="addons-title">Standalone Add-on Services</span></div>
       <p class="section-sub" id="addons-sub">We understand you may have additional devices, mailboxes or users who require support – please use the services below to calculate any additional requirements. Enter a custom quantity for each service, or leave blank to use your service unit count.</p>
 
       <!-- Additional User Support -->
@@ -942,7 +1047,7 @@
 
     <!-- STEP 8 – Onboarding (both paths) -->
     <div class="card conditional-section section-common" id="card-onboarding">
-      <div class="card-title"><span class="step-badge" id="onboarding-step-num">8</span> Onboarding</div>
+      <div class="card-title"><span class="step-badge" id="onboarding-step-num">11</span> Onboarding</div>
       <p class="section-sub">One-off upfront cost covering account setup, device enrolment, Microsoft 365 configuration and project management. Calculated automatically from your service unit count.</p>
       <div class="onboarding-display">
         <div class="ob-cost" id="ob-cost-display">–</div>
@@ -955,7 +1060,7 @@
 
     <!-- STEP 9 – Contract Term (both paths) -->
     <div class="card conditional-section section-common" id="card-term">
-      <div class="card-title"><span class="step-badge" id="term-step-num">9</span> Contract Term</div>
+      <div class="card-title"><span class="step-badge" id="term-step-num">12</span> Contract Term</div>
       <div class="term-grid">
         <div class="term-tile">
           <input type="radio" name="term" id="term-monthly" value="Rolling Monthly" onchange="updatePanel()" />
@@ -1053,19 +1158,28 @@ if (CONFIG.emailjs_public_key !== 'YOUR_EMAILJS_PUBLIC_KEY') {
 // Bundle prices
 const BUNDLES = {
   'none':     { name: null, price: 0 },
-  'ms-std':   { name: 'Microsoft Managed – Standard', price: 20 },
-  'ms-prem':  { name: 'Microsoft Managed – Premium',  price: 30 },
-  'bic-std':  { name: 'Best in Class – Standard',     price: 30 },
-  'bic-prem': { name: 'Best in Class – Premium',      price: 40 },
+  'ms-std':   { name: 'Microsoft Managed – Standard', price: 22.50 },
+  'ms-prem':  { name: 'Microsoft Managed – Premium',  price: 35.00 },
+  'bic-std':  { name: 'Best in Class – Standard',     price: 37.50 },
+  'bic-prem': { name: 'Best in Class – Premium',      price: 50.00 },
 };
 
 // Addon prices
 const ADDONS = {
   // Additional User Support
-  'add-user-mailbox': { name: 'Additional User - Mailbox Only',         price: 10.00, basis: 'user', unit: 'users' },
-  'add-user-o365':    { name: 'Additional User - Office 365 Cloud Only', price: 15.00, basis: 'user', unit: 'users' },
+  'add-user-mailbox':  { name: 'Additional User - Mailbox Only',          price: 10.00, basis: 'user',   unit: 'users' },
+  'add-user-o365':     { name: 'Additional User - Office 365 Cloud Only', price: 15.00, basis: 'user',   unit: 'users' },
+  // Microsoft Licensing (prices set dynamically by org type)
+  'ms365-biz-std-comm':  { name: 'M365 Business Standard (Commercial)', price: 9.00,  basis: 'qty',    unit: 'licences', noDiscount: true },
+  'ms365-biz-std-nfp':   { name: 'M365 Business Standard (Non-Profit)', price: 2.30,  basis: 'qty',    unit: 'licences', noDiscount: true },
+  'ms365-biz-prem-comm': { name: 'M365 Business Premium (Commercial)',  price: 16.00, basis: 'qty',    unit: 'licences', noDiscount: true },
+  'ms365-biz-prem-nfp':  { name: 'M365 Business Premium (Non-Profit)',  price: 4.30,  basis: 'qty',    unit: 'licences', noDiscount: true },
+  // Managed Network
+  'net-firewall':      { name: 'Managed Firewall',                        price: 25.00, basis: 'qty',    unit: 'devices' },
+  'net-switch':        { name: 'Managed Switch',                          price: 20.00, basis: 'qty',    unit: 'devices' },
+  'net-wifi':          { name: 'Managed Wi-Fi Access Point',              price: 10.00, basis: 'qty',    unit: 'APs' },
   // Telephony
-  'teams-telephony': { name: 'Microsoft Teams Telephony', price: 12.50, basis: 'user',   unit: 'users' },
+  'teams-telephony':   { name: 'Microsoft Teams Telephony',               price: 12.50, basis: 'user',   unit: 'users' },
   // Cyber Security – per user
   'sat':           { name: 'Security Awareness Training (SAT)', price: 1.50,  basis: 'user',   unit: 'users' },
   'email-security':{ name: 'Email Security',                    price: 2.60,  basis: 'user',   unit: 'mailboxes' },
@@ -1097,6 +1211,13 @@ const COST_PRICES = {
   'bic-prem':        24.79,
   'add-user-mailbox': 6.80,
   'add-user-o365':    6.80,
+  'ms365-biz-std-comm':  8.31,
+  'ms365-biz-std-nfp':   2.24,
+  'ms365-biz-prem-comm': 14.64,
+  'ms365-biz-prem-nfp':  4.09,
+  'net-firewall':       10.00,
+  'net-switch':         10.00,
+  'net-wifi':            5.00,
   'teams-telephony':  8.00,
   'sat':              0.91,
   'email-security':   1.30,
@@ -1125,6 +1246,77 @@ const VCM_COST_BANDS = {
 
 function getUsers()   { return Math.max(0, parseInt(document.getElementById('num-units').value)   || 0); }
 function getDevices() { return Math.max(0, parseInt(document.getElementById('num-units').value)   || 0); }
+
+let currentOrgType = 'commercial'; // 'commercial' or 'nonprofit'
+
+function setOrgType(type) {
+  currentOrgType = type;
+  updateMsLicensePrices();
+  updatePanel();
+}
+
+function toggleMs365Options() {
+  const enabled = document.getElementById('ms365-enabled')?.checked;
+  const options = document.getElementById('ms365-options');
+  if (options) options.style.display = enabled ? 'block' : 'none';
+}
+
+function updateMsLicensePrices() {
+  const isNfp = currentOrgType === 'nonprofit';
+  const stdKey  = isNfp ? 'ms365-biz-std-nfp'  : 'ms365-biz-std-comm';
+  const premKey = isNfp ? 'ms365-biz-prem-nfp' : 'ms365-biz-prem-comm';
+  const stdPrice  = ADDONS[stdKey].price;
+  const premPrice = ADDONS[premKey].price;
+  const stdEl  = document.getElementById('ms365-std-price');
+  const premEl = document.getElementById('ms365-prem-price');
+  if (stdEl)  stdEl.textContent  = fmt(stdPrice)  + '/user/mo';
+  if (premEl) premEl.textContent = fmt(premPrice) + '/user/mo';
+}
+
+function getSelectedMsLicenseKey() {
+  const selected = document.querySelector('input[name=ms365-license]:checked')?.value;
+  if (selected === 'std')  return currentOrgType === 'nonprofit' ? 'ms365-biz-std-nfp'  : 'ms365-biz-std-comm';
+  if (selected === 'prem') return currentOrgType === 'nonprofit' ? 'ms365-biz-prem-nfp' : 'ms365-biz-prem-comm';
+  return null;
+}
+
+function getLineCostInfo(line) {
+  let unitCost = COST_PRICES[line.key];
+  if (unitCost == null && line.vcmBand && VCM_COST_BANDS[line.key]) {
+    unitCost = VCM_COST_BANDS[line.key][line.vcmBand];
+  }
+  const totalCost = unitCost != null && line.qty > 0 ? unitCost * line.qty : null;
+  return { unitCost, totalCost };
+}
+
+function getLineDiscount(line, orgType = currentOrgType) {
+  if (!line || !line.amount || orgType !== 'nonprofit' || line.noDiscount) return 0;
+  return line.amount * 0.05;
+}
+
+function getFinancialSummary(lines, orgType = currentOrgType) {
+  return lines
+    .filter(line => line.qty > 0 && line.unitPrice > 0 && line.amount > 0)
+    .reduce((acc, line) => {
+      const gross = line.amount;
+      const discount = getLineDiscount(line, orgType);
+      const net = gross - discount;
+      const { unitCost, totalCost } = getLineCostInfo(line);
+      const profit = totalCost != null ? net - totalCost : null;
+      const marginPct = totalCost != null && net > 0 ? ((profit / net) * 100) : null;
+      acc.gross += gross;
+      acc.discount += discount;
+      acc.net += net;
+      if (totalCost != null) {
+        acc.cost += totalCost;
+      } else {
+        acc.allCostKnown = false;
+      }
+      if (profit != null) acc.profit += profit;
+      acc.rows.push({ line, gross, discount, net, unitCost, totalCost, profit, marginPct });
+      return acc;
+    }, { gross: 0, discount: 0, net: 0, cost: 0, profit: 0, allCostKnown: true, rows: [] });
+}
 
 function getOnboarding(units) {
   if (units <= 0)   return { cost: 0,    internalCost: 0,    label: 'Enter your service unit count above to calculate' };
@@ -1158,22 +1350,20 @@ function setServiceType(type) {
     commonCards.forEach(el => el.classList.add('visible'));
     document.getElementById('addons-title').textContent = 'Optional Add-on Services';
     document.getElementById('addons-sub').textContent = 'Enhance your managed bundle with additional standalone services.';
-    document.getElementById('addons-step-num').textContent = '7';
-    document.getElementById('onboarding-step-num').textContent = '8';
-    document.getElementById('term-step-num').textContent = '9';
+    document.getElementById('addons-step-num').textContent = '10';
+    document.getElementById('onboarding-step-num').textContent = '11';
+    document.getElementById('term-step-num').textContent = '12';
   } else {
-    // Standalone: show add-ons, onboarding, contract term only
     addonCard.classList.add('visible');
     commonCards.forEach(el => el.classList.add('visible'));
-    // Reset managed selections
     document.querySelectorAll('input[name=bundle]').forEach(r => r.checked = false);
     document.getElementById('vcm-none').checked = true;
     document.getElementById('vcto-days').value = '';
     document.getElementById('addons-title').textContent = 'Select Your Services';
     document.getElementById('addons-sub').textContent = 'Choose the individual services you need. Mix and match across user and device-based options.';
-    document.getElementById('addons-step-num').textContent = '4';
-    document.getElementById('onboarding-step-num').textContent = '5';
-    document.getElementById('term-step-num').textContent = '6';
+    document.getElementById('addons-step-num').textContent = '7';
+    document.getElementById('onboarding-step-num').textContent = '8';
+    document.getElementById('term-step-num').textContent = '9';
   }
 
   updatePanel();
@@ -1192,56 +1382,71 @@ function updatePanel() {
   const users   = getUsers();
   const devices = getDevices();
   const lines   = [];
-  let monthly   = 0;
+  let monthlySubtotal = 0;
 
-  // Bundle
+  const pushPricedLine = (line) => {
+    line.amount = line.amount || 0;
+    line.val = fmt(line.amount);
+    line.noDiscount = !!line.noDiscount;
+    monthlySubtotal += line.amount;
+    lines.push(line);
+  };
+
   const bundleVal = document.querySelector('input[name=bundle]:checked')?.value || 'none';
   const bundle = BUNDLES[bundleVal];
   if (bundle.price > 0 && users > 0) {
-    const cost = bundle.price * users;
-    monthly += cost;
-    lines.push({ key: bundleVal, label: bundle.name, sub: `${users} users \u2013 ${fmt(bundle.price)}`, val: fmt(cost), qty: users, unitPrice: bundle.price });
+    const amount = bundle.price * users;
+    pushPricedLine({ key: bundleVal, label: bundle.name, sub: `${users} users – ${fmt(bundle.price)}`, qty: users, unitPrice: bundle.price, amount });
   }
 
-  // VCM
+  const ms365Enabled = document.getElementById('ms365-enabled')?.checked;
+  if (ms365Enabled) {
+    const msKey = getSelectedMsLicenseKey();
+    const msQty = parseInt(document.getElementById('ms365-license-qty')?.value) || 0;
+    if (msKey && msQty > 0) {
+      const addon = ADDONS[msKey];
+      const amount = addon.price * msQty;
+      pushPricedLine({ key: msKey, label: addon.name, sub: `${msQty} licences x ${fmt(addon.price)}`, qty: msQty, unitPrice: addon.price, amount, noDiscount: true });
+    } else if (msKey || msQty > 0) {
+      const addon = msKey ? ADDONS[msKey] : null;
+      lines.push({ key: msKey || 'ms365-license', label: addon ? addon.name : 'Microsoft 365 Licensing', sub: msKey ? 'Enter licence quantity' : 'Choose a Microsoft 365 licence', val: '–' });
+    }
+  }
+
   const vcmVal = document.querySelector('input[name=vcm]:checked')?.value || 'none';
   const vcmNote = document.querySelector('.vcm-note[id="vcm-band-note"]');
   const band = getVcmBand(devices);
+
+  if (band) {
+    document.getElementById('vcm-std-price').textContent  = fmt(CONFIG.vcm_std[band])  + '/mo';
+    document.getElementById('vcm-prem-price').textContent = fmt(CONFIG.vcm_prem[band]) + '/mo';
+  }
 
   if (vcmVal !== 'none') {
     if (vcmNote) vcmNote.style.display = 'none';
     const table = vcmVal === 'vcm-std' ? CONFIG.vcm_std : CONFIG.vcm_prem;
     const vcmName = vcmVal === 'vcm-std' ? 'Virtual Compliance Manager – Standard' : 'Virtual Compliance Manager – Premium';
     if (band && table[band]) {
-      const cost = table[band];
-      monthly += cost;
-      lines.push({ key: vcmVal, label: vcmName, sub: `Device band: ${band}`, val: fmt(cost), qty: 1, unitPrice: cost, vcmBand: band });
+      const amount = table[band];
+      pushPricedLine({ key: vcmVal, label: vcmName, sub: `Device band: ${band}`, qty: 1, unitPrice: amount, amount, vcmBand: band });
     } else if (devices === 0) {
-      lines.push({ key: vcmVal, label: vcmName, sub: 'Enter your device count for pricing', val: '\u2013' });
+      lines.push({ key: vcmVal, label: vcmName, sub: 'Enter your device count for pricing', val: '–' });
     } else {
-      lines.push({ key: vcmVal, label: vcmName, sub: 'Outside standard bands \u2013 contact us', val: 'TBC' });
+      lines.push({ key: vcmVal, label: vcmName, sub: 'Outside standard bands – contact us', val: 'TBC' });
     }
-    // Update tile price labels
-    if (band) {
-      document.getElementById('vcm-std-price').textContent  = fmt(CONFIG.vcm_std[band])  + '/mo';
-      document.getElementById('vcm-prem-price').textContent = fmt(CONFIG.vcm_prem[band]) + '/mo';
-    }
-  } else {
-    if (vcmNote) vcmNote.style.display = 'none';
+  } else if (vcmNote) {
+    vcmNote.style.display = 'none';
   }
 
-  // vCTO
   const vctoDays = parseInt(document.getElementById('vcto-days').value) || 0;
   if (vctoDays > 0) {
-    const cost = vctoDays * 1000;
-    monthly += cost;
-    lines.push({ key: 'vcto', label: 'Virtual CTO', sub: `${vctoDays} day${vctoDays !== 1 ? 's' : ''} \u2013 \u00a31,000`, val: fmt(cost), qty: vctoDays, unitPrice: 1000 });
-    document.getElementById('vcto-total').textContent = fmt(cost) + '/month';
+    const amount = vctoDays * 1000;
+    pushPricedLine({ key: 'vcto', label: 'Virtual CTO', sub: `${vctoDays} day${vctoDays !== 1 ? 's' : ''} – £1,000`, qty: vctoDays, unitPrice: 1000, amount });
+    document.getElementById('vcto-total').textContent = fmt(amount) + '/month';
   } else {
     document.getElementById('vcto-total').textContent = '';
   }
 
-  // Addons – update placeholders then calculate
   const globalDefaults = { user: users, device: devices };
   document.querySelectorAll('.addon-item').forEach(item => {
     const qtyEl = item.querySelector('.addon-qty');
@@ -1272,16 +1477,19 @@ function updatePanel() {
       subLabel = `${qty} ${unitLabel}`;
     }
     if (qty > 0) {
-      const cost = addon.price * qty;
-      monthly += cost;
-      lines.push({ key: key, label: addon.name, sub: `${subLabel} x ${fmt(addon.price)}`, val: fmt(cost), qty: qty, unitPrice: addon.price });
+      const amount = addon.price * qty;
+      pushPricedLine({ key, label: addon.name, sub: `${subLabel} x ${fmt(addon.price)}`, qty, unitPrice: addon.price, amount, noDiscount: !!addon.noDiscount });
     } else {
-      const hint = addon.basis === 'qty' ? `Enter ${addon.unit} quantity` : `Enter quantity or set count in Step 2`;
+      const hint = addon.basis === 'qty' ? `Enter ${addon.unit} quantity` : `Enter quantity or set count in Step 3`;
       lines.push({ label: addon.name, sub: hint, val: '–' });
     }
   });
 
-  // Render lines
+  const discountTotal = currentOrgType === 'nonprofit'
+    ? lines.reduce((sum, line) => sum + getLineDiscount(line, currentOrgType), 0)
+    : 0;
+  const monthly = monthlySubtotal - discountTotal;
+
   const container = document.getElementById('qp-lines');
   if (lines.length === 0) {
     container.innerHTML = '<div class="qp-empty">Select services above to see your live pricing.</div>';
@@ -1290,21 +1498,26 @@ function updatePanel() {
       <div class="qp-line">
         <div class="qp-label">
           <div style="color:#e2e8f0;font-weight:600;font-size:.84rem;">${l.label}</div>
-          <div style="color:#64748b;font-size:.74rem;">${l.sub}</div>
+          <div style="color:#64748b;font-size:.74rem;">${l.sub || ''}</div>
         </div>
         <div class="qp-val">${l.val}</div>
       </div>
-    `).join('');
+    `).join('') + (discountTotal > 0 ? `
+      <div class="qp-line">
+        <div class="qp-label">
+          <div style="color:#e2e8f0;font-weight:600;font-size:.84rem;">🎓 Non-Profit Discount (5%)</div>
+          <div style="color:#64748b;font-size:.74rem;">Applied to eligible IT services only</div>
+        </div>
+        <div class="qp-val">-${fmt(discountTotal)}</div>
+      </div>
+    ` : '');
   }
 
-  // Total
   document.getElementById('qp-total').textContent = fmt(monthly);
 
-  // Term label
   const term = document.querySelector('input[name=term]:checked')?.value || 'Annual';
   document.getElementById('qp-term-label').textContent = term + ' contract';
 
-  // Onboarding (auto-calculated by user band)
   const ob = getOnboarding(users);
   const obCostEl = document.getElementById('ob-cost-display');
   const obBandEl = document.getElementById('ob-band-display');
@@ -1328,9 +1541,8 @@ function updatePanel() {
     obRow.style.display = 'none';
   }
 
-  // Store for PDF
   const onboarding = ob.cost || 0;
-  window._quoteState = { users, devices, bundle, vcmVal, band, vctoDays, monthly, lines, onboarding, ob, term };
+  window._quoteState = { users, devices, bundle, vcmVal, band, vctoDays, monthlySubtotal, discountTotal, monthly, lines, onboarding, ob, term, currentOrgType };
 }
 
 // -- Generate Quote (PDF + Email) --
@@ -1446,6 +1658,8 @@ function buildPDF() {
   const cphone  = document.getElementById('client-phone').value.trim();
   const cnotes  = document.getElementById('client-notes').value.trim();
   const term    = document.querySelector('input[name=term]:checked')?.value || 'Annual';
+  const orgTypeLabel = state.currentOrgType === 'nonprofit' ? 'Non-Profit / School' : 'Commercial';
+  const financials = getFinancialSummary(state.lines, state.currentOrgType);
 
   // -- Header block --
   doc.setFillColor(...navy);
@@ -1490,7 +1704,7 @@ function buildPDF() {
 
   // -- Client block --
   doc.setFillColor(...light);
-  doc.rect(margin, y, W - margin * 2, 28, 'F');
+  doc.rect(margin, y, W - margin * 2, 32, 'F');
   doc.setTextColor(...navy);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
@@ -1502,7 +1716,8 @@ function buildPDF() {
   doc.setFontSize(8.5);
   doc.setTextColor(...muted);
   doc.text(`${cname}${cemail ? '  |  ' + cemail : ''}${cphone ? '  |  ' + cphone : ''}`, margin + 5, y + 22);
-  y += 36;
+  doc.text(`Organisation type: ${orgTypeLabel}`, margin + 5, y + 28);
+  y += 40;
 
   // -- Services table --
   doc.setFont('helvetica', 'bold');
@@ -1551,11 +1766,35 @@ function buildPDF() {
   doc.setTextColor(...white);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
-  doc.text('MONTHLY TOTAL', margin + 4, y + 7.5);
+  doc.text(state.discountTotal > 0 ? 'MONTHLY SUBTOTAL' : 'MONTHLY TOTAL', margin + 4, y + 7.5);
   doc.setTextColor(...accent);
   doc.setFontSize(11);
-  doc.text(pdfSafe(fmt(state.monthly)), W - margin - 4, y + 7.5, { align: 'right' });
-  y += 16;
+  doc.text(pdfSafe(fmt(financials.gross)), W - margin - 4, y + 7.5, { align: 'right' });
+  y += 13;
+
+  if (state.discountTotal > 0) {
+    doc.setFillColor(238, 244, 255);
+    doc.rect(margin, y, W - margin * 2, 9, 'F');
+    doc.setTextColor(...navy);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.text('Non-Profit Discount (5%)', margin + 4, y + 6);
+    doc.text(pdfSafe('-' + fmt(state.discountTotal)), W - margin - 4, y + 6, { align: 'right' });
+    y += 11;
+
+    doc.setFillColor(...navy);
+    doc.rect(margin, y, W - margin * 2, 11, 'F');
+    doc.setTextColor(...white);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text('DISCOUNTED MONTHLY TOTAL', margin + 4, y + 7.5);
+    doc.setTextColor(...accent);
+    doc.setFontSize(11);
+    doc.text(pdfSafe(fmt(state.monthly)), W - margin - 4, y + 7.5, { align: 'right' });
+    y += 16;
+  } else {
+    y += 3;
+  }
 
   // Onboarding
   if (state.ob && state.ob.cost !== null && state.ob.cost > 0) {
@@ -1658,45 +1897,45 @@ async function sendEmail(company, name, email) {
 
 function buildSalesSummaryHtml(company, name, email, phone) {
   const state = window._quoteState;
-  let totalRevenue = 0, totalCost = 0, costKnown = true;
+  const financials = getFinancialSummary(state.lines, state.currentOrgType);
   const td = (content, align) => `<td style="padding:6px 10px;border:1px solid #dde8f4;${align ? 'text-align:' + align + ';' : ''}">${content}</td>`;
   const gbp = n => '\u00a3' + n.toFixed(2);
+  const term = document.querySelector('input[name=term]:checked')?.value || 'Annual';
+  const orgTypeLabel = state.currentOrgType === 'nonprofit' ? 'Non-Profit / School' : 'Commercial';
+  const tbc = financials.allCostKnown ? '' : '*';
 
-  let rows = state.lines.filter(l => l.qty > 0 && l.unitPrice > 0).map(l => {
-    const rev  = l.unitPrice * l.qty;
-    const cost = COST_PRICES[l.key] != null ? COST_PRICES[l.key] * l.qty : null;
-    const profit = cost != null ? rev - cost : null;
-    const margin = cost != null ? ((rev - cost) / rev * 100).toFixed(1) + '%' : 'TBC';
-    totalRevenue += rev;
-    if (cost != null) totalCost += cost; else costKnown = false;
+  const rows = financials.rows.map(({ line, gross, discount, net, unitCost, totalCost, profit, marginPct }) => {
+    const margin = profit != null && net > 0 ? marginPct.toFixed(1) + '%' : 'TBC';
     return `<tr>
-      ${td(l.label)}
-      ${td(l.qty, 'center')}
-      ${td(gbp(l.unitPrice), 'right')}
-      ${td(COST_PRICES[l.key] != null ? gbp(COST_PRICES[l.key]) : 'TBC', 'right')}
-      ${td(gbp(rev), 'right')}
-      ${td(cost != null ? gbp(cost) : 'TBC', 'right')}
+      ${td(line.label)}
+      ${td(line.qty, 'center')}
+      ${td(gbp(line.unitPrice), 'right')}
+      ${td(unitCost != null ? gbp(unitCost) : 'TBC', 'right')}
+      ${td(gbp(gross), 'right')}
+      ${td(discount > 0 ? '-' + gbp(discount) : '–', 'right')}
+      ${td(gbp(net), 'right')}
+      ${td(totalCost != null ? gbp(totalCost) : 'TBC', 'right')}
       ${td(profit != null ? gbp(profit) : 'TBC', 'right')}
       ${td(margin, 'right')}
     </tr>`;
   }).join('');
 
-  const totalProfit  = totalRevenue - totalCost;
-  const totalMargin  = totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100).toFixed(1) : '0.0';
-  const annualRevenue = totalRevenue * 12;
-  const annualProfit  = totalProfit * 12;
+  const annualNetRevenue = financials.net * 12;
+  const annualProfit  = financials.profit * 12;
   const ob = state.onboarding || 0;
-  const term = document.querySelector('input[name=term]:checked')?.value || 'Annual';
+  const obCost = (state.ob && state.ob.internalCost != null) ? state.ob.internalCost : null;
+  const obProfit = (ob > 0 && obCost != null) ? ob - obCost : null;
 
-  return `<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;color:#1e3a5f;max-width:900px;margin:0 auto;padding:20px;">
+  return `<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;color:#1e3a5f;max-width:980px;margin:0 auto;padding:20px;">
   <div style="background:#1e3a5f;padding:16px 24px;border-radius:6px 6px 0 0;">
     <h2 style="color:#ffffff;margin:0;font-size:18px;">&#x1F512; INTERNAL DEAL SUMMARY &ndash; CONFIDENTIAL</h2>
     <p style="color:#93c5fd;margin:4px 0 0;font-size:13px;">Not for distribution to clients</p>
   </div>
   <div style="background:#f0f5fb;padding:14px 24px;border:1px solid #dde8f4;border-top:none;">
     <table style="width:100%;border-collapse:collapse;font-size:13px;">
-      <tr><td style="padding:3px 0;width:160px;color:#64748b;">Client</td><td><strong>${company}</strong> &ndash; ${name}</td></tr>
+      <tr><td style="padding:3px 0;width:180px;color:#64748b;">Client</td><td><strong>${company}</strong> &ndash; ${name}</td></tr>
       <tr><td style="padding:3px 0;color:#64748b;">Contact</td><td>${email} &nbsp;|&nbsp; ${phone || '&ndash;'}</td></tr>
+      <tr><td style="padding:3px 0;color:#64748b;">Organisation Type</td><td>${orgTypeLabel}</td></tr>
       <tr><td style="padding:3px 0;color:#64748b;">Quote Date</td><td>${today()}</td></tr>
       <tr><td style="padding:3px 0;color:#64748b;">Contract Term</td><td>${term}</td></tr>
     </table>
@@ -1710,7 +1949,9 @@ function buildSalesSummaryHtml(company, name, email, phone) {
         <th style="padding:8px 10px;text-align:center;border:1px solid #1e3a5f;">Qty</th>
         <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Unit Sell</th>
         <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Unit Cost</th>
-        <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Mo. Revenue</th>
+        <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Gross Rev</th>
+        <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Discount</th>
+        <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Net Rev</th>
         <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Mo. Cost</th>
         <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Mo. Profit</th>
         <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Margin</th>
@@ -1722,29 +1963,37 @@ function buildSalesSummaryHtml(company, name, email, phone) {
   <div style="background:#1e3a5f;color:#ffffff;padding:14px 24px;border-radius:0 0 6px 6px;margin-top:20px;">
     <table style="width:100%;border-collapse:collapse;font-size:13px;">
       <tr>
-        <td style="padding:4px 0;width:50%;"><strong>Monthly Revenue</strong></td>
-        <td style="text-align:right;">${gbp(totalRevenue)}</td>
-        <td style="padding:4px 0 4px 30px;width:50%;"><strong>Annual Revenue</strong></td>
-        <td style="text-align:right;">${gbp(annualRevenue)}</td>
+        <td style="padding:4px 0;width:50%;"><strong>Monthly Gross Revenue</strong></td>
+        <td style="text-align:right;">${gbp(financials.gross)}</td>
+        <td style="padding:4px 0 4px 30px;width:50%;"><strong>Annual Net Revenue</strong></td>
+        <td style="text-align:right;">${gbp(annualNetRevenue)}</td>
       </tr>
       <tr>
-        <td style="padding:4px 0;"><strong>Monthly Cost</strong></td>
-        <td style="text-align:right;">${costKnown ? gbp(totalCost) : gbp(totalCost) + '*'}</td>
+        <td style="padding:4px 0;"><strong>Monthly Discount</strong></td>
+        <td style="text-align:right;">${financials.discount > 0 ? '-' + gbp(financials.discount) : '&ndash;'}</td>
         <td style="padding:4px 0 4px 30px;"><strong>Onboarding (one-off)</strong></td>
         <td style="text-align:right;">${ob > 0 ? gbp(ob) : '&ndash;'}</td>
       </tr>
+      <tr>
+        <td style="padding:4px 0;"><strong>Monthly Net Revenue</strong></td>
+        <td style="text-align:right;">${gbp(financials.net)}</td>
+        <td style="padding:4px 0 4px 30px;"><strong>Monthly Cost</strong></td>
+        <td style="text-align:right;">${financials.allCostKnown ? gbp(financials.cost) : gbp(financials.cost) + '*'}</td>
+      </tr>
       <tr style="font-size:15px;">
         <td style="padding:6px 0;"><strong>Monthly Profit</strong></td>
-        <td style="text-align:right;color:#86efac;"><strong>${costKnown ? gbp(totalProfit) : gbp(totalProfit) + '*'}</strong></td>
+        <td style="text-align:right;color:#86efac;"><strong>${financials.allCostKnown ? gbp(financials.profit) : gbp(financials.profit) + '*'}</strong></td>
         <td style="padding:6px 0 6px 30px;"><strong>Annual Profit</strong></td>
-        <td style="text-align:right;color:#86efac;"><strong>${costKnown ? gbp(annualProfit) : gbp(annualProfit) + '*'}</strong></td>
+        <td style="text-align:right;color:#86efac;"><strong>${financials.allCostKnown ? gbp(annualProfit) : gbp(annualProfit) + '*'}</strong></td>
       </tr>
       <tr>
-        <td style="padding:4px 0;" colspan="2"><strong>Gross Margin</strong></td>
-        <td style="text-align:right;color:#fde68a;" colspan="2"><strong>${totalMargin}%${costKnown ? '' : '*'}</strong></td>
+        <td style="padding:4px 0;"><strong>Gross Margin</strong></td>
+        <td style="text-align:right;color:#fde68a;"><strong>${financials.net > 0 ? ((financials.profit / financials.net) * 100).toFixed(1) : '0.0'}%${tbc}</strong></td>
+        <td style="padding:4px 0 4px 30px;"><strong>Onboarding Cost / Profit</strong></td>
+        <td style="text-align:right;">${obCost != null ? gbp(obCost) : '&ndash;'} / ${obProfit != null ? gbp(obProfit) : '&ndash;'}</td>
       </tr>
     </table>
-    ${!costKnown ? '<p style="color:#fde68a;font-size:11px;margin:8px 0 0;">* Some service costs marked TBC \u2013 totals are partial.</p>' : ''}
+    ${!financials.allCostKnown ? '<p style="color:#fde68a;font-size:11px;margin:8px 0 0;">* Some service costs marked TBC \u2013 totals are partial.</p>' : ''}
   </div>
 </body></html>`;
 }
@@ -1802,7 +2051,6 @@ function verifySalesPin() {
 // -- Internal Sales Summary PDF --
 function buildSalesPDF() {
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const state   = window._quoteState;
   const company = document.getElementById('client-company').value.trim() || 'Unknown';
   const name    = document.getElementById('client-name').value.trim() || '';
@@ -1810,9 +2058,9 @@ function buildSalesPDF() {
   const phone   = document.getElementById('client-phone').value.trim() || '\u2013';
   const term    = document.querySelector('input[name=term]:checked')?.value || 'Annual';
   const margin  = 14;
-  const pageW   = 297; // landscape A4
+  const orgTypeLabel = state.currentOrgType === 'nonprofit' ? 'Non-Profit / School' : 'Commercial';
+  const financials = getFinancialSummary(state.lines, state.currentOrgType);
 
-  // Landscape for wider table
   const docL = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'landscape' });
   const pW = 297, pH = 210;
 
@@ -1847,117 +2095,100 @@ function buildSalesPDF() {
   docL.setFont('helvetica', 'normal'); docL.text(today(), margin + 22, y);
   docL.setFont('helvetica', 'bold'); docL.text('Term:', margin + 80, y);
   docL.setFont('helvetica', 'normal'); docL.text(term, margin + 102, y);
+  docL.setFont('helvetica', 'bold'); docL.text('Org Type:', margin + 150, y);
+  docL.setFont('helvetica', 'normal'); docL.text(orgTypeLabel, margin + 178, y);
   y += 10;
 
-  // -- Build table rows --
-  let totalRevenue = 0, totalCost = 0, allCostKnown = true;
   const gbp = n => '\u00a3' + n.toFixed(2);
+  const tbc = financials.allCostKnown ? '' : '*';
 
-  const tableBody = state.lines.filter(l => l.qty > 0 && l.unitPrice > 0).map(l => {
-    const rev     = l.unitPrice * l.qty;
-    // VCM costs are band-based, not flat — look up from VCM_COST_BANDS
-    let cpUnit = COST_PRICES[l.key];
-    if (cpUnit == null && l.vcmBand && VCM_COST_BANDS[l.key]) {
-      cpUnit = VCM_COST_BANDS[l.key][l.vcmBand];
-    }
-    const costTot = cpUnit != null ? cpUnit * l.qty : null;
-    const profit  = costTot != null ? rev - costTot : null;
-    const marginP = costTot != null ? ((rev - costTot) / rev * 100).toFixed(1) + '%' : 'TBC';
-    totalRevenue += rev;
-    if (costTot != null) totalCost += costTot; else allCostKnown = false;
-    return [
-      l.label,
-      String(l.qty),
-      gbp(l.unitPrice),
-      cpUnit != null ? gbp(cpUnit) : 'TBC',
-      gbp(rev),
-      costTot != null ? gbp(costTot) : 'TBC',
-      profit != null ? gbp(profit) : 'TBC',
-      marginP
-    ];
-  });
+  const tableBody = financials.rows.map(({ line, gross, discount, net, unitCost, totalCost, profit, marginPct }) => [
+    pdfSafe(line.label),
+    String(line.qty),
+    gbp(line.unitPrice),
+    unitCost != null ? gbp(unitCost) : 'TBC',
+    gbp(gross),
+    discount > 0 ? '-' + gbp(discount) : '–',
+    gbp(net),
+    totalCost != null ? gbp(totalCost) : 'TBC',
+    profit != null ? gbp(profit) : 'TBC',
+    profit != null && net > 0 ? marginPct.toFixed(1) + '%' : 'TBC'
+  ]);
 
   // -- AutoTable --
   docL.autoTable({
     startY: y,
-    head: [['Service', 'Qty', 'Unit Sell', 'Unit Cost', 'Mo. Revenue', 'Mo. Cost', 'Mo. Profit', 'Margin']],
+    head: [['Service', 'Qty', 'Unit Sell', 'Unit Cost', 'Gross Rev', 'Discount', 'Net Rev', 'Mo. Cost', 'Mo. Profit', 'Margin']],
     body: tableBody,
     theme: 'grid',
-    styles: { fontSize: 8, cellPadding: 2.5, textColor: [30, 58, 95] },
+    styles: { fontSize: 7.5, cellPadding: 2.2, textColor: [30, 58, 95] },
     headStyles: { fillColor: [30, 58, 95], textColor: 255, fontStyle: 'bold', halign: 'center' },
     columnStyles: {
-      0: { cellWidth: 72 },
-      1: { halign: 'center', cellWidth: 14 },
-      2: { halign: 'right', cellWidth: 22 },
-      3: { halign: 'right', cellWidth: 22 },
-      4: { halign: 'right', cellWidth: 26 },
-      5: { halign: 'right', cellWidth: 24 },
-      6: { halign: 'right', cellWidth: 24 },
-      7: { halign: 'right', cellWidth: 20 },
+      0: { cellWidth: 66 },
+      1: { halign: 'center', cellWidth: 12 },
+      2: { halign: 'right', cellWidth: 20 },
+      3: { halign: 'right', cellWidth: 20 },
+      4: { halign: 'right', cellWidth: 21 },
+      5: { halign: 'right', cellWidth: 18 },
+      6: { halign: 'right', cellWidth: 21 },
+      7: { halign: 'right', cellWidth: 21 },
+      8: { halign: 'right', cellWidth: 21 },
+      9: { halign: 'right', cellWidth: 17 },
     },
     alternateRowStyles: { fillColor: [240, 245, 251] },
     margin: { left: margin, right: margin },
   });
 
-  // -- Totals summary box --
-  const totalProfit  = totalRevenue - totalCost;
-  const totalMarginP = totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100).toFixed(1) : '0.0';
-  const annualRev    = totalRevenue * 12;
-  const annualProfit = totalProfit * 12;
+  const annualNetRevenue = financials.net * 12;
+  const annualProfit = financials.profit * 12;
   const ob           = state.onboarding || 0;
   const obCost       = (state.ob && state.ob.internalCost != null) ? state.ob.internalCost : null;
   const obProfit     = (ob > 0 && obCost != null) ? ob - obCost : null;
-  const tbc          = allCostKnown ? '' : '*';
 
   let sy = docL.lastAutoTable.finalY + 8;
 
-  // totals background — taller to fit onboarding row
   docL.setFillColor(30, 58, 95);
-  docL.roundedRect(margin, sy, pW - margin * 2, 52, 3, 3, 'F');
+  docL.roundedRect(margin, sy, pW - margin * 2, 54, 3, 3, 'F');
 
-  const col1 = margin + 6, col2 = margin + 80, col3 = margin + 148, col4 = margin + 220;
+  const col1 = margin + 6, col2 = margin + 76, col3 = margin + 146, col4 = margin + 216;
   docL.setTextColor(147, 197, 253); docL.setFontSize(7.5); docL.setFont('helvetica', 'normal');
-  const lh = 6.5;
+  docL.text('Monthly Gross Revenue', col1, sy + 9);
+  docL.text('Monthly Discount',      col2, sy + 9);
+  docL.text('Monthly Net Revenue',   col3, sy + 9);
+  docL.text('Monthly Cost',          col4, sy + 9);
 
-  // Row 1 labels
-  docL.text('Monthly Revenue', col1, sy + 9);
-  docL.text('Monthly Cost',    col2, sy + 9);
-  docL.text('Monthly Profit',  col3, sy + 9);
-  docL.text('Gross Margin',    col4, sy + 9);
-
-  // Row 1 values
   docL.setTextColor(255, 255, 255); docL.setFontSize(10); docL.setFont('helvetica', 'bold');
-  docL.text(gbp(totalRevenue),        col1, sy + 17);
-  docL.text(gbp(totalCost) + tbc,     col2, sy + 17);
-  docL.text(gbp(totalProfit) + tbc,   col3, sy + 17);
-  docL.text(totalMarginP + '%' + tbc, col4, sy + 17);
+  docL.text(gbp(financials.gross),                                   col1, sy + 17);
+  docL.text(financials.discount > 0 ? '-' + gbp(financials.discount) : '–', col2, sy + 17);
+  docL.text(gbp(financials.net),                                     col3, sy + 17);
+  docL.text(gbp(financials.cost) + tbc,                              col4, sy + 17);
 
-  // Row 2 labels
   docL.setTextColor(147, 197, 253); docL.setFontSize(7.5); docL.setFont('helvetica', 'normal');
-  docL.text('Annual Revenue',  col1, sy + 28);
-  docL.text('Annual Profit',   col2, sy + 28);
+  docL.text('Monthly Profit',       col1, sy + 29);
+  docL.text('Gross Margin',         col2, sy + 29);
+  docL.text('Annual Net Revenue',   col3, sy + 29);
+  docL.text('Annual Profit',        col4, sy + 29);
 
-  // Row 2 values
   docL.setTextColor(134, 239, 172); docL.setFontSize(10); docL.setFont('helvetica', 'bold');
-  docL.text(gbp(annualRev),            col1, sy + 36);
-  docL.text(gbp(annualProfit) + tbc,   col2, sy + 36);
+  docL.text(gbp(financials.profit) + tbc,                            col1, sy + 37);
+  docL.text(((financials.net > 0 ? (financials.profit / financials.net) * 100 : 0).toFixed(1)) + '%' + tbc, col2, sy + 37);
+  docL.text(gbp(annualNetRevenue),                                   col3, sy + 37);
+  docL.text(gbp(annualProfit) + tbc,                                 col4, sy + 37);
 
-  // Row 3 labels — onboarding
   docL.setTextColor(147, 197, 253); docL.setFontSize(7.5); docL.setFont('helvetica', 'normal');
-  docL.text('Onboarding (Sell)',   col1, sy + 44);
-  docL.text('Onboarding (Cost)',   col2, sy + 44);
-  docL.text('Onboarding (Profit)', col3, sy + 44);
+  docL.text('Onboarding (Sell)',    col1, sy + 47);
+  docL.text('Onboarding (Cost)',    col2, sy + 47);
+  docL.text('Onboarding (Profit)',  col3, sy + 47);
 
-  // Row 3 values — onboarding
   docL.setTextColor(255, 255, 255); docL.setFontSize(10); docL.setFont('helvetica', 'bold');
-  docL.text(ob > 0 ? gbp(ob) : '\u2013',                          col1, sy + 52);
-  docL.text(obCost != null ? gbp(obCost) : '\u2013',              col2, sy + 52);
+  docL.text(ob > 0 ? gbp(ob) : '\u2013',                          col1, sy + 54);
+  docL.text(obCost != null ? gbp(obCost) : '\u2013',              col2, sy + 54);
   docL.setTextColor(134, 239, 172);
-  docL.text(obProfit != null ? gbp(obProfit) : '\u2013',          col3, sy + 52);
+  docL.text(obProfit != null ? gbp(obProfit) : '\u2013',          col3, sy + 54);
 
-  if (!allCostKnown) {
+  if (!financials.allCostKnown) {
     docL.setTextColor(253, 230, 138); docL.setFontSize(7); docL.setFont('helvetica', 'italic');
-    docL.text('* Some service costs are TBC \u2013 totals are partial.', margin, sy + 44);
+    docL.text('* Some service costs are TBC \u2013 totals are partial.', margin, sy + 47);
   }
 
   // -- Footer --
@@ -1973,6 +2204,8 @@ function today() {
 }
 
 // Init
+toggleMs365Options();
+updateMsLicensePrices();
 updatePanel();
 </script>
 </body>

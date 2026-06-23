@@ -1,30 +1,205 @@
 ﻿{
-  "_notes": "Edit costs here to update the app. sell = client price, cost = internal cost. Keys must match exactly.",
-  "ms-std":           { "name": "Microsoft Managed – Standard",          "sell": 20.00,  "cost": 6.80  },
-  "ms-prem":          { "name": "Microsoft Managed – Premium",           "sell": 30.00,  "cost": 16.25 },
-  "bic-std":          { "name": "Best in Class – Standard",              "sell": 30.00,  "cost": 18.44 },
-  "bic-prem":         { "name": "Best in Class – Premium",               "sell": 40.00,  "cost": 24.79 },
-  "add-user-mailbox": { "name": "Additional User – Mailbox Only",        "sell": 10.00,  "cost": 6.80  },
-  "add-user-o365":    { "name": "Additional User – O365 Cloud Only",     "sell": 15.00,  "cost": 6.80  },
-  "teams-telephony":  { "name": "Microsoft Teams Telephony",             "sell": 12.50,  "cost": 8.00  },
-  "sat":              { "name": "Security Awareness Training (SAT)",     "sell": 1.50,   "cost": 0.91  },
-  "email-security":   { "name": "Email Security",                        "sell": 2.60,   "cost": 1.30  },
-  "m365-app-sec":     { "name": "M365 App Security",                     "sell": 1.50,   "cost": 0.91  },
-  "dlp":              { "name": "Data Loss Prevention (DLP)",            "sell": 1.80,   "cost": 1.30  },
-  "spm":              { "name": "M365 Security Posture Mgmt (SPM)",      "sell": 1.66,   "cost": 0.83  },
-  "ispm":             { "name": "ISPM",                                  "sell": 1.60,   "cost": 0.80  },
-  "edr":              { "name": "EDR – Endpoint Detection & Response",   "sell": 1.00,   "cost": 0.50  },
-  "xdr":              { "name": "XDR – Extended Detection & Response",   "sell": 3.00,   "cost": 0.89  },
-  "mdr-std":          { "name": "MDR – Standard",                        "sell": 3.50,   "cost": 1.45  },
-  "mdr-adv":          { "name": "MDR – Advanced",                        "sell": 4.80,   "cost": 2.40  },
-  "m365-backup":      { "name": "M365 Backup",                           "sell": 2.10,   "cost": 1.05  },
-  "gws-backup":       { "name": "GWS Backup",                            "sell": 1.20,   "cost": 0.60  },
-  "data-bucket":      { "name": "Data Bucket",                           "sell": 0.08,   "cost": 0.05  },
-  "dr-hot":           { "name": "Data – Hot Storage",                    "sell": 0.10,   "cost": 0.04  },
-  "compute":          { "name": "Compute Points",                        "sell": 0.08,   "cost": 0.04  },
-  "public-ip":        { "name": "Public IPs",                            "sell": 1.50,   "cost": 1.33  },
-  "vcto":             { "name": "Virtual CTO (per day)",                 "sell": 1000.00,"cost": 400.00 },
-  "_vcm_std":         { "name": "VCM Standard (monthly bands)",          "bands": { "1-9": 103, "10-19": 134, "20-49": 229, "50-99": 321 }, "cost_bands": { "1-9": 76, "10-19": 102, "20-49": 141, "50-99": 196 } },
-  "_vcm_prem":        { "name": "VCM Premium (monthly bands)",           "bands": { "1-9": 200, "10-19": 300, "20-49": 400, "50-99": 500 }, "cost_bands": { "1-9": 76, "10-19": 102, "20-49": 141, "50-99": 196 } },
-  "_onboarding":      { "name": "Onboarding (one-off)",                  "bands": { "1-9": 1000, "10-19": 2000, "20-49": 3500, "50-99": 5000, "100-149": 7000 }, "cost_bands": { "1-9": 800, "10-19": 1200, "20-49": 2000, "50-99": 2800, "100-149": 4000 } }
+    "_notes":  "Edit costs here to update the app. sell = client price, cost = internal cost. Keys must match exactly.",
+    "ms-std":  {
+                   "name":  "Microsoft Managed – Standard",
+                   "sell":  22.5,
+                   "cost":  6.80
+               },
+    "ms-prem":  {
+                    "name":  "Microsoft Managed – Premium",
+                    "sell":  35,
+                    "cost":  16.25
+                },
+    "bic-std":  {
+                    "name":  "Best in Class – Standard",
+                    "sell":  37.5,
+                    "cost":  18.44
+                },
+    "bic-prem":  {
+                     "name":  "Best in Class – Premium",
+                     "sell":  50,
+                     "cost":  24.79
+                 },
+    "add-user-mailbox":  {
+                             "name":  "Additional User – Mailbox Only",
+                             "sell":  10.00,
+                             "cost":  6.80
+                         },
+    "add-user-o365":  {
+                          "name":  "Additional User – O365 Cloud Only",
+                          "sell":  15.00,
+                          "cost":  6.80
+                      },
+    "teams-telephony":  {
+                            "name":  "Microsoft Teams Telephony",
+                            "sell":  12.50,
+                            "cost":  8.00
+                        },
+    "sat":  {
+                "name":  "Security Awareness Training (SAT)",
+                "sell":  1.50,
+                "cost":  0.91
+            },
+    "email-security":  {
+                           "name":  "Email Security",
+                           "sell":  2.60,
+                           "cost":  1.30
+                       },
+    "m365-app-sec":  {
+                         "name":  "M365 App Security",
+                         "sell":  1.50,
+                         "cost":  0.91
+                     },
+    "dlp":  {
+                "name":  "Data Loss Prevention (DLP)",
+                "sell":  1.80,
+                "cost":  1.30
+            },
+    "spm":  {
+                "name":  "M365 Security Posture Mgmt (SPM)",
+                "sell":  1.66,
+                "cost":  0.83
+            },
+    "ispm":  {
+                 "name":  "ISPM",
+                 "sell":  1.60,
+                 "cost":  0.80
+             },
+    "edr":  {
+                "name":  "EDR – Endpoint Detection \u0026 Response",
+                "sell":  1.00,
+                "cost":  0.50
+            },
+    "xdr":  {
+                "name":  "XDR – Extended Detection \u0026 Response",
+                "sell":  3.00,
+                "cost":  0.89
+            },
+    "mdr-std":  {
+                    "name":  "MDR – Standard",
+                    "sell":  3.50,
+                    "cost":  1.45
+                },
+    "mdr-adv":  {
+                    "name":  "MDR – Advanced",
+                    "sell":  4.80,
+                    "cost":  2.40
+                },
+    "m365-backup":  {
+                        "name":  "M365 Backup",
+                        "sell":  2.10,
+                        "cost":  1.05
+                    },
+    "gws-backup":  {
+                       "name":  "GWS Backup",
+                       "sell":  1.20,
+                       "cost":  0.60
+                   },
+    "data-bucket":  {
+                        "name":  "Data Bucket",
+                        "sell":  0.08,
+                        "cost":  0.05
+                    },
+    "dr-hot":  {
+                   "name":  "Data – Hot Storage",
+                   "sell":  0.10,
+                   "cost":  0.04
+               },
+    "compute":  {
+                    "name":  "Compute Points",
+                    "sell":  0.08,
+                    "cost":  0.04
+                },
+    "public-ip":  {
+                      "name":  "Public IPs",
+                      "sell":  1.50,
+                      "cost":  1.33
+                  },
+    "vcto":  {
+                 "name":  "Virtual CTO (per day)",
+                 "sell":  1000.00,
+                 "cost":  400.00
+             },
+    "_vcm_std":  {
+                     "name":  "VCM Standard (monthly bands)",
+                     "bands":  {
+                                   "1-9":  103,
+                                   "10-19":  134,
+                                   "20-49":  229,
+                                   "50-99":  321
+                               },
+                     "cost_bands":  {
+                                        "1-9":  76,
+                                        "10-19":  102,
+                                        "20-49":  141,
+                                        "50-99":  196
+                                    }
+                 },
+    "_vcm_prem":  {
+                      "name":  "VCM Premium (monthly bands)",
+                      "bands":  {
+                                    "1-9":  200,
+                                    "10-19":  300,
+                                    "20-49":  400,
+                                    "50-99":  500
+                                },
+                      "cost_bands":  {
+                                         "1-9":  76,
+                                         "10-19":  102,
+                                         "20-49":  141,
+                                         "50-99":  196
+                                     }
+                  },
+    "_onboarding":  {
+                        "name":  "Onboarding (one-off)",
+                        "bands":  {
+                                      "1-9":  1000,
+                                      "10-19":  2000,
+                                      "20-49":  3500,
+                                      "50-99":  5000,
+                                      "100-149":  7000
+                                  },
+                        "cost_bands":  {
+                                           "1-9":  800,
+                                           "10-19":  1200,
+                                           "20-49":  2000,
+                                           "50-99":  2800,
+                                           "100-149":  4000
+                                       }
+                    },
+    "ms365-biz-std-comm":  {
+                               "name":  "M365 Business Standard (Commercial)",
+                               "sell":  9,
+                               "cost":  8.31
+                           },
+    "ms365-biz-std-nfp":  {
+                              "name":  "M365 Business Standard (Non-Profit)",
+                              "sell":  2.3,
+                              "cost":  2.24
+                          },
+    "ms365-biz-prem-comm":  {
+                                "name":  "M365 Business Premium (Commercial)",
+                                "sell":  16,
+                                "cost":  14.64
+                            },
+    "ms365-biz-prem-nfp":  {
+                               "name":  "M365 Business Premium (Non-Profit)",
+                               "sell":  4.3,
+                               "cost":  4.09
+                           },
+    "net-firewall":  {
+                         "name":  "Managed Firewall",
+                         "sell":  25,
+                         "cost":  10
+                     },
+    "net-switch":  {
+                       "name":  "Managed Switch",
+                       "sell":  20,
+                       "cost":  10
+                   },
+    "net-wifi":  {
+                     "name":  "Managed Wi-Fi Access Point",
+                     "sell":  10,
+                     "cost":  5
+                 }
 }
