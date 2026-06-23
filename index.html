@@ -545,7 +545,7 @@
     <!-- STEP 5 – Virtual Compliance Manager (managed path only) -->
     <div class="card conditional-section section-managed" id="card-vcm">
       <div class="card-title"><span class="step-badge">5</span> Unleashed Virtual Compliance Manager (VCM)</div>
-      <p class="section-sub">Fractional compliance support tailored to your organisation's size.</p>
+      <p class="section-sub">Fractional compliance support tailored to your organisation's size. Priced per device band per month.</p>
       <div class="radio-grid">
 
         <div class="radio-tile none-tile">
@@ -560,8 +560,12 @@
           <input type="radio" name="vcm" id="vcm-std" value="vcm-std" onchange="updatePanel()" />
           <label for="vcm-std">
             <div class="tile-name">VCM – Standard</div>
-            <div class="tile-price" id="vcm-std-price">Price by user band</div>
-            <div class="tile-desc">Cyber Essentials guidance, policy templates &amp; quarterly reviews.</div>
+            <div class="tile-price" id="vcm-std-price">Price by device band</div>
+            <ul class="feature-list">
+              <li>Feature 1 — to be confirmed</li>
+              <li>Feature 2 — to be confirmed</li>
+              <li>Feature 3 — to be confirmed</li>
+            </ul>
           </label>
         </div>
 
@@ -569,14 +573,16 @@
           <input type="radio" name="vcm" id="vcm-prem" value="vcm-prem" onchange="updatePanel()" />
           <label for="vcm-prem">
             <div class="tile-name">VCM – Premium</div>
-            <div class="tile-price" id="vcm-prem-price">Price by user band</div>
-            <div class="tile-desc">Everything in Standard plus audit support, board reporting &amp; incident response.</div>
+            <div class="tile-price" id="vcm-prem-price">Price by device band</div>
+            <ul class="feature-list">
+              <li>Everything in Standard, plus:</li>
+              <li>Feature A — to be confirmed</li>
+              <li>Feature B — to be confirmed</li>
+              <li>Feature C — to be confirmed</li>
+            </ul>
           </label>
         </div>
 
-      </div>
-      <div class="vcm-note" id="vcm-note" style="display:none">
-        ⚠️ VCM pricing is indicative — our team will confirm the exact monthly cost for your user band before issuing a formal proposal.
       </div>
     </div><!-- /card-vcm -->
 
@@ -745,8 +751,8 @@ const CONFIG = {
 
   // ── VCM Pricing bands (update when confirmed) ──
   // Format: { '1-10': price, '10-25': price, '25-50': price, '50-100': price }
-  vcm_std: { '1-10': 150, '10-25': 250, '25-50': 400, '50-100': 600 },
-  vcm_prem:{ '1-10': 200, '10-25': 350, '25-50': 550, '50-100': 800 },
+  vcm_std: { '1-10': 120, '10-25': 170, '25-50': 250, '50-100': 350 },
+  vcm_prem:{ '1-10': 200, '10-25': 300, '25-50': 400, '50-100': 500 },
 };
 // ══════════════════════════════════════════════════════════
 
@@ -856,25 +862,25 @@ function updatePanel() {
   // VCM
   const vcmVal = document.querySelector('input[name=vcm]:checked')?.value || 'none';
   const vcmNote = document.getElementById('vcm-note');
-  const band = getVcmBand(users);
+  const band = getVcmBand(devices);
 
   if (vcmVal !== 'none') {
-    vcmNote.style.display = 'block';
+    vcmNote.style.display = 'none';
     const table = vcmVal === 'vcm-std' ? CONFIG.vcm_std : CONFIG.vcm_prem;
-    const vcmName = vcmVal === 'vcm-std' ? 'VCM – Standard' : 'VCM – Premium';
+    const vcmName = vcmVal === 'vcm-std' ? 'VCM - Standard' : 'VCM - Premium';
     if (band && table[band]) {
       const cost = table[band];
       monthly += cost;
-      lines.push({ label: vcmName, sub: `Band: ${band} users (indicative)`, val: fmt(cost) });
-    } else if (users === 0) {
-      lines.push({ label: vcmName, sub: 'Enter user count for pricing', val: '—' });
+      lines.push({ label: vcmName, sub: `Device band: ${band}`, val: fmt(cost) });
+    } else if (devices === 0) {
+      lines.push({ label: vcmName, sub: 'Enter your device count for pricing', val: '—' });
     } else {
       lines.push({ label: vcmName, sub: 'Outside standard bands — contact us', val: 'TBC' });
     }
     // Update tile price labels
     if (band) {
-      document.getElementById('vcm-std-price').textContent  = fmt(CONFIG.vcm_std[band])  + '/mo (indicative)';
-      document.getElementById('vcm-prem-price').textContent = fmt(CONFIG.vcm_prem[band]) + '/mo (indicative)';
+      document.getElementById('vcm-std-price').textContent  = fmt(CONFIG.vcm_std[band])  + '/mo';
+      document.getElementById('vcm-prem-price').textContent = fmt(CONFIG.vcm_prem[band]) + '/mo';
     }
   } else {
     vcmNote.style.display = 'none';
