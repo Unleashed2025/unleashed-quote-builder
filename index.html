@@ -613,6 +613,36 @@
       <div class="card-title"><span class="step-badge" id="addons-step-num">7</span> <span id="addons-title">Standalone Add-on Services</span></div>
       <p class="section-sub" id="addons-sub">We understand you may have additional devices, mailboxes or users who require support — please use the services below to calculate any additional requirements. Enter a custom quantity for each service, or leave blank to use your service unit count.</p>
 
+      <!-- Additional User Support -->
+      <div class="addon-group-header">➕ Additional User Support</div>
+      <div class="addon-group-sub">Per user / month — for users not covered by a full service unit</div>
+      <div class="addon-grid" style="margin-bottom:1.1rem;">
+        <label class="addon-item">
+          <input type="checkbox" value="add-user-mailbox" onchange="updatePanel()" />
+          <div class="addon-label">
+            <div class="addon-name">Additional User – Mailbox Only</div>
+            <div class="addon-price">£10.00 / user / month</div>
+            <div class="addon-base">Mailbox support only — ideal for users who need email assistance without a full managed service</div>
+            <div class="addon-qty-row">
+              <input type="number" class="addon-qty" data-key="add-user-mailbox" placeholder="users" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
+              <span class="addon-qty-label">users</span>
+            </div>
+          </div>
+        </label>
+        <label class="addon-item">
+          <input type="checkbox" value="add-user-o365" onchange="updatePanel()" />
+          <div class="addon-label">
+            <div class="addon-name">Additional User – Office 365 Cloud Only</div>
+            <div class="addon-price">£15.00 / user / month</div>
+            <div class="addon-base">Cloud-only support covering Office 365 apps and services — no device support included</div>
+            <div class="addon-qty-row">
+              <input type="number" class="addon-qty" data-key="add-user-o365" placeholder="users" min="0" oninput="updatePanel()" onclick="event.stopPropagation()" />
+              <span class="addon-qty-label">users</span>
+            </div>
+          </div>
+        </label>
+      </div>
+
       <!-- Telephony -->
       <div class="addon-group-header">📞 Telephony</div>
       <div class="addon-grid" style="margin-bottom:1.1rem;">
@@ -948,6 +978,9 @@ const BUNDLES = {
 
 // Addon prices
 const ADDONS = {
+  // Additional User Support
+  'add-user-mailbox': { name: 'Additional User - Mailbox Only',         price: 10.00, basis: 'user', unit: 'users' },
+  'add-user-o365':    { name: 'Additional User - Office 365 Cloud Only', price: 15.00, basis: 'user', unit: 'users' },
   // Telephony
   'teams-telephony': { name: 'Microsoft Teams Telephony', price: 12.50, basis: 'user',   unit: 'users' },
   // Cyber Security — per user
