@@ -412,7 +412,7 @@
     <div class="card">
       <div class="card-title"><span class="step-badge">2</span> Users &amp; Devices</div>
       <p class="section-sub">These numbers drive your pricing — enter your best estimate.</p>
-      <div class="form-row triple">
+      <div class="form-row">
         <div>
           <label for="num-users">Number of Users *</label>
           <input type="number" id="num-users" min="1" placeholder="e.g. 25" oninput="updatePanel()" />
@@ -420,10 +420,6 @@
         <div>
           <label for="num-devices">Number of Devices</label>
           <input type="number" id="num-devices" min="0" placeholder="e.g. 30" oninput="updatePanel()" />
-        </div>
-        <div>
-          <label for="num-phones">Phones / Seats</label>
-          <input type="number" id="num-phones" min="0" placeholder="e.g. 5" oninput="updatePanel()" />
         </div>
       </div>
     </div>
@@ -618,6 +614,20 @@
     <div class="card conditional-section section-addons" id="card-addons">
       <div class="card-title"><span class="step-badge" id="addons-step-num">7</span> <span id="addons-title">Standalone Add-on Services</span></div>
       <p class="section-sub" id="addons-sub">Mix and match to complete your security stack.</p>
+
+      <!-- Telephony -->
+      <div class="addon-group-header">📞 Telephony</div>
+      <div class="addon-group-sub">Per user / month</div>
+      <div class="addon-grid" style="margin-bottom:1.1rem;">
+        <label class="addon-item">
+          <input type="checkbox" value="teams-telephony" onchange="updatePanel()" />
+          <div class="addon-label">
+            <div class="addon-name">Microsoft Teams Telephony</div>
+            <div class="addon-price">£12.50 / user / month</div>
+            <div class="addon-base">Full PSTN calling via Microsoft Teams — replace traditional phone lines with cloud-based telephony, managed by Unleashed</div>
+          </div>
+        </label>
+      </div>
 
       <!-- Cyber Security -->
       <div class="addon-group-header">🔐 Cyber Security</div>
@@ -889,6 +899,8 @@ const BUNDLES = {
 
 // Addon prices
 const ADDONS = {
+  // Telephony
+  'teams-telephony': { name: 'Microsoft Teams Telephony', price: 12.50, basis: 'user' },
   // Cyber Security — per user
   'sat':           { name: 'Security Awareness Training (SAT)', price: 1.23,  basis: 'user' },
   'email-security':{ name: 'Email Security',                    price: 1.76,  basis: 'user' },
