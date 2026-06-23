@@ -1396,6 +1396,7 @@ function pdfSafe(str) {
 // Pre-load logo as data URL for PDF embedding
 let _logoDataUrl = null;
 window.addEventListener('DOMContentLoaded', () => {
+  // Load logo for PDF
   const img = new Image();
   img.crossOrigin = 'anonymous';
   img.onload = function() {
@@ -1406,6 +1407,20 @@ window.addEventListener('DOMContentLoaded', () => {
     _logoDataUrl = c.toDataURL('image/png');
   };
   img.src = 'https://unleashed2025.github.io/unleashed-quote-builder/logo.png';
+
+  // Load live costs from costs.json (overrides hardcoded COST_PRICES)
+  fetch('https://unleashed2025.github.io/unleashed-quote-builder/costs.json?v=' + Date.now())
+    .then(r => r.json())
+    .then(data => {
+      Object.keys(data).forEach(key => {
+        if (key.startsWith('_')) return; // skip _notes etc.
+        if (data[key].cost !== undefined) {
+          COST_PRICES[key] = data[key].cost;
+        }
+      });
+      console.log('Cost prices loaded from costs.json');
+    })
+    .catch(() => console.log('costs.json not available – using built-in prices'));
 });
 
 function buildPDF() {
