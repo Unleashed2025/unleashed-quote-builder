@@ -89,8 +89,7 @@
     /* -- Layout -- */
     .page { max-width: 1140px; margin: 0 auto; padding: 2rem 1.5rem 4rem; display: grid; grid-template-columns: 1fr 350px; gap: 2rem; align-items: start; }
     @media(max-width:900px){ .page { grid-template-columns: 1fr; } }
-    .sidebar-col { align-self: start; position: -webkit-sticky; position: sticky; top: 20px; }
-    @media(max-width:900px){ .sidebar-col { position: static; } }
+    .sidebar-col { align-self: start; }
 
     /* -- Card -- */
     .card {
@@ -1953,34 +1952,6 @@ function today() {
 
 // Init
 updatePanel();
-
-// Sticky sidebar JS fallback (ensures sticky works across all browsers)
-(function() {
-  const sidebar = document.querySelector('.sidebar-col');
-  if (!sidebar) return;
-  let sidebarTop = 0;
-  function calcTop() {
-    sidebar.style.position = 'static';
-    sidebarTop = sidebar.getBoundingClientRect().top + window.scrollY;
-    sidebar.style.position = '';
-  }
-  window.addEventListener('load', calcTop);
-  window.addEventListener('resize', calcTop);
-  window.addEventListener('scroll', function() {
-    if (window.innerWidth <= 900) { sidebar.style.cssText = ''; return; }
-    if (window.scrollY > sidebarTop - 20) {
-      sidebar.style.position = 'fixed';
-      sidebar.style.top = '20px';
-      sidebar.style.width = '350px';
-      sidebar.style.zIndex = '100';
-    } else {
-      sidebar.style.position = 'sticky';
-      sidebar.style.top = '20px';
-      sidebar.style.width = '';
-      sidebar.style.zIndex = '';
-    }
-  }, { passive: true });
-})();
 </script>
 </body>
 </html>
