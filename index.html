@@ -1045,8 +1045,8 @@ const CONFIG = {
 
   // -- VCM Pricing bands (update when confirmed) --
   // Format: { '1-10': price, '10-25': price, '25-50': price, '50-100': price }
-  vcm_std: { '1-10': 120, '10-25': 170, '25-50': 250, '50-100': 350 },
-  vcm_prem:{ '1-10': 200, '10-25': 300, '25-50': 400, '50-100': 500 },
+  vcm_std: { '1-10': 103, '10-20': 134, '20-49': 229, '50-99': 321 },
+  vcm_prem:{ '1-10': 200, '10-20': 300, '20-49': 400, '50-99': 500 },
 };
 // ----------------------------------------------------------
 
@@ -1072,26 +1072,26 @@ const ADDONS = {
   // Telephony
   'teams-telephony': { name: 'Microsoft Teams Telephony', price: 12.50, basis: 'user',   unit: 'users' },
   // Cyber Security – per user
-  'sat':           { name: 'Security Awareness Training (SAT)', price: 1.85,  basis: 'user',   unit: 'users' },
-  'email-security':{ name: 'Email Security',                    price: 2.64,  basis: 'user',   unit: 'mailboxes' },
-  'm365-app-sec':  { name: 'M365 App Security',                 price: 1.85,  basis: 'user',   unit: 'users' },
-  'dlp':           { name: 'Data Loss Prevention (DLP)',        price: 2.64,  basis: 'user',   unit: 'users' },
-  'spm':           { name: 'M365 Security Posture Mgmt (SPM)',  price: 1.68,  basis: 'user',   unit: 'users' },
-  'ispm':          { name: 'ISPM',                              price: 2.25,  basis: 'user',   unit: 'users' },
+  'sat':           { name: 'Security Awareness Training (SAT)', price: 1.50,  basis: 'user',   unit: 'users' },
+  'email-security':{ name: 'Email Security',                    price: 2.60,  basis: 'user',   unit: 'mailboxes' },
+  'm365-app-sec':  { name: 'M365 App Security',                 price: 1.50,  basis: 'user',   unit: 'users' },
+  'dlp':           { name: 'Data Loss Prevention (DLP)',        price: 1.80,  basis: 'user',   unit: 'users' },
+  'spm':           { name: 'M365 Security Posture Mgmt (SPM)',  price: 1.66,  basis: 'user',   unit: 'users' },
+  'ispm':          { name: 'ISPM',                              price: 1.60,  basis: 'user',   unit: 'users' },
   // Cyber Security – per device
-  'edr':           { name: 'EDR',                               price: 1.02,  basis: 'device', unit: 'devices' },
-  'xdr':           { name: 'XDR',                               price: 2.50,  basis: 'device', unit: 'devices' },
-  'mdr-std':       { name: 'MDR - Standard',                    price: 3.75,  basis: 'device', unit: 'devices' },
-  'mdr-adv':       { name: 'MDR - Advanced',                    price: 4.86,  basis: 'device', unit: 'devices' },
+  'edr':           { name: 'EDR',                               price: 1.00,  basis: 'device', unit: 'devices' },
+  'xdr':           { name: 'XDR',                               price: 3.00,  basis: 'device', unit: 'devices' },
+  'mdr-std':       { name: 'MDR - Standard',                    price: 3.50,  basis: 'device', unit: 'devices' },
+  'mdr-adv':       { name: 'MDR - Advanced',                    price: 4.80,  basis: 'device', unit: 'devices' },
   // Data Protection – per seat (user)
-  'm365-backup':   { name: 'M365 Backup',                       price: 2.13,  basis: 'user',   unit: 'seats' },
-  'gws-backup':    { name: 'GWS Backup',                        price: 1.22,  basis: 'user',   unit: 'seats' },
+  'm365-backup':   { name: 'M365 Backup',                       price: 2.10,  basis: 'user',   unit: 'seats' },
+  'gws-backup':    { name: 'GWS Backup',                        price: 1.20,  basis: 'user',   unit: 'seats' },
   // Data Protection – custom qty
-  'data-bucket':   { name: 'Data Bucket',                       price: 0.11,  basis: 'qty',    unit: 'GB' },
+  'data-bucket':   { name: 'Data Bucket',                       price: 0.08,  basis: 'qty',    unit: 'GB' },
   // Disaster Recovery – custom qty
   'dr-hot':        { name: 'DR Data (Hot Storage)',             price: 0.08,  basis: 'qty',    unit: 'GB' },
   'compute':       { name: 'Compute Points',                    price: 0.08,  basis: 'qty',    unit: 'CP' },
-  'public-ip':     { name: "Public IP's",                       price: 2.70,  basis: 'qty',    unit: 'IP' },
+  'public-ip':     { name: "Public IP's",                       price: 1.50,  basis: 'qty',    unit: 'IP' },
 };
 
 // Internal cost prices (not shown to client – used for sales summary email only)
@@ -1102,7 +1102,7 @@ const COST_PRICES = {
   'bic-prem':        24.79,
   'add-user-mailbox': 6.80,
   'add-user-o365':    6.80,
-  'teams-telephony':  8.50,
+  'teams-telephony':  8.00,
   'sat':              0.91,
   'email-security':   1.30,
   'm365-app-sec':     0.91,
@@ -1119,6 +1119,7 @@ const COST_PRICES = {
   'dr-hot':           0.04,
   'compute':          0.04,
   'public-ip':        1.33,
+  'vcto':             400,   // per day (sell: £1,000, profit: £600)
 };
 
 function getUsers()   { return Math.max(0, parseInt(document.getElementById('num-units').value)   || 0); }
@@ -1129,15 +1130,16 @@ function getOnboarding(units) {
   if (units <= 10)  return { cost: 1000, label: '1-10 service units' };
   if (units <= 25)  return { cost: 2000, label: '11-25 service units' };
   if (units <= 50)  return { cost: 3500, label: '26-50 service units' };
-  if (units <= 149) return { cost: 5000, label: '51-149 service units' };
-  return { cost: null, label: '150+ service units – contact us for a bespoke quote' };
+  if (units <= 100) return { cost: 5000, label: '51-100 service units' };
+  if (units <= 150) return { cost: 7000, label: '101-150 service units' };
+  return { cost: null, label: '150+ service units \u2013 contact us for a bespoke quote' };
 }
 
 function getVcmBand(users) {
-  if (users >=  1 && users <= 10)  return '1-10';
-  if (users > 10 && users <= 25)  return '10-25';
-  if (users > 25 && users <= 50)  return '25-50';
-  if (users > 50 && users <= 100) return '50-100';
+  if (users >=  1 && users <= 10) return '1-10';
+  if (users > 10 && users <= 20)  return '10-20';
+  if (users > 20 && users <= 49)  return '20-49';
+  if (users > 49 && users <= 99)  return '50-99';
   return null;
 }
 
