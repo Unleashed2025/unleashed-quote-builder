@@ -1511,6 +1511,10 @@
           <div class="qp-total-label" style="font-size:.78rem;">One-off Onboarding</div>
           <div style="font-size:1rem;font-weight:700;color:#94a3b8;" id="qp-onboarding-val">–</div>
         </div>
+        <div class="qp-total-row" id="qp-addon-impl-row" style="margin-top:.4rem;display:none">
+          <div class="qp-total-label" style="font-size:.78rem;">Add-on Configuration</div>
+          <div style="font-size:1rem;font-weight:700;color:#94a3b8;" id="qp-addon-impl-val">–</div>
+        </div>
 
         <button class="btn-generate" id="btn-generate" onclick="generateQuote()">
           &#x1F4C4; Generate &amp; Download Quote
@@ -1708,6 +1712,13 @@ const ADDONS = {
   'dr-hot':        { name: 'DR Data (Hot Storage)',             price: 0.10,  basis: 'qty',    unit: 'GB' },
   'compute':       { name: 'Compute Points',                    price: 0.08,  basis: 'qty',    unit: 'CP' },
   'public-ip':     { name: "Public IP's",                       price: 1.50,  basis: 'qty',    unit: 'IP' },
+};
+
+// Implementation days for specific managed services add-ons (sell rate £800/day)
+const ADDON_IMPL = {
+  'teams-telephony': 4,
+  'dlp':             4,
+  'm365-app-sec':    3
 };
 
 // Internal cost prices (not shown to client – used for sales summary email only)
@@ -2341,8 +2352,18 @@ function updatePanel() {
     obRow.style.display = 'none';
   }
 
+  const addonImplDays = Array.from(document.querySelectorAll('.addon-item input[type=checkbox]:checked')).reduce((sum, cb) => sum + (ADDON_IMPL[cb.value] || 0), 0);
+  const addonImplSell = addonImplDays * 800;
+  const addonImplRow  = document.getElementById('qp-addon-impl-row');
+  const addonImplVal  = document.getElementById('qp-addon-impl-val');
+  if (addonImplSell > 0) {
+    addonImplVal.textContent = fmt(addonImplSell) + ' (' + addonImplDays + ' day' + (addonImplDays === 1 ? '' : 's') + ')';
+    addonImplRow.style.display = 'flex';
+  } else {
+    addonImplRow.style.display = 'none';
+  }
   const onboarding = ob.cost || 0;
-  window._quoteState = { users, devices, bundle, vcmVal, band, vctoDays, monthlySubtotal, lineDiscountTotal, discountTotal, monthly, lines, onboarding, ob, term, currentOrgType };
+  window._quoteState = { users, devices, bundle, vcmVal, band, vctoDays, monthlySubtotal, lineDiscountTotal, discountTotal, monthly, lines, onboarding, ob, term, currentOrgType, addonImplDays, addonImplSell };
 }
 
 // -- Generate Quote (PDF + Email) --
