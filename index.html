@@ -3050,20 +3050,20 @@ function today() {
 const PROJ_SELL = 800, PROJ_COST = 300;
 
 const PROJ_ITEMS = [
-  { id:'def-p1',    vendor:'Microsoft', name:'Microsoft Defender P1 â€“ Install & Config',        desc:'Baseline, Pilot, UAT, Enhanced Settings, Roll Out, Snagging', days:4 },
-  { id:'def-off',   vendor:'Microsoft', name:'Microsoft Defender for Office â€“ Install & Config', desc:'Baseline, MX redirect, UAT, Enhanced Settings, Roll Out, Snagging', days:3 },
-  { id:'ca-base',   vendor:'Microsoft', name:'Conditional Access / Entra ID â€“ Baseline',         desc:'Baseline policies, Microsoft best practice. Requires Business Premium or Entra ID P1.', days:2 },
-  { id:'ca-adv',    vendor:'Microsoft', name:'Conditional Access / Entra ID â€“ Advanced',         desc:'Advanced Conditional Access policies, Identity Protection, and Privileged Identity Management. Requires Microsoft Entra ID P2 (or Microsoft 365 E3/E5).', days:3 },
-  { id:'purv-bp',   vendor:'Microsoft', name:'Microsoft Purview â€“ Data Labelling (Bus. Premium)',desc:'Basic data labels/groups using Business Premium features', days:4 },
-  { id:'purv-p2',   vendor:'Microsoft', name:'Microsoft Purview â€“ Data Labelling (Purview P2)', desc:'Full Purview P2 suite data labelling and classification', days:4 },
+  { id:'def-p1',    vendor:'Microsoft', name:'Microsoft Defender P1 – Install & Config',        desc:'Baseline, Pilot, UAT, Enhanced Settings, Roll Out, Snagging', days:4 },
+  { id:'def-off',   vendor:'Microsoft', name:'Microsoft Defender for Office – Install & Config', desc:'Baseline, MX redirect, UAT, Enhanced Settings, Roll Out, Snagging', days:3 },
+  { id:'ca-base',   vendor:'Microsoft', name:'Conditional Access / Entra ID – Baseline',         desc:'Baseline policies, Microsoft best practice. Requires Business Premium or Entra ID P1.', days:2 },
+  { id:'ca-adv',    vendor:'Microsoft', name:'Conditional Access / Entra ID – Advanced',         desc:'Advanced Conditional Access policies, Identity Protection, and Privileged Identity Management. Requires Microsoft Entra ID P2 (or Microsoft 365 E3/E5).', days:3 },
+  { id:'purv-bp',   vendor:'Microsoft', name:'Microsoft Purview – Data Labelling (Bus. Premium)',desc:'Basic data labels/groups using Business Premium features', days:4 },
+  { id:'purv-p2',   vendor:'Microsoft', name:'Microsoft Purview – Data Labelling (Purview P2)', desc:'Full Purview P2 suite data labelling and classification', days:4 },
   { id:'fw-inst',   vendor:'Ubiquiti',  name:'Firewall Installation',                            desc:'Ubiquiti firewall installation and configuration', days:1.5, hasQty:true },
   { id:'sw-inst',   vendor:'Ubiquiti',  name:'Switch Installation',                              desc:'Ubiquiti switch installation and configuration', days:0.5, hasQty:true },
-  { id:'wifi-s',    vendor:'Ubiquiti',  name:'Wi-Fi Installation â€“ 1â€“9 Access Points',           desc:'Assumes cabling complete', days:1 },
-  { id:'wifi-m',    vendor:'Ubiquiti',  name:'Wi-Fi Installation â€“ 9â€“19 Access Points',          desc:'Assumes cabling complete', days:1.5 },
-  { id:'wifi-l',    vendor:'Ubiquiti',  name:'Wi-Fi Installation â€“ 20â€“49 Access Points',         desc:'Assumes cabling complete', days:3 },
-  { id:'m365-aud',  vendor:'Microsoft', name:'M365 Tenant Migration â€“ Audit & Readiness',        desc:'Full tenant audit and migration readiness assessment', days:4 },
+  { id:'wifi-s',    vendor:'Ubiquiti',  name:'Wi-Fi Installation – 1–9 Access Points',           desc:'Assumes cabling complete', days:1 },
+  { id:'wifi-m',    vendor:'Ubiquiti',  name:'Wi-Fi Installation – 9–19 Access Points',          desc:'Assumes cabling complete', days:1.5 },
+  { id:'wifi-l',    vendor:'Ubiquiti',  name:'Wi-Fi Installation – 20–49 Access Points',         desc:'Assumes cabling complete', days:3 },
+  { id:'m365-aud',  vendor:'Microsoft', name:'M365 Tenant Migration – Audit & Readiness',        desc:'Full tenant audit and migration readiness assessment', days:4 },
   { id:'m365-mig', vendor:'Microsoft', name:'M365 Tenant \u2013 Actual Migration', desc:'Priced at \u00a37.20/user. Minimum charge \u00a32,400 (covers up to ~333 users). Enter the number of users to calculate.', perUser:true, userRate:7.20, minPrice:2400 },
-  { id:'bkp-365',   vendor:'Backup',    name:'365 Backup â€“ Setup & Testing',                     desc:'1 day setup + 1 day testing', days:2 }
+  { id:'bkp-365',   vendor:'Backup',    name:'365 Backup – Setup & Testing',                     desc:'1 day setup + 1 day testing', days:2 }
 ];
 
 function projFmt(n){ return '\u00a3' + Number(n).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}); }
@@ -3242,12 +3242,12 @@ const SA_SERVICES = [
   { id:'sa-xdr',     name:'XDR',                                  unit:'device',  cost:0.89,  sell:2.85,  perUnit:true },
   { id:'sa-email',   name:'Email Security',                       unit:'mailbox', cost:1.30,  sell:2.47,  perUnit:true },
   { id:'sa-m365bk',  name:'M365 Back-up',                        unit:'user',    cost:1.05,  sell:2.00,  perUnit:true },
-  { id:'sa-mdr-adv', name:'MDR â€“ Advanced (requires EDR/XDR)',    unit:'user',    cost:2.40,  sell:4.56,  perUnit:true },
+  { id:'sa-mdr-adv', name:'MDR – Advanced (requires EDR/XDR)',    unit:'user',    cost:2.40,  sell:4.56,  perUnit:true },
   { id:'sa-sat',     name:'Security Awareness Training (SAT)',    unit:'user',    cost:0.91,  sell:1.43,  perUnit:true },
   { id:'sa-dlp',     name:'Data Loss Prevention (DLP)',           unit:'user',    cost:1.30,  sell:1.71,  perUnit:true },
   { id:'sa-spm',     name:'M365 Security Posture Mgmt (SPM)',     unit:'user',    cost:0.83,  sell:1.58,  perUnit:true },
   { id:'sa-appsec',  name:'M365 App Security',                    unit:'user',    cost:0.91,  sell:1.43,  perUnit:true },
-  { id:'sa-mdr-std', name:'MDR â€“ Standard (requires EDR/XDR)',    unit:'user',    cost:1.45,  sell:3.33,  perUnit:true },
+  { id:'sa-mdr-std', name:'MDR – Standard (requires EDR/XDR)',    unit:'user',    cost:1.45,  sell:3.33,  perUnit:true },
   { id:'sa-edr',     name:'EDR',                                  unit:'device',  cost:0.50,  sell:0.95,  perUnit:true },
   { id:'sa-gwsbk',   name:'GWS Backup',                          unit:'user',    cost:0.60,  sell:1.14,  perUnit:true },
   { id:'sa-teams',   name:'Teams Telephony',                      unit:'user',    cost:8.00,  sell:11.88, perUnit:true },
