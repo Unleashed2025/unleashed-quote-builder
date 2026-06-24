@@ -282,16 +282,7 @@
       color: #0f172a;
     }
     .addon-qty-label { font-size: .75rem; color: #94a3b8; }
-    .discount-row { display: flex; align-items: center; gap: .4rem; margin-top: .3rem; flex-wrap: wrap; }
-    .discount-label { font-size: .72rem; color: #94a3b8; white-space: nowrap; margin: 0; }
-    .discount-input-wrap { display: flex; align-items: center; gap: 2px; }
-    .discount-input {
-      width: 52px; padding: .2rem .35rem;
-      font-size: .78rem; border: 1px solid #cbd5e1;
-      border-radius: 6px; background: #f8fafc; color: #0f172a;
-      text-align: center; box-shadow: none;
-    }
-    .discount-input:focus { border-color: #2563eb; outline: none; box-shadow: none; }
+
     .discount-pct { font-size: .78rem; color: #64748b; }
     .price-discounted { font-size: .82rem; color: #16a34a; font-weight: 700; }
     .price-original { font-size: .75rem; color: #94a3b8; text-decoration: line-through; }
@@ -1795,8 +1786,7 @@ function formatDiscountPercent(value) {
   return Number.isInteger(pct) ? String(pct) : pct.toFixed(1).replace(/\.0$/, '');
 }
 
-function getDiscountInputHtml(id, handler) {
-  return `<div class="discount-row" data-discount-id="${id}">
+function getDiscountInputHtml(id, handler) { return ''; }">
     <label class="discount-label" for="${id}">Discount</label>
     <div class="discount-input-wrap">
       <input type="number" id="${id}" class="discount-input" min="0" max="100" step="0.5" value="0" onclick="event.stopPropagation()" oninput="${handler}" onchange="${handler}" />
@@ -2573,7 +2563,6 @@ function buildPDF() {
   doc.setFont('helvetica', 'bold');
   doc.text('Service', margin + 4, y + 5.5);
   doc.text('Detail', margin + 80, y + 5.5);
-  doc.text('Disc.', margin + 148, y + 5.5);
   doc.text('Monthly Cost', W - margin - 4, y + 5.5, { align: 'right' });
   y += 8;
 
@@ -2585,7 +2574,6 @@ function buildPDF() {
       doc.rect(margin, y, W - margin * 2, 9, 'F');
     }
     const subText = (line.sub || '').split('\u2022')[0].trim();
-    const discText = line.discountPct > 0 ? formatDiscountPercent(line.discountPct) + '%' : '';
     doc.setTextColor(...text);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8.5);
@@ -2593,12 +2581,7 @@ function buildPDF() {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(...muted);
-    doc.text(pdfSafe(subText), margin + 80, y + 6);
-    if (discText) {
-      doc.setFontSize(7.5);
-      doc.setTextColor(...accent);
-      doc.text(discText, margin + 148, y + 6);
-    }
+    doc.text(pdfSafe(subText), margin + 84, y + 6);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8.5);
     doc.setTextColor(...text);
