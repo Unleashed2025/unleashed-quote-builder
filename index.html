@@ -3511,16 +3511,16 @@ function saSalesReport() {
 function showSalesPinModal_orig(section) { showSalesPinModal(section); }
 
 // Init
-injectManagedDiscountInputs();
-setDefaultSectionDates();
-toggleMs365Options();
-updateMsLicensePrices();
-const managedRadio = document.getElementById('st-managed');
-if (managedRadio) managedRadio.checked = true;
-setServiceType('managed');
-updatePanel();
-projUpdatePanel();
-saUpdatePanel();
+try {
+  injectManagedDiscountInputs();
+  setDefaultSectionDates();
+  toggleMs365Options();
+  updateMsLicensePrices();
+  const managedRadio = document.getElementById('st-managed');
+  if (managedRadio) managedRadio.checked = true;
+  setServiceType('managed');
+  updatePanel();
+} catch(e) { console.error('Init error:', e); }
 showHome();
 </script>
 <script>
