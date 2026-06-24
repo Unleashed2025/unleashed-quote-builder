@@ -603,7 +603,124 @@
       transition: all .18s;
     }
     .btn-install:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(103,232,249,0.35); }
-  </style>
+      input[type=date] {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      color: #0f172a;
+      padding: .65rem .9rem;
+      font-size: .9rem;
+      width: 100%;
+      transition: border-color .18s ease, box-shadow .18s ease;
+    }
+    input[type=date]:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
+    .app-section { display: none; }
+    #section-managed #routing-card { display: none !important; }
+
+    /* -- Home screen -- */
+    .home-screen { max-width: 980px; margin: 0 auto; padding: 0 1.5rem 2.5rem; }
+    .home-intro {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 22px;
+      box-shadow: 0 4px 24px rgba(15,23,42,0.08);
+      padding: 1.5rem 1.75rem;
+      color: #475569;
+      line-height: 1.7;
+    }
+    .home-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2rem; }
+    .home-card {
+      background: #fff;
+      border: 2px solid #e2e8f0;
+      border-radius: 22px;
+      padding: 2rem;
+      cursor: pointer;
+      transition: all .2s;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(15,23,42,0.06);
+    }
+    .home-card:hover { border-color: #2563eb; box-shadow: 0 8px 32px rgba(37,99,235,0.12); transform: translateY(-2px); }
+    .home-card-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .home-card-title { font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: .5rem; }
+    .home-card-desc { font-size: .85rem; color: #64748b; line-height: 1.5; min-height: 88px; }
+    .home-card-btn { display: inline-block; margin-top: 1.25rem; padding: .6rem 1.5rem; background: #2563eb; color: #fff; border-radius: 999px; font-size: .85rem; font-weight: 700; }
+    .btn-back { background: none; border: 1px solid #e2e8f0; color: #475569; padding: .5rem 1rem; border-radius: 999px; cursor: pointer; font-size: .85rem; margin-bottom: 1rem; transition: all .15s; }
+    .btn-back:hover { background: #f1f5f9; }
+
+    /* -- New quote sections -- */
+    .section-split { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 1.25rem; align-items: start; }
+    .sticky-panel { position: sticky; top: 1rem; }
+    .selection-grid { display: grid; gap: 1rem; }
+    .selection-card {
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 1.1rem 1.2rem;
+      transition: all .18s ease;
+    }
+    .selection-card:has(input[type=checkbox]:checked) {
+      border-color: #2563eb;
+      background: rgba(37,99,235,0.04);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+    }
+    .selection-card-main { display: flex; gap: .9rem; align-items: flex-start; }
+    .selection-card-main input[type=checkbox] { margin-top: .2rem; width: 18px; height: 18px; accent-color: #2563eb; flex-shrink: 0; }
+    .selection-card-label { flex: 1; cursor: pointer; }
+    .selection-card-top { display: flex; justify-content: space-between; gap: .75rem; flex-wrap: wrap; align-items: center; }
+    .selection-card-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: .25rem .7rem;
+      border-radius: 999px;
+      background: rgba(37,99,235,0.08);
+      color: #1d4ed8;
+      border: 1px solid rgba(37,99,235,0.2);
+      font-size: .72rem;
+      font-weight: 700;
+    }
+    .selection-card-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: .25rem .7rem;
+      border-radius: 999px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #475569;
+      font-size: .72rem;
+      font-weight: 700;
+    }
+    .selection-card-title { font-size: .98rem; font-weight: 700; color: #0f172a; margin-top: .55rem; }
+    .selection-card-desc { font-size: .8rem; color: #64748b; line-height: 1.55; margin-top: .35rem; }
+    .selection-card-meta { font-size: .78rem; color: #2563eb; font-weight: 700; margin-top: .55rem; }
+    .selection-card-extra { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+    .inline-options { display: flex; gap: .75rem; flex-wrap: wrap; }
+    .inline-options label { display: flex; align-items: center; gap: .45rem; margin: 0; font-weight: 500; }
+    .helper-text { font-size: .76rem; color: #64748b; line-height: 1.5; margin-top: .45rem; }
+    .summary-mini { font-size: .74rem; color: #64748b; margin-top: .35rem; line-height: 1.5; }
+    .status-banner {
+      display: none;
+      padding: .85rem 1.25rem;
+      border-radius: 12px;
+      font-size: .88rem;
+      font-weight: 600;
+      margin-top: 1rem;
+      text-align: center;
+    }
+    .status-banner.success { background: rgba(22,163,74,.08); color: #15803d; border: 1px solid rgba(22,163,74,.3); }
+    .status-banner.error { background: rgba(220,38,38,.08); color: #dc2626; border: 1px solid rgba(220,38,38,.3); }
+
+    @media (max-width: 900px) {
+      .section-split { grid-template-columns: 1fr; }
+      .sticky-panel { position: static; }
+    }
+    @media (max-width: 700px) {
+      .home-grid { grid-template-columns: 1fr; }
+      .home-card-desc { min-height: auto; }
+    }  </style>
 </head>
 <body>
 
@@ -633,7 +750,7 @@
         <h1 style="margin:0;font-size:clamp(1.5rem,3vw,2.2rem);letter-spacing:-.03em;color:#fff;line-height:1.1;">IT Services Quote Builder</h1>
       </div>
     </div>
-    <p style="margin:0;color:rgba(226,232,240,0.82);font-size:.95rem;line-height:1.6;max-width:640px;position:relative;z-index:1;">Build your bespoke IT services proposal in minutes. Select your services, configure your options, and download a professional PDF quote.</p>
+    <p style="margin:0;color:rgba(226,232,240,0.82);font-size:.95rem;line-height:1.6;max-width:640px;position:relative;z-index:1;">Choose the quote route that matches your requirement, configure the services you need, and download a professional Unleashed proposal in minutes.</p>
     <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;position:relative;z-index:1;">
       <span style="padding:6px 14px;border-radius:999px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);font-size:.78rem;font-weight:600;color:rgba(255,255,255,0.9);">① Organisation type</span>
       <span style="padding:6px 14px;border-radius:999px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);font-size:.78rem;font-weight:600;color:rgba(255,255,255,0.9);">② Choose your service</span>
@@ -643,6 +760,37 @@
     </div>
   </div>
 </div>
+
+<!-- ------------------------ HOME ------------------------ -->
+<div id="home-screen" class="home-screen">
+  <div class="home-intro">
+    <strong style="display:block;color:#0f172a;font-size:1rem;margin-bottom:.35rem;">Choose the type of quote you want to build</strong>
+    Start with the route that matches your requirement. Build a fully managed services proposal, price a one-off implementation project, or quote software-only licences with a discounted standalone rate.
+  </div>
+  <div class="home-grid">
+    <div class="home-card" onclick="showSection('managed')">
+      <div class="home-card-icon">&#x1F6E1;&#xFE0F;</div>
+      <div class="home-card-title">Managed Services</div>
+      <div class="home-card-desc">Full managed IT and cybersecurity bundles with onboarding, recurring services and optional add-ons.</div>
+      <span class="home-card-btn">Build Quote &rarr;</span>
+    </div>
+    <div class="home-card" onclick="showSection('projects')">
+      <div class="home-card-icon">&#x1F527;</div>
+      <div class="home-card-title">Project Quote</div>
+      <div class="home-card-desc">One-off project implementations, deployments and specialist Microsoft or infrastructure engagements.</div>
+      <span class="home-card-btn">Build Quote &rarr;</span>
+    </div>
+    <div class="home-card" onclick="showSection('standalone')">
+      <div class="home-card-icon">&#x1F4BB;</div>
+      <div class="home-card-title">Standalone Software</div>
+      <div class="home-card-desc">Software licences only with a 5% software-only discount and a separate one-off onboarding fee.</div>
+      <span class="home-card-btn">Build Quote &rarr;</span>
+    </div>
+  </div>
+</div>
+
+<div id="section-managed" class="app-section" style="display:none">
+  <div class="page"><button class="btn-back" onclick="showHome()">&larr; Back to Home</button></div>
 
 <!-- ------------------------ PAGE ------------------------ -->
 <div class="page">
@@ -1342,6 +1490,158 @@
   </div>
 
 </div><!-- /page -->
+</div>
+
+<div id="section-projects" class="app-section" style="display:none">
+  <div class="page">
+    <button class="btn-back" onclick="showHome()">&larr; Back to Home</button>
+    <div class="section-split">
+      <div class="form-col">
+        <div class="card">
+          <div class="card-title"><span class="step-badge">1</span> Project Quote Details</div>
+          <div class="form-row">
+            <div>
+              <label for="project-company">Company Name *</label>
+              <input type="text" id="project-company" placeholder="Acme Ltd" oninput="updateProjectPanel()" />
+            </div>
+            <div>
+              <label for="project-contact">Contact Name *</label>
+              <input type="text" id="project-contact" placeholder="Jane Smith" oninput="updateProjectPanel()" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="project-email">Email Address *</label>
+              <input type="email" id="project-email" placeholder="jane@acme.com" oninput="updateProjectPanel()" />
+            </div>
+            <div>
+              <label for="project-date">Quote Date *</label>
+              <input type="date" id="project-date" onchange="updateProjectPanel()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="step-badge">2</span> Select Projects</div>
+          <p class="section-sub">Choose the one-off projects to include. Project work is priced at <strong>&pound;800/day sell</strong> and <strong>&pound;300/day cost</strong> unless a special pricing rule applies.</p>
+          <div id="project-list" class="selection-grid"></div>
+        </div>
+      </div>
+
+      <div class="sidebar-col">
+        <div class="quote-panel sticky-panel">
+          <div class="qp-header">&#x1F527; Project Quote Summary</div>
+          <div class="qp-body">
+            <div id="project-qp-lines"><div class="qp-empty">Select projects above to see your live quote total.</div></div>
+            <hr class="qp-divider" />
+            <div class="qp-total-row">
+              <div>
+                <div class="qp-total-label">Total days</div>
+                <div class="qp-sub" id="project-qp-days">0 days selected</div>
+              </div>
+              <div class="qp-line"><div class="qp-val" id="project-qp-days-total">&pound;0.00</div></div>
+            </div>
+            <div class="qp-total-row">
+              <div>
+                <div class="qp-total-label">Total ex VAT</div>
+                <div class="qp-sub">One-off project investment</div>
+              </div>
+              <div class="qp-total-val" id="project-qp-total">&pound;0.00</div>
+            </div>
+            <button class="btn-generate" id="project-btn-generate" onclick="generateProjectQuote()">&#x1F4C4; Generate Quote PDF</button>
+            <button class="btn-sales-internal" onclick="showSalesPinModal('projects')" title="Internal use only">&#x1F512; Internal Summary</button>
+            <div id="project-status-banner" class="status-banner"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="section-standalone" class="app-section" style="display:none">
+  <div class="page">
+    <button class="btn-back" onclick="showHome()">&larr; Back to Home</button>
+    <div class="section-split">
+      <div class="form-col">
+        <div class="card">
+          <div class="card-title"><span class="step-badge">1</span> Standalone Software Quote Details</div>
+          <div class="form-row">
+            <div>
+              <label for="standalone-company">Company Name *</label>
+              <input type="text" id="standalone-company" placeholder="Acme Ltd" oninput="updateStandalonePanel()" />
+            </div>
+            <div>
+              <label for="standalone-contact">Contact Name *</label>
+              <input type="text" id="standalone-contact" placeholder="Jane Smith" oninput="updateStandalonePanel()" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="standalone-email">Email Address *</label>
+              <input type="email" id="standalone-email" placeholder="jane@acme.com" oninput="updateStandalonePanel()" />
+            </div>
+            <div>
+              <label for="standalone-date">Quote Date *</label>
+              <input type="date" id="standalone-date" onchange="updateStandalonePanel()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="step-badge">2</span> Shared Unit Count</div>
+          <div class="form-row single">
+            <div>
+              <label for="standalone-units">Number of users / devices / mailboxes</label>
+              <input type="number" id="standalone-units" min="0" placeholder="e.g. 25" oninput="syncStandaloneQtyDefaults(true); updateStandalonePanel()" />
+            </div>
+          </div>
+          <div class="vcm-note">Sell prices shown are monthly per unit <strong>(5% software-only discount applied)</strong>.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="step-badge">3</span> Select Standalone Services</div>
+          <p class="section-sub">Choose the software and services you want to quote. Per-unit services inherit the shared unit count unless you override the quantity on an individual line.</p>
+          <div id="standalone-list" class="selection-grid"></div>
+        </div>
+      </div>
+
+      <div class="sidebar-col">
+        <div class="quote-panel sticky-panel">
+          <div class="qp-header">&#x1F4BB; Standalone Software Summary</div>
+          <div class="qp-body">
+            <div id="standalone-qp-lines"><div class="qp-empty">Select standalone services above to see recurring and onboarding totals.</div></div>
+            <hr class="qp-divider" />
+            <div class="qp-total-row">
+              <div>
+                <div class="qp-total-label">Monthly recurring total</div>
+                <div class="qp-sub">5% software-only discount applied</div>
+              </div>
+              <div class="qp-total-val" id="standalone-qp-monthly">&pound;0.00</div>
+            </div>
+            <div class="qp-total-row">
+              <div>
+                <div class="qp-total-label">One-off implementation</div>
+                <div class="qp-sub" id="standalone-qp-impl-days">No onboarding required</div>
+              </div>
+              <div class="qp-line"><div class="qp-val" id="standalone-qp-implementation">&pound;0.00</div></div>
+            </div>
+            <div class="qp-total-row">
+              <div>
+                <div class="qp-total-label">First month total</div>
+                <div class="qp-sub">Recurring + one-off setup</div>
+              </div>
+              <div class="qp-total-val" id="standalone-qp-first-month">&pound;0.00</div>
+            </div>
+            <button class="btn-generate" id="standalone-btn-generate" onclick="generateStandaloneQuote()">&#x1F4C4; Generate Quote PDF</button>
+            <button class="btn-sales-internal" onclick="showSalesPinModal('standalone')" title="Internal use only">&#x1F512; Internal Summary</button>
+            <div id="standalone-status-banner" class="status-banner"></div>
+            <p class="qp-note">Software-only pricing (5% discount applied). Implementation days are added as a one-off setup fee when per-unit services are included.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ------------------------ FOOTER ------------------------ -->
 <footer style="background:var(--navy);color:#94b8d8;text-align:center;padding:1.5rem 1rem;font-size:.75rem;margin-top:2rem;">
@@ -1472,6 +1772,1126 @@ const VCM_COST_BANDS = {
   'vcm-std':  { '1-9': 76, '10-19': 102, '20-49': 141, '50-99': 196 },
   'vcm-prem': { '1-9': 76, '10-19': 102, '20-49': 141, '50-99': 196 },
 };
+
+const PROJECT_DAY_SELL = 800;
+const PROJECT_DAY_COST = 300;
+
+const PROJECTS = [
+  {
+    id: 'defender-p1',
+    vendor: 'Microsoft',
+    name: 'Microsoft Defender P1 – Installation & Configuration',
+    description: 'Baseline Configuration, Pilot, UAT, Enhanced Settings, Roll Out, Snagging',
+    baseDays: 4,
+    hasDeployment: true,
+    deploymentNote: 'Additional days based on device count for Intune deployment'
+  },
+  {
+    id: 'defender-office',
+    vendor: 'Microsoft',
+    name: 'Microsoft Defender for Office – Installation & Configuration',
+    description: 'Baseline Configuration, MX redirect, UAT, Enhanced Settings, Roll Out, Snagging',
+    baseDays: 3,
+    hasDeployment: false
+  },
+  {
+    id: 'conditional-access-baseline',
+    vendor: 'Microsoft',
+    name: 'Microsoft Conditional Access / Entra ID – Baseline Configuration',
+    description: 'Baseline policies using Microsoft best practice. Requires Business Premium or Entra ID P1.',
+    baseDays: 2,
+    hasInsideAgent: true,
+    insideAgentDays: 0.5
+  },
+  {
+    id: 'conditional-access-advanced',
+    vendor: 'Microsoft',
+    name: 'Microsoft Conditional Access / Entra ID – Advanced Configuration',
+    description: 'Advanced policy configuration. Requires Business Premium or Entra ID P1.',
+    baseDays: 3,
+    hasInsideAgent: true,
+    insideAgentDays: 1.5
+  },
+  {
+    id: 'purview-basic',
+    vendor: 'Microsoft',
+    name: 'Microsoft Purview – Data Labelling (Business Premium)',
+    description: 'Basic data labels and groups using Business Premium features',
+    baseDays: 4,
+    hasDeployment: false
+  },
+  {
+    id: 'purview-p2',
+    vendor: 'Microsoft',
+    name: 'Microsoft Purview – Data Labelling (Purview P2)',
+    description: 'Full Purview P2 suite data labelling and classification',
+    baseDays: 4,
+    hasDeployment: false
+  },
+  {
+    id: 'firewall-install',
+    vendor: 'Ubiquiti',
+    name: 'Firewall Installation',
+    description: 'Ubiquiti firewall installation and configuration',
+    baseDays: 1.5,
+    hasDeployment: false
+  },
+  {
+    id: 'switch-install',
+    vendor: 'Ubiquiti',
+    name: 'Switch Installation',
+    description: 'Ubiquiti switch installation and configuration',
+    baseDays: 0.5,
+    hasDeployment: false
+  },
+  {
+    id: 'wifi-1-9',
+    vendor: 'Ubiquiti',
+    name: 'Wi-Fi Installation (1–9 Access Points)',
+    description: 'Assumes cabling already complete',
+    baseDays: 1,
+    hasDeployment: false
+  },
+  {
+    id: 'wifi-9-19',
+    vendor: 'Ubiquiti',
+    name: 'Wi-Fi Installation (9–19 Access Points)',
+    description: 'Assumes cabling already complete',
+    baseDays: 1.5,
+    hasDeployment: false
+  },
+  {
+    id: 'wifi-20-49',
+    vendor: 'Ubiquiti',
+    name: 'Wi-Fi Installation (20–49 Access Points)',
+    description: 'Assumes cabling already complete',
+    baseDays: 3,
+    hasDeployment: false
+  },
+  {
+    id: 'm365-migration-audit',
+    vendor: 'Microsoft',
+    name: 'M365 Tenant Migration – Audit, Discovery & Readiness Assessment',
+    description: 'Full tenant audit and migration readiness assessment. Can be combined with actual migration.',
+    baseDays: 4,
+    hasDeployment: false
+  },
+  {
+    id: 'm365-migration-actual',
+    vendor: 'Microsoft',
+    name: 'M365 Tenant – Actual Migration',
+    description: 'Minimum 2 days. Over ~250 users: priced at £7.20/user with no day rate added on top.',
+    baseDays: 2,
+    hasMigration: true
+  },
+  {
+    id: 'backup-365',
+    vendor: 'Back-up',
+    name: '365 Backup – Setup & Testing',
+    description: '1 day setup + 1 day testing',
+    baseDays: 2,
+    hasDeployment: false
+  }
+];
+
+const STANDALONE_SERVICES = [
+  { id: 'ss-inside-agent',  name: 'Inside Agent (ISPM)',           unit: 'user',    cost: 0.80, sell: 1.52,  perUnit: true },
+  { id: 'ss-xdr',           name: 'XDR',                           unit: 'device',  cost: 0.89, sell: 2.85,  perUnit: true },
+  { id: 'ss-email-sec',     name: 'Email Security',                unit: 'mailbox', cost: 1.30, sell: 2.47,  perUnit: true },
+  { id: 'ss-m365-backup',   name: 'M365 Back-up',                  unit: 'user',    cost: 1.05, sell: 2.00,  perUnit: true },
+  { id: 'ss-mdr-advanced',  name: 'MDR – Advanced (requires EDR/XDR)', unit: 'user', cost: 2.40, sell: 4.56,  perUnit: true },
+  { id: 'ss-sat',           name: 'Security Awareness Training (SAT)', unit: 'user', cost: 0.91, sell: 1.43,  perUnit: true },
+  { id: 'ss-dlp',           name: 'Data Loss Prevention (DLP)',    unit: 'user',    cost: 1.30, sell: 1.71,  perUnit: true },
+  { id: 'ss-spm',           name: 'M365 Security Posture Mgmt (SPM)', unit: 'user', cost: 0.83, sell: 1.58,  perUnit: true },
+  { id: 'ss-app-sec',       name: 'M365 App Security',             unit: 'user',    cost: 0.91, sell: 1.43,  perUnit: true },
+  { id: 'ss-mdr-std',       name: 'MDR – Standard (requires EDR/XDR)', unit: 'user', cost: 1.45, sell: 3.33, perUnit: true },
+  { id: 'ss-edr',           name: 'EDR',                           unit: 'device',  cost: 0.50, sell: 0.95,  perUnit: true },
+  { id: 'ss-gws-backup',    name: 'GWS Backup',                    unit: 'user',    cost: 0.60, sell: 1.14,  perUnit: true },
+  { id: 'ss-teams-tel',     name: 'Teams Telephony',               unit: 'user',    cost: 8.00, sell: 11.88, perUnit: true },
+  { id: 'ss-data-bucket',   name: 'Data Bucket (Servers/Machines/M365/GWS)', unit: 'GB', cost: 0.05, sell: 0.076, perUnit: false },
+  { id: 'ss-hot-storage',   name: 'DR Data (Hot Storage)',         unit: 'GB',      cost: 0.04, sell: 0.095, perUnit: false },
+  { id: 'ss-compute',       name: 'Compute Points',                unit: 'point',   cost: 0.04, sell: 0.076, perUnit: false },
+  { id: 'ss-public-ip',     name: 'Public IPs',                    unit: 'IP',      cost: 1.33, sell: 1.43,  perUnit: false },
+  { id: 'ss-onsite-eng',    name: 'Onsite Engineer',               unit: 'day',     cost: 300,  sell: 380,   perUnit: false },
+];
+
+let _salesSummaryTarget = 'managed';
+
+function isoToday() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function formatInputDate(value) {
+  if (!value) return today();
+  const dt = new Date(value + 'T00:00:00');
+  if (Number.isNaN(dt.getTime())) return value;
+  return dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function formatDays(days) {
+  if (days == null) return 'TBC';
+  const num = Number(days);
+  const display = Number.isInteger(num) ? String(num) : num.toFixed(1).replace(/\.0$/, '');
+  return `${display} day${Math.abs(num) === 1 ? '' : 's'}`;
+}
+
+function showHome() {
+  const home = document.getElementById('home-screen');
+  if (home) home.style.display = 'block';
+  document.querySelectorAll('.app-section').forEach(section => section.style.display = 'none');
+  window._activeSection = 'home';
+  window.scrollTo(0, 0);
+}
+
+function showSection(id) {
+  const home = document.getElementById('home-screen');
+  if (home) home.style.display = 'none';
+  document.querySelectorAll('.app-section').forEach(section => section.style.display = 'none');
+  const target = document.getElementById('section-' + id);
+  if (target) target.style.display = 'block';
+  window._activeSection = id;
+
+  if (id === 'managed') {
+    const managedRadio = document.getElementById('st-managed');
+    if (managedRadio) managedRadio.checked = true;
+    setServiceType('managed');
+    updatePanel();
+  }
+  if (id === 'projects') updateProjectPanel();
+  if (id === 'standalone') {
+    syncStandaloneQtyDefaults(true);
+    updateStandalonePanel();
+  }
+  window.scrollTo(0, 0);
+}
+
+function getQuoteStateForSection(section) {
+  if (section === 'projects') return window._projectQuoteState || null;
+  if (section === 'standalone') return window._standaloneQuoteState || null;
+  return window._quoteState ? { ...window._quoteState, hasValue: window._quoteState.monthly > 0 } : null;
+}
+
+function setDefaultSectionDates() {
+  ['project-date', 'standalone-date'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el.value) el.value = isoToday();
+  });
+}
+
+function renderProjectCards() {
+  const container = document.getElementById('project-list');
+  if (!container) return;
+  container.innerHTML = PROJECTS.map(project => {
+    let extra = '';
+    if (project.hasDeployment) {
+      extra += `
+        <div class="selection-card-extra" id="project-extra-${project.id}" style="display:none;">
+          <div class="form-row">
+            <div>
+              <label for="project-device-count-${project.id}">Number of devices</label>
+              <input type="number" id="project-device-count-${project.id}" min="1" placeholder="e.g. 45" oninput="updateProjectPanel()" />
+            </div>
+            <div>
+              <label>Deployment method</label>
+              <div class="inline-options">
+                <label><input type="radio" name="project-deploy-${project.id}" value="intune" checked onchange="updateProjectPanel()" /> Intune</label>
+                <label><input type="radio" name="project-deploy-${project.id}" value="121" onchange="updateProjectPanel()" /> 1-2-1</label>
+              </div>
+            </div>
+          </div>
+          <div class="helper-text">${project.deploymentNote}</div>
+        </div>`;
+    }
+    if (project.hasInsideAgent) {
+      extra += `
+        <div class="selection-card-extra" id="project-extra-${project.id}" style="display:none;">
+          <label><input type="checkbox" id="project-inside-agent-${project.id}" onchange="updateProjectPanel()" /> Client has Inside Agent / ISPM</label>
+          <div class="helper-text">If enabled, reduced project effort applies automatically.</div>
+        </div>`;
+    }
+    if (project.hasMigration) {
+      extra += `
+        <div class="selection-card-extra" id="project-extra-${project.id}" style="display:none;">
+          <div class="form-row single">
+            <div>
+              <label for="project-migration-users-${project.id}">Number of users</label>
+              <input type="number" id="project-migration-users-${project.id}" min="1" placeholder="e.g. 280" oninput="updateProjectPanel()" />
+            </div>
+          </div>
+          <div class="helper-text">Up to 250 users: standard 2-day migration charge. Over 250 users: <strong>£7.20/user</strong> migration pricing applies with no day rate added on top.</div>
+        </div>`;
+    }
+    return `
+      <div class="selection-card" id="project-card-${project.id}">
+        <div class="selection-card-main">
+          <input type="checkbox" id="project-${project.id}" onchange="updateProjectPanel()" />
+          <label for="project-${project.id}" class="selection-card-label">
+            <div class="selection-card-top">
+              <span class="selection-card-badge">${project.vendor}</span>
+              <span class="selection-card-pill" id="project-days-${project.id}">${formatDays(project.baseDays)}</span>
+            </div>
+            <div class="selection-card-title">${project.name}</div>
+            <div class="selection-card-desc">${project.description}</div>
+            <div class="selection-card-meta" id="project-price-${project.id}">${fmt(project.baseDays * PROJECT_DAY_SELL)}</div>
+          </label>
+        </div>
+        ${extra}
+      </div>`;
+  }).join('');
+}
+
+function renderStandaloneCards() {
+  const container = document.getElementById('standalone-list');
+  if (!container) return;
+  container.innerHTML = STANDALONE_SERVICES.map(service => `
+    <div class="selection-card" id="standalone-card-${service.id}">
+      <div class="selection-card-main">
+        <input type="checkbox" id="standalone-${service.id}" onchange="updateStandalonePanel()" />
+        <label for="standalone-${service.id}" class="selection-card-label">
+          <div class="selection-card-top">
+            <span class="selection-card-badge">${service.perUnit ? 'Per ' + service.unit : 'Custom quantity'}</span>
+            <span class="selection-card-pill">${fmt(service.sell)} / ${service.unit} / mo</span>
+          </div>
+          <div class="selection-card-title">${service.name}</div>
+          <div class="selection-card-desc">${service.perUnit ? 'Quantity defaults to the shared unit count unless overridden below.' : 'Enter the quantity required for this non-unit service.'}</div>
+          <div class="selection-card-meta">Cost ${fmt(service.cost)} • Sell ${fmt(service.sell)} per ${service.unit}${service.perUnit ? ' / month' : ''}</div>
+        </label>
+      </div>
+      <div class="selection-card-extra">
+        <div class="form-row single">
+          <div>
+            <label for="standalone-qty-${service.id}">Quantity (${service.unit})</label>
+            <input type="number" id="standalone-qty-${service.id}" min="0" step="0.01" placeholder="${service.perUnit ? 'Defaults to shared unit count' : 'Enter quantity'}" data-auto="${service.perUnit ? 'true' : 'false'}" oninput="markStandaloneQtyManual(this); updateStandalonePanel()" />
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function getProjectDeploymentDays(devices) {
+  if (devices <= 0) return null;
+  if (devices <= 9) return 1;
+  if (devices <= 19) return 1.5;
+  if (devices <= 49) return 2.5;
+  if (devices <= 99) return 5;
+  if (devices <= 149) return 7;
+  return null;
+}
+
+function getStandaloneImplementationBand(units) {
+  if (units <= 0) return { days: 0, sell: 0, cost: 0, label: 'No onboarding required' };
+  if (units <= 9) return { days: 1, sell: 800, cost: 300, label: '1-9 units' };
+  if (units <= 19) return { days: 1.5, sell: 1200, cost: 450, label: '10-19 units' };
+  if (units <= 49) return { days: 2.5, sell: 2000, cost: 750, label: '20-49 units' };
+  if (units <= 99) return { days: 3.5, sell: 2800, cost: 1050, label: '50-99 units' };
+  if (units <= 149) return { days: 5, sell: 4000, cost: 1500, label: '100-149 units' };
+  return { days: null, sell: null, cost: null, label: '150+ units – contact us' };
+}
+
+function updateProjectPanel() {
+  const lineEls = document.getElementById('project-qp-lines');
+  if (!lineEls) return;
+
+  const pricedItems = [];
+  const displayLines = [];
+  let totalSell = 0;
+  let totalCost = 0;
+  let totalDays = 0;
+  let pendingCount = 0;
+
+  PROJECTS.forEach(project => {
+    const checked = document.getElementById(`project-${project.id}`)?.checked;
+    const extra = document.getElementById(`project-extra-${project.id}`);
+    if (extra) extra.style.display = checked ? 'block' : 'none';
+
+    const pill = document.getElementById(`project-days-${project.id}`);
+    const price = document.getElementById(`project-price-${project.id}`);
+
+    if (!checked) {
+      if (pill) pill.textContent = formatDays(project.baseDays);
+      if (price) price.textContent = fmt(project.baseDays * PROJECT_DAY_SELL);
+      return;
+    }
+
+    const item = calculateProjectItem(project);
+    if (pill) pill.textContent = item.daysSummary;
+    if (price) price.textContent = item.metaSummary;
+
+    if (item.ready) {
+      pricedItems.push(item);
+      totalSell += item.sell;
+      totalCost += item.cost;
+      totalDays += item.totalDaysForFooter;
+      displayLines.push({ label: item.name, sub: item.summary, val: fmt(item.sell) });
+    } else {
+      pendingCount += 1;
+      displayLines.push({ label: item.name, sub: item.summary, val: 'Pending' });
+    }
+  });
+
+  if (displayLines.length === 0) {
+    lineEls.innerHTML = '<div class="qp-empty">Select projects above to see your live quote total.</div>';
+  } else {
+    lineEls.innerHTML = displayLines.map(line => `
+      <div class="qp-line">
+        <div class="qp-label">
+          <div style="color:#0f172a;font-weight:600;font-size:.84rem;">${line.label}</div>
+          <div style="color:#64748b;font-size:.74rem;">${line.sub}</div>
+        </div>
+        <div class="qp-val">${line.val}</div>
+      </div>`).join('');
+  }
+
+  document.getElementById('project-qp-days').textContent = pricedItems.length ? `${formatDays(totalDays)} selected` : '0 days selected';
+  document.getElementById('project-qp-days-total').textContent = pricedItems.length ? `${pricedItems.length} project${pricedItems.length === 1 ? '' : 's'}` : 'None';
+  document.getElementById('project-qp-total').textContent = fmt(totalSell);
+
+  window._projectQuoteState = {
+    company: document.getElementById('project-company')?.value.trim() || '',
+    contact: document.getElementById('project-contact')?.value.trim() || '',
+    email: document.getElementById('project-email')?.value.trim() || '',
+    date: document.getElementById('project-date')?.value || isoToday(),
+    items: pricedItems,
+    totalSell,
+    totalCost,
+    totalDays,
+    grossProfit: totalSell - totalCost,
+    commission: (totalSell - totalCost) * 0.25,
+    pendingCount,
+    ready: pricedItems.length > 0 && pendingCount === 0,
+    hasValue: pricedItems.length > 0
+  };
+}
+
+function calculateProjectItem(project) {
+  let days = project.baseDays;
+  let sell = project.baseDays * PROJECT_DAY_SELL;
+  let cost = project.baseDays * PROJECT_DAY_COST;
+  let rateDisplay = fmt(PROJECT_DAY_SELL) + '/day';
+  let summary = formatDays(project.baseDays) + ' base effort';
+  let totalDaysForFooter = project.baseDays;
+
+  if (project.hasDeployment) {
+    const deviceCount = parseInt(document.getElementById(`project-device-count-${project.id}`)?.value, 10) || 0;
+    const method = document.querySelector(`input[name="project-deploy-${project.id}"]:checked`)?.value || 'intune';
+    if (deviceCount <= 0) {
+      return {
+        id: project.id,
+        name: project.name,
+        vendor: project.vendor,
+        ready: false,
+        daysSummary: formatDays(project.baseDays),
+        metaSummary: 'Enter device count to calculate total',
+        summary: 'Enter the device count to price deployment effort.'
+      };
+    }
+    let extraDays = 0;
+    if (method === '121') {
+      extraDays = deviceCount * 0.5;
+    } else {
+      extraDays = getProjectDeploymentDays(deviceCount);
+    }
+    if (extraDays == null) {
+      return {
+        id: project.id,
+        name: project.name,
+        vendor: project.vendor,
+        ready: false,
+        daysSummary: formatDays(project.baseDays),
+        metaSummary: 'Device count outside standard band',
+        summary: 'Device count exceeds standard deployment bands. Contact us for tailored pricing.'
+      };
+    }
+    days = project.baseDays + extraDays;
+    sell = days * PROJECT_DAY_SELL;
+    cost = days * PROJECT_DAY_COST;
+    summary = `${formatDays(project.baseDays)} base + ${formatDays(extraDays)} deployment (${method === '121' ? '1-2-1' : 'Intune'}, ${deviceCount} devices)`;
+    totalDaysForFooter = days;
+  }
+
+  if (project.hasInsideAgent) {
+    const hasInsideAgent = document.getElementById(`project-inside-agent-${project.id}`)?.checked;
+    days = hasInsideAgent ? project.insideAgentDays : project.baseDays;
+    sell = days * PROJECT_DAY_SELL;
+    cost = days * PROJECT_DAY_COST;
+    summary = hasInsideAgent ? `Reduced effort with Inside Agent / ISPM (${formatDays(days)})` : `${formatDays(days)} standard project effort`;
+    totalDaysForFooter = days;
+  }
+
+  if (project.hasMigration) {
+    const userCount = parseInt(document.getElementById(`project-migration-users-${project.id}`)?.value, 10) || 0;
+    if (userCount <= 0) {
+      return {
+        id: project.id,
+        name: project.name,
+        vendor: project.vendor,
+        ready: false,
+        daysSummary: formatDays(project.baseDays),
+        metaSummary: 'Enter user count to calculate pricing',
+        summary: 'Enter the number of migration users to calculate the correct pricing model.'
+      };
+    }
+    if (userCount > 250) {
+      sell = userCount * 7.2;
+      cost = sell;
+      rateDisplay = '£7.20/user';
+      summary = `${userCount} users • migration tool pricing applies • no day rate added`;
+      totalDaysForFooter = 0;
+      return {
+        id: project.id,
+        name: project.name,
+        vendor: project.vendor,
+        ready: true,
+        sell,
+        cost,
+        grossProfit: sell - cost,
+        commission: (sell - cost) * 0.25,
+        days: 0,
+        daysSummary: `${userCount} users`,
+        daysDisplay: `${userCount} users`,
+        totalDaysForFooter,
+        rateDisplay,
+        summary,
+        metaSummary: `${fmt(sell)} • £7.20/user migration pricing applies`
+      };
+    }
+    days = project.baseDays;
+    sell = days * PROJECT_DAY_SELL;
+    cost = days * PROJECT_DAY_COST;
+    summary = `${userCount} users • standard ${formatDays(days)} migration engagement`;
+    totalDaysForFooter = days;
+  }
+
+  return {
+    id: project.id,
+    name: project.name,
+    vendor: project.vendor,
+    ready: true,
+    sell,
+    cost,
+    grossProfit: sell - cost,
+    commission: (sell - cost) * 0.25,
+    days,
+    daysSummary: formatDays(days),
+    daysDisplay: formatDays(days),
+    totalDaysForFooter,
+    rateDisplay,
+    summary,
+    metaSummary: `${fmt(sell)} • ${rateDisplay}`
+  };
+}
+
+function showSectionStatus(id, msg, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.className = `status-banner ${type}`;
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 8000);
+}
+
+function generateProjectQuote() {
+  const state = window._projectQuoteState || {};
+  if (!state.company || !state.contact || !state.email) {
+    showSectionStatus('project-status-banner', 'Please complete the company, contact and email fields before generating a project quote.', 'error');
+    return;
+  }
+  if (!state.ready) {
+    showSectionStatus('project-status-banner', 'Please select at least one fully configured project before generating a quote.', 'error');
+    return;
+  }
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    showSectionStatus('project-status-banner', 'PDF library not loaded – please refresh and try again.', 'error');
+    return;
+  }
+  const btn = document.getElementById('project-btn-generate');
+  btn.disabled = true;
+  btn.textContent = 'Generating…';
+  try {
+    const blob = buildProjectPDF();
+    downloadBlob(blob, `Unleashed-Project-Quote-${state.company.replace(/[^a-zA-Z0-9]/g, '-')}-${today()}.pdf`);
+    showSectionStatus('project-status-banner', 'Project quote PDF generated successfully.', 'success');
+  } catch (err) {
+    console.error(err);
+    showSectionStatus('project-status-banner', 'Could not generate the project quote PDF: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '📄 Generate Quote PDF';
+  }
+}
+
+function buildProjectPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const W = 210;
+  const margin = 18;
+  const state = window._projectQuoteState;
+
+  doc.setFillColor(15, 39, 68);
+  doc.rect(0, 0, W, 42, 'F');
+  doc.setFillColor(37, 99, 235);
+  doc.rect(0, 42, W, 3, 'F');
+  if (_logoDataUrl) doc.addImage(_logoDataUrl, 'PNG', margin, 4, 52, 34);
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text('PROJECT BUDGETARY QUOTATION', W - margin, 16, { align: 'right' });
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.text(`Date: ${formatInputDate(state.date)}`, W - margin, 24, { align: 'right' });
+  doc.text(`Ref: PRJ-${Date.now().toString().slice(-6)}`, W - margin, 31, { align: 'right' });
+
+  doc.setFillColor(244, 247, 251);
+  doc.rect(margin, 54, W - margin * 2, 28, 'F');
+  doc.setTextColor(15, 39, 68);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text('PREPARED FOR', margin + 5, 61);
+  doc.setFontSize(12);
+  doc.text(state.company, margin + 5, 69);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text(`${state.contact}  |  ${state.email}`, margin + 5, 76);
+
+  doc.autoTable({
+    startY: 90,
+    head: [['Service', 'Vendor', 'Days', 'Day Rate', 'Total']],
+    body: state.items.map(item => [
+      pdfSafe(item.name),
+      pdfSafe(item.vendor),
+      pdfSafe(item.daysDisplay),
+      pdfSafe(item.rateDisplay),
+      pdfSafe(fmt(item.sell))
+    ]),
+    theme: 'grid',
+    styles: { fontSize: 8, cellPadding: 2.8, textColor: [30, 41, 59] },
+    headStyles: { fillColor: [15, 39, 68], textColor: 255, fontStyle: 'bold' },
+    columnStyles: {
+      0: { cellWidth: 86 },
+      1: { cellWidth: 28 },
+      2: { halign: 'right', cellWidth: 24 },
+      3: { halign: 'right', cellWidth: 28 },
+      4: { halign: 'right', cellWidth: 26 }
+    },
+    alternateRowStyles: { fillColor: [248, 250, 252] },
+    margin: { left: margin, right: margin }
+  });
+
+  let y = doc.lastAutoTable.finalY + 10;
+  doc.setFillColor(238, 244, 255);
+  doc.roundedRect(margin, y, W - margin * 2, 24, 3, 3, 'F');
+  doc.setTextColor(15, 39, 68);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text('Total days', margin + 5, y + 8);
+  doc.text('Total investment (ex VAT)', margin + 5, y + 18);
+  doc.setFontSize(10);
+  doc.text(pdfSafe(formatDays(state.totalDays)), W - margin - 5, y + 8, { align: 'right' });
+  doc.text(pdfSafe(fmt(state.totalSell)), W - margin - 5, y + 18, { align: 'right' });
+  y += 32;
+
+  const notes = state.items.filter(item => item.summary).map(item => `• ${item.name}: ${item.summary}`);
+  if (notes.length) {
+    doc.setTextColor(100, 116, 139);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    const noteLines = doc.splitTextToSize(notes.join('\n'), W - margin * 2);
+    doc.text(noteLines, margin, y);
+  }
+
+  doc.setFillColor(15, 39, 68);
+  doc.rect(0, 275, W, 22, 'F');
+  doc.setTextColor(148, 163, 184);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.text('Unleashed Solutions  |  All prices exclude VAT  |  www.teamunleashed.co.uk', W / 2, 284, { align: 'center' });
+  doc.setTextColor(37, 99, 235);
+  doc.text('Project quote generated by Unleashed Quote Builder', W / 2, 291, { align: 'center' });
+  return doc.output('blob');
+}
+
+function buildProjectSalesPDF() {
+  const { jsPDF } = window.jspdf;
+  const state = window._projectQuoteState;
+  const company = state.company || 'Unknown';
+  const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'landscape' });
+  const pW = 297;
+  const pH = 210;
+  const margin = 14;
+  const totalGp = state.grossProfit;
+  const totalMargin = state.totalSell > 0 ? (totalGp / state.totalSell) * 100 : 0;
+
+  doc.setFillColor(30, 58, 95);
+  doc.rect(0, 0, pW, 22, 'F');
+  if (_logoDataUrl) doc.addImage(_logoDataUrl, 'PNG', margin, 2, 30, 18);
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(13);
+  doc.setFont('helvetica', 'bold');
+  doc.text('INTERNAL PROJECT SUMMARY  –  CONFIDENTIAL', pW / 2, 10, { align: 'center' });
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(147, 197, 253);
+  doc.text('Not for distribution to clients', pW / 2, 16, { align: 'center' });
+
+  let y = 30;
+  doc.setTextColor(30, 58, 95);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Client:', margin, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(company + (state.contact ? '  –  ' + state.contact : ''), margin + 20, y);
+  y += 6;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Contact:', margin, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(state.email || '–', margin + 20, y);
+  y += 6;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Quote Date:', margin, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(formatInputDate(state.date), margin + 20, y);
+
+  doc.autoTable({
+    startY: y + 8,
+    head: [['Service', 'Vendor', 'Pricing Basis', 'Sell', 'Cost', 'GP', 'Margin', 'Commission']],
+    body: state.items.map(item => [
+      pdfSafe(item.name),
+      pdfSafe(item.vendor),
+      pdfSafe(item.summary),
+      fmt(item.sell),
+      fmt(item.cost),
+      fmt(item.grossProfit),
+      `${item.sell > 0 ? ((item.grossProfit / item.sell) * 100).toFixed(1) : '0.0'}%`,
+      fmt(item.commission)
+    ]),
+    theme: 'grid',
+    styles: { fontSize: 7.5, cellPadding: 2.2, textColor: [30, 58, 95] },
+    headStyles: { fillColor: [30, 58, 95], textColor: 255, fontStyle: 'bold' },
+    columnStyles: {
+      0: { cellWidth: 72 },
+      1: { cellWidth: 24 },
+      2: { cellWidth: 72 },
+      3: { halign: 'right', cellWidth: 24 },
+      4: { halign: 'right', cellWidth: 24 },
+      5: { halign: 'right', cellWidth: 22 },
+      6: { halign: 'right', cellWidth: 18 },
+      7: { halign: 'right', cellWidth: 24 }
+    },
+    alternateRowStyles: { fillColor: [240, 245, 251] },
+    margin: { left: margin, right: margin }
+  });
+
+  const sy = doc.lastAutoTable.finalY + 10;
+  doc.setFillColor(30, 58, 95);
+  doc.roundedRect(margin, sy, pW - margin * 2, 38, 3, 3, 'F');
+  doc.setTextColor(147, 197, 253);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Total Sell', margin + 6, sy + 10);
+  doc.text('Total Cost', margin + 76, sy + 10);
+  doc.text('Gross Profit', margin + 146, sy + 10);
+  doc.text('Margin %', margin + 216, sy + 10);
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.text(fmt(state.totalSell), margin + 6, sy + 20);
+  doc.text(fmt(state.totalCost), margin + 76, sy + 20);
+  doc.text(fmt(totalGp), margin + 146, sy + 20);
+  doc.text(totalMargin.toFixed(1) + '%', margin + 216, sy + 20);
+  doc.setTextColor(253, 224, 71);
+  doc.text('25% Commission on GP: ' + fmt(state.commission), margin + 6, sy + 32);
+
+  doc.setTextColor(100, 116, 139);
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'normal');
+  doc.text('UNLEASHED SOLUTIONS  |  INTERNAL USE ONLY  |  Generated ' + today(), pW / 2, pH - 6, { align: 'center' });
+  downloadBlob(doc.output('blob'), `Unleashed-INTERNAL-ProjectSummary-${company.replace(/[^a-zA-Z0-9]/g, '-')}-${today()}.pdf`);
+}
+
+function markStandaloneQtyManual(input) {
+  if (!input) return;
+  input.dataset.auto = input.value === '' ? 'true' : 'false';
+}
+
+function syncStandaloneQtyDefaults(force) {
+  const units = Math.max(0, parseFloat(document.getElementById('standalone-units')?.value) || 0);
+  STANDALONE_SERVICES.filter(service => service.perUnit).forEach(service => {
+    const input = document.getElementById(`standalone-qty-${service.id}`);
+    if (!input) return;
+    if (force || input.dataset.auto !== 'false' || !input.value) {
+      input.value = units > 0 ? String(units) : '';
+      input.dataset.auto = 'true';
+    }
+  });
+}
+
+function getStandaloneQty(service) {
+  const input = document.getElementById(`standalone-qty-${service.id}`);
+  const raw = input ? parseFloat(input.value) || 0 : 0;
+  if (service.perUnit) {
+    const units = Math.max(0, parseFloat(document.getElementById('standalone-units')?.value) || 0);
+    return raw > 0 ? raw : units;
+  }
+  return raw > 0 ? raw : 0;
+}
+
+function updateStandalonePanel() {
+  const lineEls = document.getElementById('standalone-qp-lines');
+  if (!lineEls) return;
+
+  const selectedLines = [];
+  const displayLines = [];
+  const selectedPerUnit = [];
+  let monthlySell = 0;
+  let monthlyCost = 0;
+  let pendingCount = 0;
+
+  STANDALONE_SERVICES.forEach(service => {
+    const checked = document.getElementById(`standalone-${service.id}`)?.checked;
+    if (!checked) return;
+    const qty = getStandaloneQty(service);
+    if (qty <= 0) {
+      pendingCount += 1;
+      displayLines.push({ label: service.name, sub: `Enter a valid ${service.unit} quantity`, val: 'Pending' });
+      return;
+    }
+    const line = {
+      id: service.id,
+      name: service.name,
+      unit: service.unit,
+      qty,
+      perUnit: service.perUnit,
+      unitSell: service.sell,
+      unitCost: service.cost,
+      monthlySell: qty * service.sell,
+      monthlyCost: qty * service.cost,
+      grossProfit: qty * (service.sell - service.cost)
+    };
+    monthlySell += line.monthlySell;
+    monthlyCost += line.monthlyCost;
+    selectedLines.push(line);
+    if (service.perUnit) selectedPerUnit.push(line);
+    displayLines.push({ label: service.name, sub: `${qty} ${service.unit}${qty === 1 ? '' : 's'} × ${fmt(service.sell)}/mo`, val: fmt(line.monthlySell) });
+  });
+
+  const unitCount = Math.max(0, parseFloat(document.getElementById('standalone-units')?.value) || 0);
+  let implementation = { days: 0, sell: 0, cost: 0, label: 'No onboarding required', grossProfit: 0 };
+  if (selectedPerUnit.length > 0) {
+    implementation = getStandaloneImplementationBand(unitCount);
+    if (implementation.sell == null) {
+      pendingCount += 1;
+      displayLines.push({ label: 'Implementation & Onboarding', sub: implementation.label, val: 'TBC' });
+    } else if (implementation.sell > 0) {
+      implementation.grossProfit = implementation.sell - implementation.cost;
+      displayLines.push({ label: 'Implementation & Onboarding', sub: `${formatDays(implementation.days)} (${implementation.label})`, val: fmt(implementation.sell) });
+    }
+  }
+
+  if (displayLines.length === 0) {
+    lineEls.innerHTML = '<div class="qp-empty">Select standalone services above to see recurring and onboarding totals.</div>';
+  } else {
+    lineEls.innerHTML = displayLines.map(line => `
+      <div class="qp-line">
+        <div class="qp-label">
+          <div style="color:#0f172a;font-weight:600;font-size:.84rem;">${line.label}</div>
+          <div style="color:#64748b;font-size:.74rem;">${line.sub}</div>
+        </div>
+        <div class="qp-val">${line.val}</div>
+      </div>`).join('');
+  }
+
+  const firstMonthTotal = monthlySell + (implementation.sell || 0);
+  document.getElementById('standalone-qp-monthly').textContent = fmt(monthlySell);
+  document.getElementById('standalone-qp-implementation').textContent = implementation.sell == null ? 'TBC' : fmt(implementation.sell || 0);
+  document.getElementById('standalone-qp-impl-days').textContent = selectedPerUnit.length === 0 ? 'No onboarding required' : (implementation.days == null ? implementation.label : `${formatDays(implementation.days)} • ${implementation.label}`);
+  document.getElementById('standalone-qp-first-month').textContent = implementation.sell == null ? fmt(monthlySell) + ' + TBC' : fmt(firstMonthTotal);
+
+  window._standaloneQuoteState = {
+    company: document.getElementById('standalone-company')?.value.trim() || '',
+    contact: document.getElementById('standalone-contact')?.value.trim() || '',
+    email: document.getElementById('standalone-email')?.value.trim() || '',
+    date: document.getElementById('standalone-date')?.value || isoToday(),
+    unitCount,
+    recurringLines: selectedLines,
+    implementation,
+    monthlySell,
+    monthlyCost,
+    monthlyGrossProfit: monthlySell - monthlyCost,
+    implementationGrossProfit: implementation.sell != null ? (implementation.sell || 0) - (implementation.cost || 0) : 0,
+    firstMonthTotal,
+    pendingCount,
+    ready: selectedLines.length > 0 && pendingCount === 0,
+    hasValue: selectedLines.length > 0
+  };
+}
+
+function generateStandaloneQuote() {
+  const state = window._standaloneQuoteState || {};
+  if (!state.company || !state.contact || !state.email) {
+    showSectionStatus('standalone-status-banner', 'Please complete the company, contact and email fields before generating a software quote.', 'error');
+    return;
+  }
+  if (!state.ready) {
+    showSectionStatus('standalone-status-banner', 'Please select at least one fully configured standalone service before generating a quote.', 'error');
+    return;
+  }
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    showSectionStatus('standalone-status-banner', 'PDF library not loaded – please refresh and try again.', 'error');
+    return;
+  }
+  const btn = document.getElementById('standalone-btn-generate');
+  btn.disabled = true;
+  btn.textContent = 'Generating…';
+  try {
+    const blob = buildStandalonePDF();
+    downloadBlob(blob, `Unleashed-Standalone-Software-${state.company.replace(/[^a-zA-Z0-9]/g, '-')}-${today()}.pdf`);
+    showSectionStatus('standalone-status-banner', 'Standalone software quote PDF generated successfully.', 'success');
+  } catch (err) {
+    console.error(err);
+    showSectionStatus('standalone-status-banner', 'Could not generate the standalone software PDF: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '📄 Generate Quote PDF';
+  }
+}
+
+function buildStandalonePDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const W = 210;
+  const margin = 18;
+  const state = window._standaloneQuoteState;
+
+  doc.setFillColor(15, 39, 68);
+  doc.rect(0, 0, W, 42, 'F');
+  doc.setFillColor(37, 99, 235);
+  doc.rect(0, 42, W, 3, 'F');
+  if (_logoDataUrl) doc.addImage(_logoDataUrl, 'PNG', margin, 4, 52, 34);
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text('STANDALONE SOFTWARE QUOTATION', W - margin, 16, { align: 'right' });
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.text(`Date: ${formatInputDate(state.date)}`, W - margin, 24, { align: 'right' });
+  doc.text(`Ref: SW-${Date.now().toString().slice(-6)}`, W - margin, 31, { align: 'right' });
+
+  doc.setFillColor(244, 247, 251);
+  doc.rect(margin, 54, W - margin * 2, 28, 'F');
+  doc.setTextColor(15, 39, 68);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text('PREPARED FOR', margin + 5, 61);
+  doc.setFontSize(12);
+  doc.text(state.company, margin + 5, 69);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text(`${state.contact}  |  ${state.email}`, margin + 5, 76);
+
+  doc.autoTable({
+    startY: 90,
+    head: [['Service', 'Unit', 'Qty', 'Monthly / Unit', 'Monthly Total']],
+    body: state.recurringLines.map(line => [
+      pdfSafe(line.name),
+      pdfSafe(line.unit),
+      String(line.qty),
+      pdfSafe(fmt(line.unitSell)),
+      pdfSafe(fmt(line.monthlySell))
+    ]),
+    theme: 'grid',
+    styles: { fontSize: 8, cellPadding: 2.8, textColor: [30, 41, 59] },
+    headStyles: { fillColor: [15, 39, 68], textColor: 255, fontStyle: 'bold' },
+    columnStyles: {
+      0: { cellWidth: 88 },
+      1: { cellWidth: 24 },
+      2: { halign: 'right', cellWidth: 20 },
+      3: { halign: 'right', cellWidth: 30 },
+      4: { halign: 'right', cellWidth: 30 }
+    },
+    alternateRowStyles: { fillColor: [248, 250, 252] },
+    margin: { left: margin, right: margin }
+  });
+
+  let y = doc.lastAutoTable.finalY + 10;
+  if (state.implementation.sell && state.implementation.sell > 0) {
+    doc.setFillColor(238, 244, 255);
+    doc.roundedRect(margin, y, W - margin * 2, 18, 3, 3, 'F');
+    doc.setTextColor(15, 39, 68);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.text('Implementation & Onboarding', margin + 5, y + 8);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.text(`${formatDays(state.implementation.days)} • ${state.implementation.label}`, margin + 5, y + 14);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text(fmt(state.implementation.sell), W - margin - 5, y + 11, { align: 'right' });
+    y += 24;
+  }
+
+  doc.setFillColor(15, 39, 68);
+  doc.roundedRect(margin, y, W - margin * 2, 28, 3, 3, 'F');
+  doc.setTextColor(147, 197, 253);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.text('Monthly recurring total', margin + 5, y + 8);
+  doc.text('One-off implementation total', margin + 5, y + 16);
+  doc.text('First month total', margin + 5, y + 24);
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.text(fmt(state.monthlySell), W - margin - 5, y + 8, { align: 'right' });
+  doc.text(state.implementation.sell == null ? 'TBC' : fmt(state.implementation.sell || 0), W - margin - 5, y + 16, { align: 'right' });
+  doc.text(state.implementation.sell == null ? pdfSafe(fmt(state.monthlySell) + ' + TBC') : fmt(state.firstMonthTotal), W - margin - 5, y + 24, { align: 'right' });
+
+  y += 36;
+  doc.setTextColor(100, 116, 139);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  const note = 'Software-only pricing (5% discount applied). Implementation days included as one-off setup fee.';
+  const noteLines = doc.splitTextToSize(note, W - margin * 2);
+  doc.text(noteLines, margin, y);
+
+  doc.setFillColor(15, 39, 68);
+  doc.rect(0, 275, W, 22, 'F');
+  doc.setTextColor(148, 163, 184);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.text('Unleashed Solutions  |  Standalone software pricing  |  www.teamunleashed.co.uk', W / 2, 284, { align: 'center' });
+  doc.setTextColor(37, 99, 235);
+  doc.text('Software-only pricing (5% discount applied)', W / 2, 291, { align: 'center' });
+  return doc.output('blob');
+}
+
+function buildStandaloneSalesPDF() {
+  const { jsPDF } = window.jspdf;
+  const state = window._standaloneQuoteState;
+  const company = state.company || 'Unknown';
+  const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'landscape' });
+  const pW = 297;
+  const pH = 210;
+  const margin = 14;
+  const implementation = state.implementation || { sell: 0, cost: 0, grossProfit: 0 };
+  const totalSell = state.monthlySell + (implementation.sell || 0);
+  const totalCost = state.monthlyCost + (implementation.cost || 0);
+  const totalGp = (state.monthlyGrossProfit || 0) + (implementation.grossProfit || 0);
+  const totalMargin = totalSell > 0 ? (totalGp / totalSell) * 100 : 0;
+  const monthlyCommission = (state.monthlyGrossProfit || 0) * 0.25;
+  const implementationCommission = (implementation.grossProfit || 0) * 0.25;
+
+  doc.setFillColor(30, 58, 95);
+  doc.rect(0, 0, pW, 22, 'F');
+  if (_logoDataUrl) doc.addImage(_logoDataUrl, 'PNG', margin, 2, 30, 18);
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(13);
+  doc.setFont('helvetica', 'bold');
+  doc.text('INTERNAL SOFTWARE SUMMARY  –  CONFIDENTIAL', pW / 2, 10, { align: 'center' });
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(147, 197, 253);
+  doc.text('Not for distribution to clients', pW / 2, 16, { align: 'center' });
+
+  let y = 30;
+  doc.setTextColor(30, 58, 95);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Client:', margin, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(company + (state.contact ? '  –  ' + state.contact : ''), margin + 20, y);
+  y += 6;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Contact:', margin, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(state.email || '–', margin + 20, y);
+  y += 6;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Quote Date:', margin, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(formatInputDate(state.date), margin + 20, y);
+
+  const rows = state.recurringLines.map(line => [
+    pdfSafe(line.name),
+    'Monthly',
+    String(line.qty),
+    fmt(line.unitSell),
+    fmt(line.unitCost),
+    fmt(line.monthlySell),
+    fmt(line.monthlyCost),
+    fmt(line.grossProfit),
+    `${line.monthlySell > 0 ? ((line.grossProfit / line.monthlySell) * 100).toFixed(1) : '0.0'}%`
+  ]);
+  if (implementation.sell && implementation.sell > 0) {
+    rows.push([
+      'Implementation & Onboarding',
+      'One-off',
+      formatDays(implementation.days),
+      fmt((implementation.sell || 0) / (implementation.days || 1)),
+      fmt((implementation.cost || 0) / (implementation.days || 1)),
+      fmt(implementation.sell || 0),
+      fmt(implementation.cost || 0),
+      fmt(implementation.grossProfit || 0),
+      `${implementation.sell > 0 ? (((implementation.grossProfit || 0) / implementation.sell) * 100).toFixed(1) : '0.0'}%`
+    ]);
+  }
+
+  doc.autoTable({
+    startY: y + 8,
+    head: [['Service', 'Type', 'Qty / Days', 'Unit Sell', 'Unit Cost', 'Sell Total', 'Cost Total', 'GP', 'Margin']],
+    body: rows,
+    theme: 'grid',
+    styles: { fontSize: 7.5, cellPadding: 2.2, textColor: [30, 58, 95] },
+    headStyles: { fillColor: [30, 58, 95], textColor: 255, fontStyle: 'bold' },
+    columnStyles: {
+      0: { cellWidth: 70 },
+      1: { cellWidth: 18 },
+      2: { halign: 'right', cellWidth: 20 },
+      3: { halign: 'right', cellWidth: 22 },
+      4: { halign: 'right', cellWidth: 22 },
+      5: { halign: 'right', cellWidth: 24 },
+      6: { halign: 'right', cellWidth: 24 },
+      7: { halign: 'right', cellWidth: 22 },
+      8: { halign: 'right', cellWidth: 18 }
+    },
+    alternateRowStyles: { fillColor: [240, 245, 251] },
+    margin: { left: margin, right: margin }
+  });
+
+  const sy = doc.lastAutoTable.finalY + 10;
+  doc.setFillColor(30, 58, 95);
+  doc.roundedRect(margin, sy, pW - margin * 2, 42, 3, 3, 'F');
+  doc.setTextColor(147, 197, 253);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Monthly Sell', margin + 6, sy + 10);
+  doc.text('Monthly Cost', margin + 76, sy + 10);
+  doc.text('One-off Sell', margin + 146, sy + 10);
+  doc.text('One-off Cost', margin + 216, sy + 10);
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.text(fmt(state.monthlySell), margin + 6, sy + 20);
+  doc.text(fmt(state.monthlyCost), margin + 76, sy + 20);
+  doc.text(fmt(implementation.sell || 0), margin + 146, sy + 20);
+  doc.text(fmt(implementation.cost || 0), margin + 216, sy + 20);
+  doc.setTextColor(147, 197, 253);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Total GP / Margin', margin + 6, sy + 32);
+  doc.text('25% Commission', margin + 146, sy + 32);
+  doc.setTextColor(253, 224, 71);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${fmt(totalGp)} (${totalMargin.toFixed(1)}%)`, margin + 6, sy + 40);
+  doc.text(`${fmt(monthlyCommission + implementationCommission)} total`, margin + 146, sy + 40);
+
+  doc.setTextColor(100, 116, 139);
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'normal');
+  doc.text('UNLEASHED SOLUTIONS  |  INTERNAL USE ONLY  |  Generated ' + today(), pW / 2, pH - 6, { align: 'center' });
+  downloadBlob(doc.output('blob'), `Unleashed-INTERNAL-SoftwareSummary-${company.replace(/[^a-zA-Z0-9]/g, '-')}-${today()}.pdf`);
+}
 
 function getUsers()   { return Math.max(0, parseInt(document.getElementById('num-units').value)   || 0); }
 function getDevices() { return Math.max(0, parseInt(document.getElementById('num-units').value)   || 0); }
@@ -2252,11 +3672,14 @@ function showStatus(msg, type) {
 }
 
 // -- Sales PIN modal --
-function showSalesPinModal() {
-  if (!window._quoteState || window._quoteState.monthly === 0) {
+function showSalesPinModal(section) {
+  const targetSection = section || window._activeSection || 'managed';
+  const state = getQuoteStateForSection(targetSection);
+  if (!state || !state.hasValue) {
     alert('Please select at least one service before generating a sales summary.');
     return;
   }
+  _salesSummaryTarget = targetSection;
   document.getElementById('pin-input').value = '';
   document.getElementById('pin-error').textContent = '';
   document.getElementById('pin-overlay').classList.add('active');
@@ -2271,7 +3694,13 @@ function verifySalesPin() {
   const entered = document.getElementById('pin-input').value;
   if (entered === CONFIG.sales_pin) {
     closePinModal();
-    buildSalesPDF();
+    if (_salesSummaryTarget === 'projects') {
+      buildProjectSalesPDF();
+    } else if (_salesSummaryTarget === 'standalone') {
+      buildStandaloneSalesPDF();
+    } else {
+      buildSalesPDF();
+    }
   } else {
     document.getElementById('pin-error').textContent = 'Incorrect PIN – please try again.';
     document.getElementById('pin-input').value = '';
@@ -2454,9 +3883,19 @@ function today() {
 }
 
 // Init
+renderProjectCards();
+renderStandaloneCards();
+setDefaultSectionDates();
 toggleMs365Options();
 updateMsLicensePrices();
+const managedRadio = document.getElementById('st-managed');
+if (managedRadio) managedRadio.checked = true;
+setServiceType('managed');
+syncStandaloneQtyDefaults(true);
 updatePanel();
+updateProjectPanel();
+updateStandalonePanel();
+showHome();
 </script>
 <script>
   if ("serviceWorker" in navigator) {
