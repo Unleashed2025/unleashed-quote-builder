@@ -3231,18 +3231,17 @@ const SA_SERVICES = [
   { id:'sa-m365bk',  name:'M365 Back-up',                        unit:'user',    cost:1.05,  sell:2.00,  perUnit:true,  implDays:2 },
   { id:'sa-mdr-adv', name:'MDR – Advanced (requires EDR/XDR)',    unit:'user',    cost:2.40,  sell:4.56,  perUnit:true,  implDays:4 },
   { id:'sa-sat',     name:'Security Awareness Training (SAT)',    unit:'user',    cost:0.91,  sell:1.43,  perUnit:true,  implDays:2 },
-  { id:'sa-dlp',     name:'Data Loss Prevention (DLP)',           unit:'user',    cost:1.30,  sell:1.71,  perUnit:true },
-  { id:'sa-spm',     name:'M365 Security Posture Mgmt (SPM)',     unit:'user',    cost:0.83,  sell:1.58,  perUnit:true },
-  { id:'sa-appsec',  name:'M365 App Security',                    unit:'user',    cost:0.91,  sell:1.43,  perUnit:true },
+  { id:'sa-dlp',     name:'Data Loss Prevention (DLP)',           unit:'user',    cost:1.30,  sell:1.71,  perUnit:true,  implDays:4 },
+  { id:'sa-spm',     name:'M365 Security Posture Mgmt (SPM)',     unit:'user',    cost:0.83,  sell:1.58,  perUnit:true,  implDays:1 },
+  { id:'sa-appsec',  name:'M365 App Security',                    unit:'user',    cost:0.91,  sell:1.43,  perUnit:true,  implDays:2 },
   { id:'sa-mdr-std', name:'MDR – Standard (requires EDR/XDR)',    unit:'user',    cost:1.45,  sell:3.33,  perUnit:true,  implDays:4 },
-  { id:'sa-edr',     name:'EDR',                                  unit:'device',  cost:0.50,  sell:0.95,  perUnit:true },
+  { id:'sa-edr',     name:'EDR',                                  unit:'device',  cost:0.50,  sell:0.95,  perUnit:true,  implDays:3 },
   { id:'sa-gwsbk',   name:'GWS Backup',                          unit:'user',    cost:0.60,  sell:1.14,  perUnit:true },
-  { id:'sa-teams',   name:'Teams Telephony',                      unit:'user',    cost:8.00,  sell:11.88, perUnit:true },
-  { id:'sa-databkt', name:'Data Bucket (Servers/M365/GWS)',       unit:'GB',      cost:0.05,  sell:0.076, perUnit:false },
-  { id:'sa-hotstr',  name:'DR Data (Hot Storage)',                unit:'GB',      cost:0.04,  sell:0.095, perUnit:false },
-  { id:'sa-compute', name:'Compute Points',                       unit:'point',   cost:0.04,  sell:0.076, perUnit:false },
-  { id:'sa-pubip',   name:'Public IPs',                           unit:'IP',      cost:1.33,  sell:1.43,  perUnit:false },
-  { id:'sa-onsite',  name:'Onsite Engineer',                      unit:'day',     cost:300,   sell:380,   perUnit:false }
+  { id:'sa-teams',   name:'Teams Telephony',                      unit:'user',    cost:8.00,  sell:11.88, perUnit:true,  implDays:4 },
+  { id:'sa-databkt', name:'Data Bucket (Servers/M365/GWS)',       unit:'GB',      cost:0.05,  sell:0.076, perUnit:false, implDays:3 },
+  { id:'sa-hotstr',  name:'DR Data (Hot Storage)',                unit:'GB',      cost:0.04,  sell:0.095, perUnit:false, implDays:3 },
+  { id:'sa-compute', name:'Compute Points',                       unit:'point',   cost:0.04,  sell:0.076, perUnit:false, implDays:0 },
+  { id:'sa-pubip',   name:'Public IPs',                           unit:'IP',      cost:1.33,  sell:1.43,  perUnit:false, implDays:0 },
 ];
 
 function saImplDays(units) {
@@ -3262,7 +3261,7 @@ function saBuildCards() {
     const tagClass  = s.perUnit ? 'ms' : 'bic';
     const tagLabel  = s.perUnit ? 'Per ' + s.unit + ' / mo' : 'Custom qty';
     const priceLabel = '\u00a3' + s.sell.toFixed(s.sell < 1 ? 3 : 2) + ' / ' + s.unit + (s.perUnit ? ' / mo' : '');
-    const implRow   = s.perUnit ? `<div id="saimpl-${s.id}" style="font-size:.73rem;color:#64748b;font-style:italic;margin-top:.35rem;"></div>` : '';
+    const implRow   = (s.perUnit || (s.implDays !== undefined && s.implDays > 0)) ? `<div id="saimpl-${s.id}" style="font-size:.73rem;color:#64748b;font-style:italic;margin-top:.35rem;"></div>` : '';
     return `
     <div class="check-tile" id="sacard-${s.id}">
       <input type="checkbox" id="sachk-${s.id}" onchange="saUpdatePanel()" />
@@ -3313,11 +3312,12 @@ function saUpdatePanel() {
     const lineCost = s.cost * qty;
     if (totEl) totEl.textContent = qty > 0 ? '\u00a3'+(effSell*qty).toFixed(2)+'/mo' : '';
     if (card) card.style.borderColor = chk.checked ? '#2563eb' : '#e2e8f0';
-    if (s.perUnit) {
+    if (s.perUnit || (s.implDays !== undefined && s.implDays > 0)) {
       const iDays = (s.implDays !== undefined) ? s.implDays : saImplDays(qty);
       const implEl = document.getElementById('saimpl-' + s.id);
-      if (implEl) implEl.textContent = qty > 0 ? 'Est. implementation: '+iDays+' day'+(iDays===1?'':'s')+' \u00b7 \u00a3'+(iDays*800).toFixed(2) : '';
-      if (chk.checked && qty > 0) { totalImplSell += iDays*800; totalImplCost += iDays*300; totalImplDays += iDays; }
+      const showImpl = iDays > 0 && (s.perUnit ? qty > 0 : true);
+      if (implEl) implEl.textContent = showImpl ? 'Est. implementation: '+iDays+' day'+(iDays===1?'':'s')+' \u00b7 \u00a3'+(iDays*800).toFixed(2) : '';
+      if (chk.checked && showImpl) { totalImplSell += iDays*800; totalImplCost += iDays*300; totalImplDays += iDays; }
     }
     if (!chk.checked) return;
     totalMonthly += lineTotal;
