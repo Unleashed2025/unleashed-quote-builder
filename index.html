@@ -3038,7 +3038,7 @@ const PROJ_ITEMS = [
   { id:'def-p1',    vendor:'Microsoft', name:'Microsoft Defender P1 â€“ Install & Config',        desc:'Baseline, Pilot, UAT, Enhanced Settings, Roll Out, Snagging', days:4 },
   { id:'def-off',   vendor:'Microsoft', name:'Microsoft Defender for Office â€“ Install & Config', desc:'Baseline, MX redirect, UAT, Enhanced Settings, Roll Out, Snagging', days:3 },
   { id:'ca-base',   vendor:'Microsoft', name:'Conditional Access / Entra ID â€“ Baseline',         desc:'Baseline policies, Microsoft best practice. Requires Business Premium or Entra ID P1.', days:2 },
-  { id:'ca-adv',    vendor:'Microsoft', name:'Conditional Access / Entra ID â€“ Advanced',         desc:'Advanced configuration. Requires Business Premium or Entra ID P1.', days:3 },
+  { id:'ca-adv',    vendor:'Microsoft', name:'Conditional Access / Entra ID â€“ Advanced',         desc:'Advanced Conditional Access policies, Identity Protection, and Privileged Identity Management. Requires Microsoft Entra ID P2 (or Microsoft 365 E3/E5).', days:3 },
   { id:'purv-bp',   vendor:'Microsoft', name:'Microsoft Purview â€“ Data Labelling (Bus. Premium)',desc:'Basic data labels/groups using Business Premium features', days:4 },
   { id:'purv-p2',   vendor:'Microsoft', name:'Microsoft Purview â€“ Data Labelling (Purview P2)', desc:'Full Purview P2 suite data labelling and classification', days:4 },
   { id:'fw-inst',   vendor:'Ubiquiti',  name:'Firewall Installation',                            desc:'Ubiquiti firewall installation and configuration', days:1.5 },
@@ -3057,28 +3057,31 @@ function projDaysFmt(d){ const n=Number(d); return (Number.isInteger(n)?n:n.toFi
 function projBuildCards() {
   const container = document.getElementById('proj-list');
   if (!container) return;
+  container.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1rem;';
   container.innerHTML = PROJ_ITEMS.map(p => `
-    <div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:1rem 1.1rem;margin-bottom:.7rem;transition:border-color .18s;" id="projcard-${p.id}">
-      <div style="display:flex;align-items:flex-start;gap:.75rem;">
-        <input type="checkbox" id="projchk-${p.id}" style="margin-top:3px;width:17px;height:17px;accent-color:#2563eb;flex-shrink:0;" onchange="projUpdatePanel()" />
-        <label for="projchk-${p.id}" style="flex:1;cursor:pointer;">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap;">
-            <span style="font-size:.72rem;font-weight:700;background:rgba(37,99,235,.08);color:#1d4ed8;border:1px solid rgba(37,99,235,.2);padding:.2rem .6rem;border-radius:999px;">${p.vendor}</span>
-            <span style="font-size:.8rem;font-weight:700;color:#2563eb;">${projFmt(p.days * PROJ_SELL)} &nbsp;(${projDaysFmt(p.days)})</span>
-          </div>
-          <div style="font-size:.95rem;font-weight:700;color:#0f172a;margin-top:.4rem;">${p.name}</div>
-          <div style="font-size:.78rem;color:#64748b;margin-top:.2rem;line-height:1.45;">${p.desc}</div>
-        </label>
+    <div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;padding:1.25rem 1.25rem 1rem;transition:border-color .18s,box-shadow .18s;display:flex;flex-direction:column;gap:.55rem;cursor:default;" id="projcard-${p.id}">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap;">
+        <span style="font-size:.7rem;font-weight:700;background:rgba(37,99,235,.08);color:#1d4ed8;border:1px solid rgba(37,99,235,.2);padding:.2rem .65rem;border-radius:999px;">${p.vendor}</span>
+        <span style="font-size:.85rem;font-weight:700;color:#2563eb;">${projFmt(p.days * PROJ_SELL)}</span>
       </div>
-      <div style="margin-top:.6rem;padding-top:.6rem;border-top:1px solid #f1f5f9;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
-        <label style="font-size:.75rem;color:#94a3b8;margin:0;">Discount</label>
-        <input type="number" id="proj-disc-${p.id}" min="0" max="100" step="0.5" value="0" style="width:56px;padding:.2rem .35rem;font-size:.78rem;border:1px solid #cbd5e1;border-radius:6px;text-align:center;" oninput="projUpdatePanel()" />
-        <span style="font-size:.78rem;color:#64748b;">%</span>
-        <span id="proj-effprice-${p.id}" style="font-size:.78rem;color:#16a34a;font-weight:600;"></span>
+      <div style="font-size:.97rem;font-weight:700;color:#0f172a;line-height:1.3;">${p.name}</div>
+      <div style="font-size:.8rem;color:#64748b;line-height:1.55;flex:1;">${p.desc}</div>
+      <div style="font-size:.73rem;color:#94a3b8;">${projDaysFmt(p.days)} &mdash; &pound;${PROJ_SELL}/day</div>
+      <div style="padding-top:.7rem;border-top:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.4rem;">
+        <label for="projchk-${p.id}" style="display:flex;align-items:center;gap:.45rem;cursor:pointer;font-size:.82rem;font-weight:600;color:#0f172a;">
+          <input type="checkbox" id="projchk-${p.id}" style="width:17px;height:17px;accent-color:#2563eb;flex-shrink:0;" onchange="projUpdatePanel()" />
+          Add to quote
+        </label>
+        <div style="display:flex;align-items:center;gap:.3rem;">
+          <label style="font-size:.72rem;color:#94a3b8;margin:0;">Disc</label>
+          <input type="number" id="proj-disc-${p.id}" min="0" max="100" step="0.5" value="0"
+            style="width:46px;padding:.18rem .3rem;font-size:.76rem;border:1px solid #cbd5e1;border-radius:6px;text-align:center;" oninput="projUpdatePanel()" />
+          <span style="font-size:.72rem;color:#64748b;">%</span>
+          <span id="proj-effprice-${p.id}" style="font-size:.74rem;color:#16a34a;font-weight:600;"></span>
+        </div>
       </div>
     </div>`).join('');
 }
-
 function projUpdatePanel() {
   const lines = [], priced = [];
   let totalSell = 0, totalCost = 0;
