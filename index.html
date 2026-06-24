@@ -2572,18 +2572,19 @@ function buildPDF() {
   doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
   doc.text('Service', margin + 4, y + 5.5);
-  doc.text('Detail', margin + 80, y + 5.5);
-  doc.text('Disc.', margin + 148, y + 5.5);
-  doc.text('Monthly Cost', W - margin - 4,  // Rows - 4 columns: Service | Detail | Disc% | Monthly Cost
+  doc.text('Detail', margin + 84, y + 5.5);
+  doc.text('Monthly Cost', W - margin - 4, y + 5.5, { align: 'right' });
+  y += 8;
+
+  // Rows
   let rowAlt = false;
   state.lines.filter(l => l.amount > 0).forEach(line => {
     if (rowAlt) {
       doc.setFillColor(244, 247, 251);
       doc.rect(margin, y, W - margin * 2, 9, 'F');
     }
-    const bullet = '\u2022';
-    const subText = pdfSafe((line.sub || '').split(bullet)[0].trim());
-    const discText = line.discountPct > 0 ? pdfSafe(formatDiscountPercent(line.discountPct) + '%') : '';
+    const detail = line.discountPct > 0 ? `${line.sub || ''} • ${formatDiscountPercent(line.discountPct)}% discount` : (line.sub || '');
+    const priceText = buildPriceSummaryText(line.originalAmount, line.amount, line.discountPct);
     doc.setTextColor(...text);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8.5);
@@ -2591,20 +2592,11 @@ function buildPDF() {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(...muted);
-    doc.text(subText, margin + 80, y + 6);
-    if (discText) {
-      doc.setTextColor(...accent);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(7.5);
-      doc.text(discText, margin + 148, y + 6);
-    }
+    doc.text(pdfSafe(detail), margin + 84, y + 6);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8.5);
     doc.setTextColor(...text);
-    doc.text(pdfSafe(fmt(line.amount)), W - margin - 4, y + 6, { align: 'right' });
-    rowAlt = !rowAlt;
-    y += 9;
-  }););
+    doc.text(pdfSafe(priceText), W - margin - 4, y + 6, { align: 'right' });
     rowAlt = !rowAlt;
     y += 9;
   });
@@ -2758,36 +2750,6 @@ async function sendEmail(company, name, email) {
   });
 }
 
-function buildAddonImplSection() {
-  var items = [];
-  Object.keys(ADDON_IMPL).forEach(function(key) {
-    var cb = document.querySelector('.addon-item input[type=checkbox][value=' + '"' + key + '"' + ']:checked');
-    if (!cb) return;
-    var days = ADDON_IMPL[key]; var sell = days * 800; var cost = days * 300;
-    var a = ADDONS[key]; items.push({ name: a ? a.name : key, days: days, sell: sell, cost: cost, profit: sell - cost });
-  });
-  if (!items.length) return '';
-  var g = function(n) { return '\u00a3' + n.toFixed(2); };
-  var tD=0,tS=0,tC=0,tP=0;
-  var rows = items.map(function(i) { tD+=i.days; tS+=i.sell; tC+=i.cost; tP+=i.profit;
-    return '<tr><td style="padding:6px 10px;border:1px solid #dde8f4;">'+i.name+'</td><td style="padding:6px 10px;border:1px solid #dde8f4;text-align:center;">'+i.days+' days</td><td style="padding:6px 10px;border:1px solid #dde8f4;text-align:right;">'+g(i.sell)+'</td><td style="padding:6px 10px;border:1px solid #dde8f4;text-align:right;">'+g(i.cost)+'</td><td style="padding:6px 10px;border:1px solid #dde8f4;text-align:right;color:#16a34a;font-weight:bold;">'+g(i.profit)+'</td></tr>';
-  }).join('');
-  return '<h3 style="margin:20px 0 8px;font-size:14px;color:#1e3a5f;">Add-on Configuration Services (One-off)</h3>'
-    + '<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="background:#1e3a5f;color:#fff;">'
-    + '<th style="padding:8px 10px;text-align:left;border:1px solid #1e3a5f;">Service</th>'
-    + '<th style="padding:8px 10px;text-align:center;border:1px solid #1e3a5f;">Days</th>'
-    + '<th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Sell (one-off)</th>'
-    + '<th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Cost</th>'
-    + '<th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Profit</th>'
-    + '</tr></thead><tbody>' + rows + '</tbody>'
-    + '<tfoot><tr style="background:#f0f5fb;font-weight:bold;"><td style="padding:8px 10px;border:1px solid #dde8f4;">TOTAL</td>'
-    + '<td style="padding:8px 10px;border:1px solid #dde8f4;text-align:center;">'+tD+' days</td>'
-    + '<td style="padding:8px 10px;border:1px solid #dde8f4;text-align:right;">'+g(tS)+'</td>'
-    + '<td style="padding:8px 10px;border:1px solid #dde8f4;text-align:right;">'+g(tC)+'</td>'
-    + '<td style="padding:8px 10px;border:1px solid #dde8f4;text-align:right;color:#16a34a;font-weight:bold;">'+g(tP)+'</td>'
-    + '</tr></tfoot></table>';
-}
-
 function buildSalesSummaryHtml(company, name, email, phone) {
   const state = window._quoteState;
   const financials = getFinancialSummary(state.lines, state.currentOrgType);
@@ -2888,7 +2850,7 @@ function buildSalesSummaryHtml(company, name, email, phone) {
     </table>
     ${!financials.allCostKnown ? '<p style="color:#fde68a;font-size:11px;margin:8px 0 0;">* Some service costs marked TBC \u2013 totals are partial.</p>' : ''}
   </div>
-${buildAddonImplSection()}</body></html>`;
+</body></html>`;
 }
 
 async function sendSalesSummaryEmail(company, name, email) {
