@@ -1577,9 +1577,7 @@
     <button class="btn-back" onclick="showHome()">&#x2302; Home</button>
 
     <div class="section-split">
-      <!-- LEFT COLUMN -->
       <div class="form-col">
-
         <div class="card">
           <div class="card-title"><span class="step-badge">1</span> Quote Details</div>
           <div class="form-row">
@@ -1590,27 +1588,9 @@
             <div><label for="sa-email">Email *</label><input type="email" id="sa-email" placeholder="jane@acme.com" oninput="saUpdatePanel()" /></div>
             <div><label for="sa-date">Date</label><input type="date" id="sa-date" onchange="saUpdatePanel()" /></div>
           </div>
+          <input type="hidden" id="sa-units" value="0" />
         </div>
-
-        <div class="card">
-          <div class="card-title"><span class="step-badge">2</span> User / Device Count</div>
-          <div class="form-row single">
-            <div>
-              <label for="sa-units">Number of users / devices / mailboxes</label>
-              <input type="number" id="sa-units" min="1" placeholder="e.g. 25" oninput="saUpdatePanel()" />
-            </div>
-          </div>
-          <div class="vcm-note">Sell prices shown are <strong>monthly per unit</strong> with a <strong>5% software-only discount</strong> applied. Implementation days are calculated from your unit count.</div>
-        </div>
-
-        <div class="card">
-          <div class="card-title"><span class="step-badge">3</span> Select Services</div>
-          <div id="sa-list"></div>
-        </div>
-
       </div>
-
-      <!-- RIGHT COLUMN: QUOTE PANEL -->
       <div class="sidebar-col">
         <div class="quote-panel sticky-panel">
           <div class="qp-header">&#x1F4BB; Standalone Software Summary</div>
@@ -1636,6 +1616,13 @@
         </div>
       </div>
     </div>
+
+    <div class="card" style="margin-top:1.5rem;">
+      <div class="card-title"><span class="step-badge">2</span> Select Services</div>
+      <p class="section-sub">Monthly recurring pricing per unit. Enter qty for each service &mdash; implementation cost is auto-calculated.</p>
+      <div id="sa-list"></div>
+    </div>
+
   </div>
 </div>
 
@@ -3270,28 +3257,39 @@ function saImplDays(units) {
 function saBuildCards() {
   const container = document.getElementById('sa-list');
   if (!container) return;
-  container.innerHTML = SA_SERVICES.map(s => `
-    <div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:1rem 1.1rem;margin-bottom:.7rem;transition:border-color .18s;" id="sacard-${s.id}">
-      <div style="display:flex;align-items:flex-start;gap:.75rem;">
-        <input type="checkbox" id="sachk-${s.id}" style="margin-top:3px;width:17px;height:17px;accent-color:#2563eb;flex-shrink:0;" onchange="saUpdatePanel()" />
-        <label for="sachk-${s.id}" style="flex:1;cursor:pointer;">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap;">
-            <span style="font-size:.72rem;font-weight:700;background:rgba(37,99,235,.08);color:#1d4ed8;border:1px solid rgba(37,99,235,.2);padding:.2rem .6rem;border-radius:999px;">${s.perUnit ? 'Per '+s.unit+' / mo' : 'Custom qty'}</span>
-            <span style="font-size:.82rem;font-weight:700;color:#2563eb;">\u00a3${s.sell.toFixed(s.sell<1?3:2)} / ${s.unit}${s.perUnit?' / mo':''}</span>
+  container.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;';
+  container.innerHTML = SA_SERVICES.map(s => {
+    const tagClass  = s.perUnit ? 'ms' : 'bic';
+    const tagLabel  = s.perUnit ? 'Per ' + s.unit + ' / mo' : 'Custom qty';
+    const priceLabel = '\u00a3' + s.sell.toFixed(s.sell < 1 ? 3 : 2) + ' / ' + s.unit + (s.perUnit ? ' / mo' : '');
+    const implRow   = s.perUnit ? `<div id="saimpl-${s.id}" style="font-size:.73rem;color:#64748b;font-style:italic;margin-top:.35rem;"></div>` : '';
+    return `
+    <div class="check-tile" id="sacard-${s.id}">
+      <input type="checkbox" id="sachk-${s.id}" onchange="saUpdatePanel()" />
+      <label for="sachk-${s.id}">
+        <span class="tile-tag ${tagClass}">${tagLabel}</span>
+        <div class="tile-name">${s.name}</div>
+        <div class="tile-price">${priceLabel}</div>
+        <div style="margin-top:.75rem;padding-top:.6rem;border-top:1px solid #e2e8f0;">
+          <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem;flex-wrap:wrap;">
+            <label style="font-size:.74rem;color:#64748b;margin:0;">Qty</label>
+            <input type="number" id="sa-qty-${s.id}" min="0" step="1" value="" placeholder="${s.perUnit ? 'enter qty' : '0'}"
+              style="width:80px;padding:.2rem .4rem;font-size:.8rem;border:1px solid #cbd5e1;border-radius:6px;text-align:center;background:#fff;"
+              oninput="saUpdatePanel()" onclick="event.stopPropagation()" />
+            <span id="sa-total-${s.id}" style="font-size:.75rem;color:#2563eb;font-weight:600;"></span>
           </div>
-          <div style="font-size:.95rem;font-weight:700;color:#0f172a;margin-top:.4rem;">${s.name}</div>
-        </label>
-      </div>
-      <div style="margin-top:.6rem;padding-top:.6rem;border-top:1px solid #f1f5f9;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
-        <label style="font-size:.75rem;color:#64748b;margin:0;">Qty</label>
-        <input type="number" id="sa-qty-${s.id}" min="0" step="1" value="" placeholder="${s.perUnit?'auto':''}" style="width:70px;padding:.2rem .4rem;font-size:.8rem;border:1px solid #cbd5e1;border-radius:6px;text-align:center;" oninput="saUpdatePanel()" />
-        <label style="font-size:.75rem;color:#94a3b8;margin:0;">Disc</label>
-        <input type="number" id="sa-disc-${s.id}" min="0" max="100" step="0.5" value="0" style="width:52px;padding:.2rem .35rem;font-size:.78rem;border:1px solid #cbd5e1;border-radius:6px;text-align:center;" oninput="saUpdatePanel()" />
-        <span style="font-size:.78rem;color:#64748b;">%</span>
-        <span id="sa-total-${s.id}" style="font-size:.78rem;color:#16a34a;font-weight:600;margin-left:.25rem;"></span>
-      </div>
-      ${s.perUnit ? '<div style="margin-top:.4rem;padding-top:.4rem;border-top:1px dashed #f1f5f9;font-size:.73rem;color:#64748b;" id="saimpl-'+s.id+'"></div>' : ''}
-    </div>`).join('');
+          <div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;">
+            <span style="font-size:.72rem;color:#94a3b8;">Discount</span>
+            <input type="number" id="sa-disc-${s.id}" min="0" max="100" step="0.5" value="0"
+              style="width:46px;padding:.18rem .3rem;font-size:.76rem;border:1px solid #cbd5e1;border-radius:6px;text-align:center;background:#fff;"
+              oninput="saUpdatePanel()" onclick="event.stopPropagation()" />
+            <span style="font-size:.72rem;color:#64748b;">%</span>
+          </div>
+          ${implRow}
+        </div>
+      </label>
+    </div>`;
+  }).join('');
 }
 
 function saUpdatePanel() {
