@@ -2660,6 +2660,18 @@ function buildPDF() {
     y += 13;
   }
 
+  // Add-on Configuration (one-off impl cost)
+  if (state.addonImplSell > 0) {
+    doc.setFillColor(238, 244, 255);
+    doc.rect(margin, y, W - margin * 2, 9, 'F');
+    doc.setTextColor(...navy);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.text('Add-on Configuration (one-off)', margin + 4, y + 6);
+    doc.text(pdfSafe(fmt(state.addonImplSell) + ' (' + state.addonImplDays + ' day' + (state.addonImplDays === 1 ? '' : 's') + ')'), W - margin - 4, y + 6, { align: 'right' });
+    y += 13;
+  }
+
   // Contract term
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
