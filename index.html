@@ -2128,7 +2128,8 @@ function setServiceType(type) {
 }
 
 function fmt(n) {
-  return '\u00a3' + n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (n == null || isNaN(n)) return '-';
+  return '\u00a3' + Number(n).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function updatePanel() {
@@ -2577,7 +2578,7 @@ function buildPDF() {
 
   // Rows
   let rowAlt = false;
-  state.lines.forEach(line => {
+  state.lines.filter(l => l.amount > 0).forEach(line => {
     if (rowAlt) {
       doc.setFillColor(244, 247, 251);
       doc.rect(margin, y, W - margin * 2, 9, 'F');
