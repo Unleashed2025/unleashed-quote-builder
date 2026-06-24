@@ -3225,16 +3225,16 @@ function projGeneratePDF() {
 //  STANDALONE SOFTWARE
 // ============================================================
 const SA_SERVICES = [
-  { id:'sa-ispm',    name:'Inside Agent (ISPM)',                  unit:'user',    cost:0.80,  sell:1.52,  perUnit:true },
-  { id:'sa-xdr',     name:'XDR',                                  unit:'device',  cost:0.89,  sell:2.85,  perUnit:true },
-  { id:'sa-email',   name:'Email Security',                       unit:'mailbox', cost:1.30,  sell:2.47,  perUnit:true },
-  { id:'sa-m365bk',  name:'M365 Back-up',                        unit:'user',    cost:1.05,  sell:2.00,  perUnit:true },
-  { id:'sa-mdr-adv', name:'MDR – Advanced (requires EDR/XDR)',    unit:'user',    cost:2.40,  sell:4.56,  perUnit:true },
-  { id:'sa-sat',     name:'Security Awareness Training (SAT)',    unit:'user',    cost:0.91,  sell:1.43,  perUnit:true },
+  { id:'sa-ispm',    name:'Inside Agent (ISPM)',                  unit:'user',    cost:0.80,  sell:1.52,  perUnit:true,  implDays:1 },
+  { id:'sa-xdr',     name:'XDR',                                  unit:'device',  cost:0.89,  sell:2.85,  perUnit:true,  implDays:4 },
+  { id:'sa-email',   name:'Email Security',                       unit:'mailbox', cost:1.30,  sell:2.47,  perUnit:true,  implDays:3 },
+  { id:'sa-m365bk',  name:'M365 Back-up',                        unit:'user',    cost:1.05,  sell:2.00,  perUnit:true,  implDays:2 },
+  { id:'sa-mdr-adv', name:'MDR – Advanced (requires EDR/XDR)',    unit:'user',    cost:2.40,  sell:4.56,  perUnit:true,  implDays:4 },
+  { id:'sa-sat',     name:'Security Awareness Training (SAT)',    unit:'user',    cost:0.91,  sell:1.43,  perUnit:true,  implDays:2 },
   { id:'sa-dlp',     name:'Data Loss Prevention (DLP)',           unit:'user',    cost:1.30,  sell:1.71,  perUnit:true },
   { id:'sa-spm',     name:'M365 Security Posture Mgmt (SPM)',     unit:'user',    cost:0.83,  sell:1.58,  perUnit:true },
   { id:'sa-appsec',  name:'M365 App Security',                    unit:'user',    cost:0.91,  sell:1.43,  perUnit:true },
-  { id:'sa-mdr-std', name:'MDR – Standard (requires EDR/XDR)',    unit:'user',    cost:1.45,  sell:3.33,  perUnit:true },
+  { id:'sa-mdr-std', name:'MDR – Standard (requires EDR/XDR)',    unit:'user',    cost:1.45,  sell:3.33,  perUnit:true,  implDays:4 },
   { id:'sa-edr',     name:'EDR',                                  unit:'device',  cost:0.50,  sell:0.95,  perUnit:true },
   { id:'sa-gwsbk',   name:'GWS Backup',                          unit:'user',    cost:0.60,  sell:1.14,  perUnit:true },
   { id:'sa-teams',   name:'Teams Telephony',                      unit:'user',    cost:8.00,  sell:11.88, perUnit:true },
@@ -3314,7 +3314,7 @@ function saUpdatePanel() {
     if (totEl) totEl.textContent = qty > 0 ? '\u00a3'+(effSell*qty).toFixed(2)+'/mo' : '';
     if (card) card.style.borderColor = chk.checked ? '#2563eb' : '#e2e8f0';
     if (s.perUnit) {
-      const iDays = saImplDays(qty);
+      const iDays = (s.implDays !== undefined) ? s.implDays : saImplDays(qty);
       const implEl = document.getElementById('saimpl-' + s.id);
       if (implEl) implEl.textContent = qty > 0 ? 'Est. implementation: '+iDays+' day'+(iDays===1?'':'s')+' \u00b7 \u00a3'+(iDays*800).toFixed(2) : '';
       if (chk.checked && qty > 0) { totalImplSell += iDays*800; totalImplCost += iDays*300; totalImplDays += iDays; }
