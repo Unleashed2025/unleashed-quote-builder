@@ -3056,13 +3056,13 @@ const PROJ_ITEMS = [
   { id:'ca-adv',    vendor:'Microsoft', name:'Conditional Access / Entra ID â€“ Advanced',         desc:'Advanced Conditional Access policies, Identity Protection, and Privileged Identity Management. Requires Microsoft Entra ID P2 (or Microsoft 365 E3/E5).', days:3 },
   { id:'purv-bp',   vendor:'Microsoft', name:'Microsoft Purview â€“ Data Labelling (Bus. Premium)',desc:'Basic data labels/groups using Business Premium features', days:4 },
   { id:'purv-p2',   vendor:'Microsoft', name:'Microsoft Purview â€“ Data Labelling (Purview P2)', desc:'Full Purview P2 suite data labelling and classification', days:4 },
-  { id:'fw-inst',   vendor:'Ubiquiti',  name:'Firewall Installation',                            desc:'Ubiquiti firewall installation and configuration', days:1.5 },
-  { id:'sw-inst',   vendor:'Ubiquiti',  name:'Switch Installation',                              desc:'Ubiquiti switch installation and configuration', days:0.5 },
+  { id:'fw-inst',   vendor:'Ubiquiti',  name:'Firewall Installation',                            desc:'Ubiquiti firewall installation and configuration', days:1.5, hasQty:true },
+  { id:'sw-inst',   vendor:'Ubiquiti',  name:'Switch Installation',                              desc:'Ubiquiti switch installation and configuration', days:0.5, hasQty:true },
   { id:'wifi-s',    vendor:'Ubiquiti',  name:'Wi-Fi Installation â€“ 1â€“9 Access Points',           desc:'Assumes cabling complete', days:1 },
   { id:'wifi-m',    vendor:'Ubiquiti',  name:'Wi-Fi Installation â€“ 9â€“19 Access Points',          desc:'Assumes cabling complete', days:1.5 },
   { id:'wifi-l',    vendor:'Ubiquiti',  name:'Wi-Fi Installation â€“ 20â€“49 Access Points',         desc:'Assumes cabling complete', days:3 },
   { id:'m365-aud',  vendor:'Microsoft', name:'M365 Tenant Migration â€“ Audit & Readiness',        desc:'Full tenant audit and migration readiness assessment', days:4 },
-  { id:'m365-mig',  vendor:'Microsoft', name:'M365 Tenant â€“ Actual Migration',                   desc:'Minimum 2 days (up to ~250 users). Over 250 users: Â£7.20/user migration tool pricing applies instead of day rate.', days:2 },
+  { id:'m365-mig', vendor:'Microsoft', name:'M365 Tenant \u2013 Actual Migration', desc:'Priced at \u00a37.20/user. Minimum charge \u00a32,400 (covers up to ~333 users). Enter the number of users to calculate.', perUser:true, userRate:7.20, minPrice:2400 },
   { id:'bkp-365',   vendor:'Backup',    name:'365 Backup â€“ Setup & Testing',                     desc:'1 day setup + 1 day testing', days:2 }
 ];
 
@@ -3073,45 +3073,95 @@ function projBuildCards() {
   const container = document.getElementById('proj-list');
   if (!container) return;
   container.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;';
-  container.innerHTML = PROJ_ITEMS.map(p => `
+  container.innerHTML = PROJ_ITEMS.map(p => {
+    const baseSell = p.perUser ? p.minPrice : (p.days * PROJ_SELL);
+    const priceLabel = p.perUser
+      ? `&pound;${p.userRate.toFixed(2)}/user &mdash; min &pound;${p.minPrice.toLocaleString()}`
+      : `${projFmt(baseSell)} &middot; ${projDaysFmt(p.days)}`;
+    const qtyRow = (p.hasQty || p.perUser) ? `
+        <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem;">
+          <label style="font-size:.74rem;color:#64748b;margin:0;">${p.perUser ? 'Users' : 'Qty'}</label>
+          <input type="number" id="proj-qty-${p.id}" min="1" step="1" value="${p.hasQty ? 1 : ''}"
+            placeholder="${p.perUser ? 'enter users' : '1'}"
+            style="width:80px;padding:.2rem .4rem;font-size:.8rem;border:1px solid #cbd5e1;border-radius:6px;text-align:center;background:#fff;"
+            oninput="projUpdatePanel()" onclick="event.stopPropagation()" />
+          <span id="proj-qtyprice-${p.id}" style="font-size:.75rem;color:#2563eb;font-weight:600;"></span>
+        </div>` : '';
+    return `
     <div class="check-tile" id="projcard-${p.id}">
       <input type="checkbox" id="projchk-${p.id}" onchange="projUpdatePanel()" />
       <label for="projchk-${p.id}">
         <span class="tile-tag ms">${p.vendor.toUpperCase()}</span>
         <div class="tile-name">${p.name}</div>
-        <div class="tile-price">${projFmt(p.days * PROJ_SELL)} &nbsp;&middot;&nbsp; ${projDaysFmt(p.days)}</div>
+        <div class="tile-price">${priceLabel}</div>
         <div class="tile-overview">${p.desc}</div>
-        <div style="margin-top:.75rem;padding-top:.6rem;border-top:1px solid #e2e8f0;display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;">
-          <span style="font-size:.72rem;color:#94a3b8;">Discount</span>
-          <input type="number" id="proj-disc-${p.id}" min="0" max="100" step="0.5" value="0"
-            style="width:46px;padding:.18rem .3rem;font-size:.76rem;border:1px solid #cbd5e1;border-radius:6px;text-align:center;background:#fff;" oninput="projUpdatePanel()" onclick="event.stopPropagation()" />
-          <span style="font-size:.72rem;color:#64748b;">%</span>
-          <span id="proj-effprice-${p.id}" style="font-size:.74rem;color:#16a34a;font-weight:600;"></span>
+        <div style="margin-top:.75rem;padding-top:.6rem;border-top:1px solid #e2e8f0;">
+          ${qtyRow}
+          <div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;">
+            <span style="font-size:.72rem;color:#94a3b8;">Discount</span>
+            <input type="number" id="proj-disc-${p.id}" min="0" max="100" step="0.5" value="0"
+              style="width:46px;padding:.18rem .3rem;font-size:.76rem;border:1px solid #cbd5e1;border-radius:6px;text-align:center;background:#fff;"
+              oninput="projUpdatePanel()" onclick="event.stopPropagation()" />
+            <span style="font-size:.72rem;color:#64748b;">%</span>
+            <span id="proj-effprice-${p.id}" style="font-size:.74rem;color:#16a34a;font-weight:600;"></span>
+          </div>
         </div>
       </label>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 function projUpdatePanel() {
   const lines = [], priced = [];
   let totalSell = 0, totalCost = 0;
 
   PROJ_ITEMS.forEach(p => {
-    const chk = document.getElementById('projchk-' + p.id);
-    const discEl = document.getElementById('proj-disc-' + p.id);
-    const effEl = document.getElementById('proj-effprice-' + p.id);
-    const card = document.getElementById('projcard-' + p.id);
+    const chk     = document.getElementById('projchk-' + p.id);
+    const discEl  = document.getElementById('proj-disc-' + p.id);
+    const effEl   = document.getElementById('proj-effprice-' + p.id);
+    const qtyEl   = document.getElementById('proj-qty-' + p.id);
+    const qtyPriceEl = document.getElementById('proj-qtyprice-' + p.id);
+    const card    = document.getElementById('projcard-' + p.id);
     if (!chk) return;
-    const disc = Math.max(0, Math.min(100, parseFloat(discEl?.value)||0));
-    const baseSell = p.days * PROJ_SELL;
-    const effSell = baseSell * (1 - disc/100);
-    const effCost = p.days * PROJ_COST;
+
+    const disc = Math.max(0, Math.min(100, parseFloat(discEl?.value) || 0));
+    let baseSell, baseCost, displayDays;
+
+    if (p.perUser) {
+      const users = parseInt(qtyEl?.value) || 0;
+      const perUserTotal = users * p.userRate;
+      baseSell = Math.max(p.minPrice, perUserTotal);
+      baseCost = baseSell * 0.375; // ~37.5% cost ratio
+      displayDays = null;
+      if (qtyPriceEl) qtyPriceEl.textContent = users > 0 ? '= ' + projFmt(baseSell) : '(min ' + projFmt(p.minPrice) + ')';
+    } else if (p.hasQty) {
+      const qty = parseInt(qtyEl?.value) || 1;
+      baseSell = qty * p.days * PROJ_SELL;
+      baseCost = qty * p.days * PROJ_COST;
+      displayDays = qty * p.days;
+      if (qtyPriceEl) qtyPriceEl.textContent = '= ' + projFmt(baseSell);
+    } else {
+      baseSell = p.days * PROJ_SELL;
+      baseCost = p.days * PROJ_COST;
+      displayDays = p.days;
+    }
+
+    const effSell = baseSell * (1 - disc / 100);
+    const effCost = baseCost;
     if (effEl) effEl.textContent = disc > 0 ? 'Effective: ' + projFmt(effSell) : '';
     if (card) card.style.borderColor = chk.checked ? '#2563eb' : '#e2e8f0';
     if (!chk.checked) return;
+
     totalSell += effSell;
     totalCost += effCost;
-    priced.push({ name: p.name, sell: effSell, cost: effCost, days: p.days, disc });
-    lines.push(`<div class="qp-line"><div class="qp-label"><div style="color:#0f172a;font-weight:600;font-size:.84rem;">${p.name}</div><div style="color:#64748b;font-size:.74rem;">${projDaysFmt(p.days)}${disc>0?' Â· '+disc+'% disc':''}</div></div><div class="qp-val">${projFmt(effSell)}</div></div>`);
+    const daysLabel = displayDays !== null ? projDaysFmt(displayDays) : null;
+    priced.push({ name: p.name, sell: effSell, cost: effCost, days: displayDays, disc });
+    lines.push(`<div class="qp-line">
+      <div class="qp-label">
+        <div style="color:#0f172a;font-weight:600;font-size:.84rem;">${p.name}</div>
+        <div style="color:#64748b;font-size:.74rem;">${daysLabel ? daysLabel : ''}${disc > 0 ? ' &middot; ' + disc + '% disc' : ''}</div>
+      </div>
+      <div class="qp-val">${projFmt(effSell)}</div>
+    </div>`);
   });
 
   const linesEl = document.getElementById('proj-qp-lines');
@@ -3120,18 +3170,16 @@ function projUpdatePanel() {
   if (totEl) totEl.textContent = projFmt(totalSell);
 
   window._projState = {
-    company: document.getElementById('proj-company')?.value.trim()||'',
-    contact: document.getElementById('proj-contact')?.value.trim()||'',
-    email:   document.getElementById('proj-email')?.value.trim()||'',
-    date:    document.getElementById('proj-date')?.value||new Date().toISOString().split('T')[0],
+    company: document.getElementById('proj-company')?.value.trim() || '',
+    contact: document.getElementById('proj-contact')?.value.trim() || '',
+    email:   document.getElementById('proj-email')?.value.trim() || '',
+    date:    document.getElementById('proj-date')?.value || new Date().toISOString().split('T')[0],
     items: priced, totalSell, totalCost,
     gp: totalSell - totalCost,
     commission: (totalSell - totalCost) * 0.25,
-    ready: priced.length > 0,
-    hasValue: priced.length > 0
+    ready: priced.length > 0
   };
 }
-
 function projGeneratePDF() {
   const s = window._projState;
   if (!s) return;
