@@ -2594,7 +2594,8 @@ function buildPDF() {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(...muted);
-    doc.text(pdfSafe(line.sub || ''), margin + 84, y + 5.5);
+    const subClean = hasDisc ? pdfSafe((line.sub || '').split('\u2022')[0].trim()) : pdfSafe(line.sub || '');
+    doc.text(subClean, margin + 84, y + 5.5);
     if (hasDisc) {
       // Original price — muted, with strikethrough
       const origText = pdfSafe(fmt(line.originalAmount));
