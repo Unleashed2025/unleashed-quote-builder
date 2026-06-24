@@ -262,6 +262,21 @@
       color: #0f172a;
     }
     .addon-qty-label { font-size: .75rem; color: #94a3b8; }
+    .discount-row { display: flex; align-items: center; gap: .4rem; margin-top: .3rem; flex-wrap: wrap; }
+    .discount-label { font-size: .72rem; color: #94a3b8; white-space: nowrap; margin: 0; }
+    .discount-input-wrap { display: flex; align-items: center; gap: 2px; }
+    .discount-input {
+      width: 52px; padding: .2rem .35rem;
+      font-size: .78rem; border: 1px solid #cbd5e1;
+      border-radius: 6px; background: #f8fafc; color: #0f172a;
+      text-align: center; box-shadow: none;
+    }
+    .discount-input:focus { border-color: #2563eb; outline: none; box-shadow: none; }
+    .discount-pct { font-size: .78rem; color: #64748b; }
+    .price-discounted { font-size: .82rem; color: #16a34a; font-weight: 700; }
+    .price-original { font-size: .75rem; color: #94a3b8; text-decoration: line-through; }
+    .discount-detail { display: block; margin-top: .15rem; font-size: .72rem; color: #64748b; font-weight: 500; }
+    .qp-arrow { color: #64748b; margin: 0 .18rem; }
 
     /* -- vCTO -- */
     .vcto-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
@@ -1935,6 +1950,166 @@ function formatDays(days) {
   return `${display} day${Math.abs(num) === 1 ? '' : 's'}`;
 }
 
+function normaliseDiscountValue(value) {
+  const num = parseFloat(value);
+  if (!Number.isFinite(num)) return 0;
+  return Math.min(100, Math.max(0, Math.round(num * 100) / 100));
+}
+
+function formatDiscountPercent(value) {
+  const pct = normaliseDiscountValue(value);
+  return Number.isInteger(pct) ? String(pct) : pct.toFixed(1).replace(/\.0$/, '');
+}
+
+function getDiscountInputHtml(id, handler) {
+  return `<div class="discount-row" data-discount-id="${id}">
+    <label class="discount-label" for="${id}">Discount</label>
+    <div class="discount-input-wrap">
+      <input type="number" id="${id}" class="discount-input" min="0" max="100" step="0.5" value="0" onclick="event.stopPropagation()" oninput="${handler}" onchange="${handler}" />
+      <span class="discount-pct">%</span>
+    </div>
+  </div>`;
+}
+
+function bindDiscountRows(root = document) {
+  if (!root || !root.querySelectorAll) return;
+  root.querySelectorAll('.discount-row').forEach(row => {
+    if (row.dataset.bound === 'true') return;
+    row.dataset.bound = 'true';
+    ['click', 'mousedown', 'mouseup', 'touchstart', 'pointerdown'].forEach(evt => {
+      row.addEventListener(evt, ev => ev.stopPropagation());
+    });
+  });
+}
+
+function getDiscountValueById(id) {
+  const input = document.getElementById(id);
+  return input ? normaliseDiscountValue(input.value) : 0;
+}
+
+function applyDiscountPricing(unitPrice, qty, discountPct) {
+  const pct = normaliseDiscountValue(discountPct);
+  const factor = 1 - (pct / 100);
+  const originalAmount = unitPrice * qty;
+  const discountedUnitPrice = unitPrice * factor;
+  const amount = originalAmount * factor;
+  return {
+    discountPct: pct,
+    originalUnitPrice: unitPrice,
+    discountedUnitPrice,
+    originalAmount,
+    amount,
+    manualDiscountAmount: originalAmount - amount
+  };
+}
+
+function applyDiscountAmount(amount, discountPct) {
+  const pct = normaliseDiscountValue(discountPct);
+  const factor = 1 - (pct / 100);
+  const discountedAmount = amount * factor;
+  return {
+    discountPct: pct,
+    originalAmount: amount,
+    amount: discountedAmount,
+    manualDiscountAmount: amount - discountedAmount
+  };
+}
+
+function buildQuoteValueHtml(original, discounted, discountPct) {
+  return discountPct > 0
+    ? `<span class="price-original">${fmt(original)}</span><span class="qp-arrow">&rarr;</span><span class="price-discounted">${fmt(discounted)}</span>`
+    : fmt(discounted);
+}
+
+function buildPriceSummaryText(original, discounted, discountPct) {
+  return discountPct > 0 ? `${fmt(original)} -> ${fmt(discounted)}` : fmt(discounted);
+}
+
+function buildPriceBreakdownText(original, discounted, discountPct) {
+  return discountPct > 0
+    ? `${fmt(original)} • ${formatDiscountPercent(discountPct)}% discount • ${fmt(discounted)}`
+    : fmt(discounted);
+}
+
+function buildSelectionPriceHtml(original, discounted, discountPct, footer) {
+  let html = discountPct > 0
+    ? `<span class="price-original">${fmt(original)}</span><br><span class="price-discounted">${fmt(discounted)}</span>`
+    : fmt(discounted);
+  if (footer) html += `<span class="discount-detail">${footer}</span>`;
+  return html;
+}
+
+function getManagedDiscountInputId(key) { return `discount-${key}`; }
+function getProjectDiscountInputId(id) { return `project-discount-${id}`; }
+function getStandaloneDiscountInputId(id) { return `standalone-discount-${id}`; }
+function getManagedDiscount(key) { return getDiscountValueById(getManagedDiscountInputId(key)); }
+function getProjectDiscount(id) { return getDiscountValueById(getProjectDiscountInputId(id)); }
+function getStandaloneDiscount(id) { return getDiscountValueById(getStandaloneDiscountInputId(id)); }
+function getVctoDiscount() { return getDiscountValueById('discount-vcto'); }
+
+function getManagedMs365DiscountKey(selected) {
+  if (selected === 'std') return 'ms365-license-std';
+  if (selected === 'prem') return 'ms365-license-prem';
+  return null;
+}
+
+function getInternalDiscountText(line, manualDiscount, orgDiscount) {
+  const parts = [];
+  if (line.discountPct > 0) parts.push(`${formatDiscountPercent(line.discountPct)}% line (-${fmt(manualDiscount)})`);
+  if (orgDiscount > 0) parts.push(`NFP (-${fmt(orgDiscount)})`);
+  return parts.length ? parts.join(' + ') : '–';
+}
+
+function injectManagedDiscountInputs() {
+  document.querySelectorAll('input[name="bundle"]').forEach(input => {
+    if (!input.value || input.value === 'none') return;
+    const label = input.nextElementSibling;
+    const id = getManagedDiscountInputId(input.value);
+    if (!label || label.querySelector(`#${id}`)) return;
+    const anchor = label.querySelector('.tile-name') || label.querySelector('.tile-price');
+    if (anchor) anchor.insertAdjacentHTML('afterend', getDiscountInputHtml(id, 'updatePanel()'));
+  });
+
+  document.querySelectorAll('input[name="ms365-license"]').forEach(input => {
+    const key = getManagedMs365DiscountKey(input.value);
+    const label = input.nextElementSibling;
+    const priceEl = label ? label.querySelector('.tile-price') : null;
+    const id = key ? getManagedDiscountInputId(key) : null;
+    if (priceEl && id && !label.querySelector(`#${id}`)) {
+      priceEl.insertAdjacentHTML('afterend', getDiscountInputHtml(id, 'updatePanel()'));
+    }
+  });
+
+  document.querySelectorAll('input[name="vcm"]').forEach(input => {
+    if (!input.value || input.value === 'none') return;
+    const label = input.nextElementSibling;
+    const priceEl = label ? label.querySelector('.tile-price') : null;
+    const id = getManagedDiscountInputId(input.value);
+    if (priceEl && !label.querySelector(`#${id}`)) {
+      priceEl.insertAdjacentHTML('afterend', getDiscountInputHtml(id, 'updatePanel()'));
+    }
+  });
+
+  document.querySelectorAll('.addon-item input[type=checkbox]').forEach(input => {
+    const key = input.value;
+    if (!key || !ADDONS[key]) return;
+    const card = input.closest('.addon-item');
+    const label = card ? card.querySelector('.addon-label') : null;
+    const priceEl = label ? label.querySelector('.addon-price') : null;
+    const id = getManagedDiscountInputId(key);
+    if (priceEl && !label.querySelector(`#${id}`)) {
+      priceEl.insertAdjacentHTML('afterend', getDiscountInputHtml(id, 'updatePanel()'));
+    }
+  });
+
+  const vctoBox = document.querySelector('#card-vcto .vcto-row > div:first-child');
+  if (vctoBox && !document.getElementById('discount-vcto')) {
+    vctoBox.insertAdjacentHTML('beforeend', getDiscountInputHtml('discount-vcto', 'updatePanel()'));
+  }
+
+  bindDiscountRows(document);
+}
+
 function showHome() {
   const home = document.getElementById('home-screen');
   if (home) home.style.display = 'block';
@@ -2032,12 +2207,14 @@ function renderProjectCards() {
             </div>
             <div class="selection-card-title">${project.name}</div>
             <div class="selection-card-desc">${project.description}</div>
-            <div class="selection-card-meta" id="project-price-${project.id}">${fmt(project.baseDays * PROJECT_DAY_SELL)}</div>
+            <div class="selection-card-meta" id="project-price-${project.id}">${buildSelectionPriceHtml(project.baseDays * PROJECT_DAY_SELL, project.baseDays * PROJECT_DAY_SELL, 0, fmt(PROJECT_DAY_SELL) + '/day')}</div>
+            ${getDiscountInputHtml(getProjectDiscountInputId(project.id), 'updateProjectPanel()')}
           </label>
         </div>
         ${extra}
       </div>`;
   }).join('');
+  bindDiscountRows(container);
 }
 
 function renderStandaloneCards() {
@@ -2054,7 +2231,8 @@ function renderStandaloneCards() {
           </div>
           <div class="selection-card-title">${service.name}</div>
           <div class="selection-card-desc">${service.perUnit ? 'Quantity defaults to the shared unit count unless overridden below.' : 'Enter the quantity required for this non-unit service.'}</div>
-          <div class="selection-card-meta">Cost ${fmt(service.cost)} • Sell ${fmt(service.sell)} per ${service.unit}${service.perUnit ? ' / month' : ''}</div>
+          <div class="selection-card-meta" id="standalone-price-${service.id}">${buildSelectionPriceHtml(service.sell, service.sell, 0, `Cost ${fmt(service.cost)} • Sell ${fmt(service.sell)} per ${service.unit}${service.perUnit ? ' / month' : ''}`)}</div>
+          ${getDiscountInputHtml(getStandaloneDiscountInputId(service.id), 'updateStandalonePanel()')}
         </label>
       </div>
       <div class="selection-card-extra">
@@ -2066,6 +2244,7 @@ function renderStandaloneCards() {
         </div>
       </div>
     </div>`).join('');
+  bindDiscountRows(container);
 }
 
 function getProjectDeploymentDays(devices) {
@@ -2106,26 +2285,27 @@ function updateProjectPanel() {
 
     const pill = document.getElementById(`project-days-${project.id}`);
     const price = document.getElementById(`project-price-${project.id}`);
+    const preview = applyDiscountAmount(project.baseDays * PROJECT_DAY_SELL, getProjectDiscount(project.id));
 
     if (!checked) {
       if (pill) pill.textContent = formatDays(project.baseDays);
-      if (price) price.textContent = fmt(project.baseDays * PROJECT_DAY_SELL);
+      if (price) price.innerHTML = buildSelectionPriceHtml(preview.originalAmount, preview.amount, preview.discountPct, fmt(PROJECT_DAY_SELL) + '/day');
       return;
     }
 
     const item = calculateProjectItem(project);
     if (pill) pill.textContent = item.daysSummary;
-    if (price) price.textContent = item.metaSummary;
+    if (price) price.innerHTML = item.metaSummaryHtml;
 
     if (item.ready) {
       pricedItems.push(item);
       totalSell += item.sell;
       totalCost += item.cost;
       totalDays += item.totalDaysForFooter;
-      displayLines.push({ label: item.name, sub: item.summary, val: fmt(item.sell) });
+      displayLines.push({ label: item.name, sub: item.summary, valHtml: buildQuoteValueHtml(item.originalSell, item.sell, item.discountPct) });
     } else {
       pendingCount += 1;
-      displayLines.push({ label: item.name, sub: item.summary, val: 'Pending' });
+      displayLines.push({ label: item.name, sub: item.summary, valHtml: 'Pending' });
     }
   });
 
@@ -2138,7 +2318,7 @@ function updateProjectPanel() {
           <div style="color:#0f172a;font-weight:600;font-size:.84rem;">${line.label}</div>
           <div style="color:#64748b;font-size:.74rem;">${line.sub}</div>
         </div>
-        <div class="qp-val">${line.val}</div>
+        <div class="qp-val">${line.valHtml}</div>
       </div>`).join('');
   }
 
@@ -2181,7 +2361,7 @@ function calculateProjectItem(project) {
         vendor: project.vendor,
         ready: false,
         daysSummary: formatDays(project.baseDays),
-        metaSummary: 'Enter device count to calculate total',
+        metaSummaryHtml: 'Enter device count to calculate total',
         summary: 'Enter the device count to price deployment effort.'
       };
     }
@@ -2198,7 +2378,7 @@ function calculateProjectItem(project) {
         vendor: project.vendor,
         ready: false,
         daysSummary: formatDays(project.baseDays),
-        metaSummary: 'Device count outside standard band',
+        metaSummaryHtml: 'Device count outside standard band',
         summary: 'Device count exceeds standard deployment bands. Contact us for tailored pricing.'
       };
     }
@@ -2227,7 +2407,7 @@ function calculateProjectItem(project) {
         vendor: project.vendor,
         ready: false,
         daysSummary: formatDays(project.baseDays),
-        metaSummary: 'Enter user count to calculate pricing',
+        metaSummaryHtml: 'Enter user count to calculate pricing',
         summary: 'Enter the number of migration users to calculate the correct pricing model.'
       };
     }
@@ -2237,22 +2417,27 @@ function calculateProjectItem(project) {
       rateDisplay = '£7.20/user';
       summary = `${userCount} users • migration tool pricing applies • no day rate added`;
       totalDaysForFooter = 0;
+      const discountedMigration = applyDiscountAmount(sell, getProjectDiscount(project.id));
+      const discountedSell = discountedMigration.amount;
       return {
         id: project.id,
         name: project.name,
         vendor: project.vendor,
         ready: true,
-        sell,
+        sell: discountedSell,
+        originalSell: discountedMigration.originalAmount,
         cost,
-        grossProfit: sell - cost,
-        commission: (sell - cost) * 0.25,
+        discountPct: discountedMigration.discountPct,
+        manualDiscountAmount: discountedMigration.manualDiscountAmount,
+        grossProfit: discountedSell - cost,
+        commission: (discountedSell - cost) * 0.25,
         days: 0,
         daysSummary: `${userCount} users`,
         daysDisplay: `${userCount} users`,
         totalDaysForFooter,
         rateDisplay,
         summary,
-        metaSummary: `${fmt(sell)} • £7.20/user migration pricing applies`
+        metaSummaryHtml: buildSelectionPriceHtml(discountedMigration.originalAmount, discountedSell, discountedMigration.discountPct, `${rateDisplay}${discountedMigration.discountPct > 0 ? ` • ${formatDiscountPercent(discountedMigration.discountPct)}% discount` : ''}`)
       };
     }
     days = project.baseDays;
@@ -2262,22 +2447,28 @@ function calculateProjectItem(project) {
     totalDaysForFooter = days;
   }
 
+  const discounted = applyDiscountAmount(sell, getProjectDiscount(project.id));
+  const discountedSell = discounted.amount;
+
   return {
     id: project.id,
     name: project.name,
     vendor: project.vendor,
     ready: true,
-    sell,
+    sell: discountedSell,
+    originalSell: discounted.originalAmount,
     cost,
-    grossProfit: sell - cost,
-    commission: (sell - cost) * 0.25,
+    discountPct: discounted.discountPct,
+    manualDiscountAmount: discounted.manualDiscountAmount,
+    grossProfit: discountedSell - cost,
+    commission: (discountedSell - cost) * 0.25,
     days,
     daysSummary: formatDays(days),
     daysDisplay: formatDays(days),
     totalDaysForFooter,
     rateDisplay,
     summary,
-    metaSummary: `${fmt(sell)} • ${rateDisplay}`
+    metaSummaryHtml: buildSelectionPriceHtml(discounted.originalAmount, discountedSell, discounted.discountPct, `${rateDisplay}${discounted.discountPct > 0 ? ` • ${formatDiscountPercent(discounted.discountPct)}% discount` : ''}`)
   };
 }
 
@@ -2356,23 +2547,23 @@ function buildProjectPDF() {
 
   doc.autoTable({
     startY: 90,
-    head: [['Service', 'Vendor', 'Days', 'Day Rate', 'Total']],
+    head: [['Service', 'Vendor', 'Days', 'Pricing', 'Total']],
     body: state.items.map(item => [
       pdfSafe(item.name),
       pdfSafe(item.vendor),
       pdfSafe(item.daysDisplay),
-      pdfSafe(item.rateDisplay),
-      pdfSafe(fmt(item.sell))
+      pdfSafe(item.discountPct > 0 ? `${item.rateDisplay} • ${formatDiscountPercent(item.discountPct)}% discount` : item.rateDisplay),
+      pdfSafe(buildPriceSummaryText(item.originalSell, item.sell, item.discountPct))
     ]),
     theme: 'grid',
     styles: { fontSize: 8, cellPadding: 2.8, textColor: [30, 41, 59] },
     headStyles: { fillColor: [15, 39, 68], textColor: 255, fontStyle: 'bold' },
     columnStyles: {
-      0: { cellWidth: 86 },
-      1: { cellWidth: 28 },
-      2: { halign: 'right', cellWidth: 24 },
-      3: { halign: 'right', cellWidth: 28 },
-      4: { halign: 'right', cellWidth: 26 }
+      0: { cellWidth: 72 },
+      1: { cellWidth: 24 },
+      2: { halign: 'right', cellWidth: 20 },
+      3: { cellWidth: 40 },
+      4: { halign: 'right', cellWidth: 30 }
     },
     alternateRowStyles: { fillColor: [248, 250, 252] },
     margin: { left: margin, right: margin }
@@ -2391,7 +2582,7 @@ function buildProjectPDF() {
   doc.text(pdfSafe(fmt(state.totalSell)), W - margin - 5, y + 18, { align: 'right' });
   y += 32;
 
-  const notes = state.items.filter(item => item.summary).map(item => `• ${item.name}: ${item.summary}`);
+  const notes = state.items.filter(item => item.summary).map(item => `• ${item.name}: ${item.summary}${item.discountPct > 0 ? ` (${formatDiscountPercent(item.discountPct)}% discount applied)` : ''}`);
   if (notes.length) {
     doc.setTextColor(100, 116, 139);
     doc.setFont('helvetica', 'normal');
@@ -2458,8 +2649,8 @@ function buildProjectSalesPDF() {
     body: state.items.map(item => [
       pdfSafe(item.name),
       pdfSafe(item.vendor),
-      pdfSafe(item.summary),
-      fmt(item.sell),
+      pdfSafe(`${item.summary}${item.discountPct > 0 ? ` • ${formatDiscountPercent(item.discountPct)}% discount` : ''}`),
+      buildPriceSummaryText(item.originalSell, item.sell, item.discountPct),
       fmt(item.cost),
       fmt(item.grossProfit),
       `${item.sell > 0 ? ((item.grossProfit / item.sell) * 100).toFixed(1) : '0.0'}%`,
@@ -2469,13 +2660,13 @@ function buildProjectSalesPDF() {
     styles: { fontSize: 7.5, cellPadding: 2.2, textColor: [30, 58, 95] },
     headStyles: { fillColor: [30, 58, 95], textColor: 255, fontStyle: 'bold' },
     columnStyles: {
-      0: { cellWidth: 72 },
-      1: { cellWidth: 24 },
-      2: { cellWidth: 72 },
+      0: { cellWidth: 66 },
+      1: { cellWidth: 22 },
+      2: { cellWidth: 86 },
       3: { halign: 'right', cellWidth: 24 },
-      4: { halign: 'right', cellWidth: 24 },
-      5: { halign: 'right', cellWidth: 22 },
-      6: { halign: 'right', cellWidth: 18 },
+      4: { halign: 'right', cellWidth: 22 },
+      5: { halign: 'right', cellWidth: 20 },
+      6: { halign: 'right', cellWidth: 17 },
       7: { halign: 'right', cellWidth: 24 }
     },
     alternateRowStyles: { fillColor: [240, 245, 251] },
@@ -2549,13 +2740,25 @@ function updateStandalonePanel() {
 
   STANDALONE_SERVICES.forEach(service => {
     const checked = document.getElementById(`standalone-${service.id}`)?.checked;
+    const discountPct = getStandaloneDiscount(service.id);
+    const discountedUnit = applyDiscountPricing(service.sell, 1, discountPct);
+    const meta = document.getElementById(`standalone-price-${service.id}`);
+    if (meta) {
+      meta.innerHTML = buildSelectionPriceHtml(
+        discountedUnit.originalUnitPrice,
+        discountedUnit.discountedUnitPrice,
+        discountPct,
+        `Cost ${fmt(service.cost)} • Sell ${fmt(discountedUnit.discountedUnitPrice)} per ${service.unit}${service.perUnit ? ' / month' : ''}${discountPct > 0 ? ` • ${formatDiscountPercent(discountPct)}% discount` : ''}`
+      );
+    }
     if (!checked) return;
     const qty = getStandaloneQty(service);
     if (qty <= 0) {
       pendingCount += 1;
-      displayLines.push({ label: service.name, sub: `Enter a valid ${service.unit} quantity`, val: 'Pending' });
+      displayLines.push({ label: service.name, sub: `Enter a valid ${service.unit} quantity`, valHtml: 'Pending' });
       return;
     }
+    const pricing = applyDiscountPricing(service.sell, qty, discountPct);
     const line = {
       id: service.id,
       name: service.name,
@@ -2563,16 +2766,24 @@ function updateStandalonePanel() {
       qty,
       perUnit: service.perUnit,
       unitSell: service.sell,
+      discountedUnitSell: pricing.discountedUnitPrice,
       unitCost: service.cost,
-      monthlySell: qty * service.sell,
+      originalMonthlySell: pricing.originalAmount,
+      monthlySell: pricing.amount,
       monthlyCost: qty * service.cost,
-      grossProfit: qty * (service.sell - service.cost)
+      manualDiscountAmount: pricing.manualDiscountAmount,
+      discountPct: pricing.discountPct,
+      grossProfit: pricing.amount - (qty * service.cost)
     };
     monthlySell += line.monthlySell;
     monthlyCost += line.monthlyCost;
     selectedLines.push(line);
     if (service.perUnit) selectedPerUnit.push(line);
-    displayLines.push({ label: service.name, sub: `${qty} ${service.unit}${qty === 1 ? '' : 's'} × ${fmt(service.sell)}/mo`, val: fmt(line.monthlySell) });
+    displayLines.push({
+      label: service.name,
+      sub: `${qty} ${service.unit}${qty === 1 ? '' : 's'} x ${fmt(service.unitSell)}/mo${pricing.discountPct > 0 ? ` • ${formatDiscountPercent(pricing.discountPct)}% discount` : ''}`,
+      valHtml: buildQuoteValueHtml(line.originalMonthlySell, line.monthlySell, line.discountPct)
+    });
   });
 
   const unitCount = Math.max(0, parseFloat(document.getElementById('standalone-units')?.value) || 0);
@@ -2581,10 +2792,10 @@ function updateStandalonePanel() {
     implementation = getStandaloneImplementationBand(unitCount);
     if (implementation.sell == null) {
       pendingCount += 1;
-      displayLines.push({ label: 'Implementation & Onboarding', sub: implementation.label, val: 'TBC' });
+      displayLines.push({ label: 'Implementation & Onboarding', sub: implementation.label, valHtml: 'TBC' });
     } else if (implementation.sell > 0) {
       implementation.grossProfit = implementation.sell - implementation.cost;
-      displayLines.push({ label: 'Implementation & Onboarding', sub: `${formatDays(implementation.days)} (${implementation.label})`, val: fmt(implementation.sell) });
+      displayLines.push({ label: 'Implementation & Onboarding', sub: `${formatDays(implementation.days)} (${implementation.label})`, valHtml: fmt(implementation.sell) });
     }
   }
 
@@ -2597,7 +2808,7 @@ function updateStandalonePanel() {
           <div style="color:#0f172a;font-weight:600;font-size:.84rem;">${line.label}</div>
           <div style="color:#64748b;font-size:.74rem;">${line.sub}</div>
         </div>
-        <div class="qp-val">${line.val}</div>
+        <div class="qp-val">${line.valHtml}</div>
       </div>`).join('');
   }
 
@@ -2692,22 +2903,22 @@ function buildStandalonePDF() {
 
   doc.autoTable({
     startY: 90,
-    head: [['Service', 'Unit', 'Qty', 'Monthly / Unit', 'Monthly Total']],
+    head: [['Service', 'Unit', 'Qty', 'Pricing', 'Monthly Total']],
     body: state.recurringLines.map(line => [
       pdfSafe(line.name),
       pdfSafe(line.unit),
       String(line.qty),
-      pdfSafe(fmt(line.unitSell)),
-      pdfSafe(fmt(line.monthlySell))
+      pdfSafe(buildPriceBreakdownText(line.unitSell, line.discountedUnitSell, line.discountPct)),
+      pdfSafe(buildPriceSummaryText(line.originalMonthlySell, line.monthlySell, line.discountPct))
     ]),
     theme: 'grid',
     styles: { fontSize: 8, cellPadding: 2.8, textColor: [30, 41, 59] },
     headStyles: { fillColor: [15, 39, 68], textColor: 255, fontStyle: 'bold' },
     columnStyles: {
-      0: { cellWidth: 88 },
-      1: { cellWidth: 24 },
-      2: { halign: 'right', cellWidth: 20 },
-      3: { halign: 'right', cellWidth: 30 },
+      0: { cellWidth: 76 },
+      1: { cellWidth: 22 },
+      2: { halign: 'right', cellWidth: 18 },
+      3: { cellWidth: 44 },
       4: { halign: 'right', cellWidth: 30 }
     },
     alternateRowStyles: { fillColor: [248, 250, 252] },
@@ -2813,11 +3024,11 @@ function buildStandaloneSalesPDF() {
 
   const rows = state.recurringLines.map(line => [
     pdfSafe(line.name),
-    'Monthly',
+    pdfSafe(line.discountPct > 0 ? `Monthly • ${formatDiscountPercent(line.discountPct)}% discount` : 'Monthly'),
     String(line.qty),
-    fmt(line.unitSell),
+    buildPriceBreakdownText(line.unitSell, line.discountedUnitSell, line.discountPct),
     fmt(line.unitCost),
-    fmt(line.monthlySell),
+    buildPriceSummaryText(line.originalMonthlySell, line.monthlySell, line.discountPct),
     fmt(line.monthlyCost),
     fmt(line.grossProfit),
     `${line.monthlySell > 0 ? ((line.grossProfit / line.monthlySell) * 100).toFixed(1) : '0.0'}%`
@@ -2844,15 +3055,15 @@ function buildStandaloneSalesPDF() {
     styles: { fontSize: 7.5, cellPadding: 2.2, textColor: [30, 58, 95] },
     headStyles: { fillColor: [30, 58, 95], textColor: 255, fontStyle: 'bold' },
     columnStyles: {
-      0: { cellWidth: 70 },
-      1: { cellWidth: 18 },
-      2: { halign: 'right', cellWidth: 20 },
-      3: { halign: 'right', cellWidth: 22 },
+      0: { cellWidth: 64 },
+      1: { cellWidth: 24 },
+      2: { halign: 'right', cellWidth: 18 },
+      3: { cellWidth: 34 },
       4: { halign: 'right', cellWidth: 22 },
-      5: { halign: 'right', cellWidth: 24 },
+      5: { cellWidth: 34 },
       6: { halign: 'right', cellWidth: 24 },
       7: { halign: 'right', cellWidth: 22 },
-      8: { halign: 'right', cellWidth: 18 }
+      8: { halign: 'right', cellWidth: 17 }
     },
     alternateRowStyles: { fillColor: [240, 245, 251] },
     margin: { left: margin, right: margin }
@@ -2947,13 +3158,19 @@ function getFinancialSummary(lines, orgType = currentOrgType) {
   return lines
     .filter(line => line.qty > 0 && line.unitPrice > 0 && line.amount > 0)
     .reduce((acc, line) => {
+      const list = line.originalAmount != null ? line.originalAmount : line.amount;
+      const lineDiscount = line.manualDiscountAmount != null ? line.manualDiscountAmount : 0;
       const gross = line.amount;
-      const discount = getLineDiscount(line, orgType);
-      const net = gross - discount;
+      const orgDiscount = getLineDiscount(line, orgType);
+      const discount = lineDiscount + orgDiscount;
+      const net = gross - orgDiscount;
       const { unitCost, totalCost } = getLineCostInfo(line);
       const profit = totalCost != null ? net - totalCost : null;
       const marginPct = totalCost != null && net > 0 ? ((profit / net) * 100) : null;
+      acc.list += list;
+      acc.lineDiscount += lineDiscount;
       acc.gross += gross;
+      acc.orgDiscount += orgDiscount;
       acc.discount += discount;
       acc.net += net;
       if (totalCost != null) {
@@ -2962,9 +3179,9 @@ function getFinancialSummary(lines, orgType = currentOrgType) {
         acc.allCostKnown = false;
       }
       if (profit != null) acc.profit += profit;
-      acc.rows.push({ line, gross, discount, net, unitCost, totalCost, profit, marginPct });
+      acc.rows.push({ line, list, lineDiscount, gross, orgDiscount, discount, net, unitCost, totalCost, profit, marginPct });
       return acc;
-    }, { gross: 0, discount: 0, net: 0, cost: 0, profit: 0, allCostKnown: true, rows: [] });
+    }, { list: 0, lineDiscount: 0, gross: 0, orgDiscount: 0, discount: 0, net: 0, cost: 0, profit: 0, allCostKnown: true, rows: [] });
 }
 
 function getOnboarding(units) {
@@ -3034,11 +3251,17 @@ function updatePanel() {
   const devices = getDevices();
   const lines   = [];
   let monthlySubtotal = 0;
+  let lineDiscountTotal = 0;
 
   const pushPricedLine = (line) => {
     line.amount = line.amount || 0;
-    line.val = fmt(line.amount);
+    line.originalAmount = line.originalAmount != null ? line.originalAmount : line.amount;
+    line.discountPct = normaliseDiscountValue(line.discountPct);
+    line.manualDiscountAmount = line.manualDiscountAmount != null ? line.manualDiscountAmount : Math.max(0, line.originalAmount - line.amount);
+    line.valHtml = buildQuoteValueHtml(line.originalAmount, line.amount, line.discountPct);
+    line.valText = buildPriceSummaryText(line.originalAmount, line.amount, line.discountPct);
     line.noDiscount = !!line.noDiscount;
+    lineDiscountTotal += line.manualDiscountAmount;
     monthlySubtotal += line.amount;
     lines.push(line);
   };
@@ -3046,21 +3269,43 @@ function updatePanel() {
   const bundleVal = document.querySelector('input[name=bundle]:checked')?.value || 'none';
   const bundle = BUNDLES[bundleVal];
   if (bundle.price > 0 && users > 0) {
-    const amount = bundle.price * users;
-    pushPricedLine({ key: bundleVal, label: bundle.name, sub: `${users} users – ${fmt(bundle.price)}`, qty: users, unitPrice: bundle.price, amount });
+    const pricing = applyDiscountPricing(bundle.price, users, getManagedDiscount(bundleVal));
+    pushPricedLine({
+      key: bundleVal,
+      label: bundle.name,
+      sub: `${users} users x ${fmt(bundle.price)}${pricing.discountPct > 0 ? ` • ${formatDiscountPercent(pricing.discountPct)}% discount` : ''}`,
+      qty: users,
+      unitPrice: bundle.price,
+      amount: pricing.amount,
+      originalAmount: pricing.originalAmount,
+      manualDiscountAmount: pricing.manualDiscountAmount,
+      discountPct: pricing.discountPct
+    });
   }
 
   const ms365Enabled = document.getElementById('ms365-enabled')?.checked;
   if (ms365Enabled) {
+    const selectedMs = document.querySelector('input[name=ms365-license]:checked')?.value;
     const msKey = getSelectedMsLicenseKey();
     const msQty = parseInt(document.getElementById('ms365-license-qty')?.value) || 0;
     if (msKey && msQty > 0) {
       const addon = ADDONS[msKey];
-      const amount = addon.price * msQty;
-      pushPricedLine({ key: msKey, label: addon.name, sub: `${msQty} licences x ${fmt(addon.price)}`, qty: msQty, unitPrice: addon.price, amount, noDiscount: true });
+      const pricing = applyDiscountPricing(addon.price, msQty, getManagedDiscount(getManagedMs365DiscountKey(selectedMs)));
+      pushPricedLine({
+        key: msKey,
+        label: addon.name,
+        sub: `${msQty} licences x ${fmt(addon.price)}${pricing.discountPct > 0 ? ` • ${formatDiscountPercent(pricing.discountPct)}% discount` : ''}`,
+        qty: msQty,
+        unitPrice: addon.price,
+        amount: pricing.amount,
+        originalAmount: pricing.originalAmount,
+        manualDiscountAmount: pricing.manualDiscountAmount,
+        discountPct: pricing.discountPct,
+        noDiscount: true
+      });
     } else if (msKey || msQty > 0) {
       const addon = msKey ? ADDONS[msKey] : null;
-      lines.push({ key: msKey || 'ms365-license', label: addon ? addon.name : 'Microsoft 365 Licensing', sub: msKey ? 'Enter licence quantity' : 'Choose a Microsoft 365 licence', val: '–' });
+      lines.push({ key: msKey || 'ms365-license', label: addon ? addon.name : 'Microsoft 365 Licensing', sub: msKey ? 'Enter licence quantity' : 'Choose a Microsoft 365 licence', valHtml: '–' });
     }
   }
 
@@ -3078,12 +3323,23 @@ function updatePanel() {
     const table = vcmVal === 'vcm-std' ? CONFIG.vcm_std : CONFIG.vcm_prem;
     const vcmName = vcmVal === 'vcm-std' ? 'Virtual Compliance Manager – Standard' : 'Virtual Compliance Manager – Premium';
     if (band && table[band]) {
-      const amount = table[band];
-      pushPricedLine({ key: vcmVal, label: vcmName, sub: `Device band: ${band}`, qty: 1, unitPrice: amount, amount, vcmBand: band });
+      const pricing = applyDiscountPricing(table[band], 1, getManagedDiscount(vcmVal));
+      pushPricedLine({
+        key: vcmVal,
+        label: vcmName,
+        sub: `Device band: ${band}${pricing.discountPct > 0 ? ` • ${formatDiscountPercent(pricing.discountPct)}% discount` : ''}`,
+        qty: 1,
+        unitPrice: table[band],
+        amount: pricing.amount,
+        originalAmount: pricing.originalAmount,
+        manualDiscountAmount: pricing.manualDiscountAmount,
+        discountPct: pricing.discountPct,
+        vcmBand: band
+      });
     } else if (devices === 0) {
-      lines.push({ key: vcmVal, label: vcmName, sub: 'Enter your device count for pricing', val: '–' });
+      lines.push({ key: vcmVal, label: vcmName, sub: 'Enter your device count for pricing', valHtml: '–' });
     } else {
-      lines.push({ key: vcmVal, label: vcmName, sub: 'Outside standard bands – contact us', val: 'TBC' });
+      lines.push({ key: vcmVal, label: vcmName, sub: 'Outside standard bands – contact us', valHtml: 'TBC' });
     }
   } else if (vcmNote) {
     vcmNote.style.display = 'none';
@@ -3091,9 +3347,19 @@ function updatePanel() {
 
   const vctoDays = parseInt(document.getElementById('vcto-days').value) || 0;
   if (vctoDays > 0) {
-    const amount = vctoDays * 1000;
-    pushPricedLine({ key: 'vcto', label: 'Virtual CTO', sub: `${vctoDays} day${vctoDays !== 1 ? 's' : ''} – £1,000`, qty: vctoDays, unitPrice: 1000, amount });
-    document.getElementById('vcto-total').textContent = fmt(amount) + '/month';
+    const pricing = applyDiscountPricing(1000, vctoDays, getVctoDiscount());
+    pushPricedLine({
+      key: 'vcto',
+      label: 'Virtual CTO',
+      sub: `${vctoDays} day${vctoDays !== 1 ? 's' : ''} x ${fmt(1000)}${pricing.discountPct > 0 ? ` • ${formatDiscountPercent(pricing.discountPct)}% discount` : ''}`,
+      qty: vctoDays,
+      unitPrice: 1000,
+      amount: pricing.amount,
+      originalAmount: pricing.originalAmount,
+      manualDiscountAmount: pricing.manualDiscountAmount,
+      discountPct: pricing.discountPct
+    });
+    document.getElementById('vcto-total').innerHTML = buildSelectionPriceHtml(pricing.originalAmount, pricing.amount, pricing.discountPct, 'per month');
   } else {
     document.getElementById('vcto-total').textContent = '';
   }
@@ -3128,11 +3394,22 @@ function updatePanel() {
       subLabel = `${qty} ${unitLabel}`;
     }
     if (qty > 0) {
-      const amount = addon.price * qty;
-      pushPricedLine({ key, label: addon.name, sub: `${subLabel} x ${fmt(addon.price)}`, qty, unitPrice: addon.price, amount, noDiscount: !!addon.noDiscount });
+      const pricing = applyDiscountPricing(addon.price, qty, getManagedDiscount(key));
+      pushPricedLine({
+        key,
+        label: addon.name,
+        sub: `${subLabel} x ${fmt(addon.price)}${pricing.discountPct > 0 ? ` • ${formatDiscountPercent(pricing.discountPct)}% discount` : ''}`,
+        qty,
+        unitPrice: addon.price,
+        amount: pricing.amount,
+        originalAmount: pricing.originalAmount,
+        manualDiscountAmount: pricing.manualDiscountAmount,
+        discountPct: pricing.discountPct,
+        noDiscount: !!addon.noDiscount
+      });
     } else {
       const hint = addon.basis === 'qty' ? `Enter ${addon.unit} quantity` : `Enter quantity or set count in Step 3`;
-      lines.push({ label: addon.name, sub: hint, val: '–' });
+      lines.push({ label: addon.name, sub: hint, valHtml: '–' });
     }
   });
 
@@ -3151,7 +3428,7 @@ function updatePanel() {
           <div style="color:#e2e8f0;font-weight:600;font-size:.84rem;">${l.label}</div>
           <div style="color:#64748b;font-size:.74rem;">${l.sub || ''}</div>
         </div>
-        <div class="qp-val">${l.val}</div>
+        <div class="qp-val">${l.valHtml || l.valText || '–'}</div>
       </div>
     `).join('') + (discountTotal > 0 ? `
       <div class="qp-line">
@@ -3193,7 +3470,7 @@ function updatePanel() {
   }
 
   const onboarding = ob.cost || 0;
-  window._quoteState = { users, devices, bundle, vcmVal, band, vctoDays, monthlySubtotal, discountTotal, monthly, lines, onboarding, ob, term, currentOrgType };
+  window._quoteState = { users, devices, bundle, vcmVal, band, vctoDays, monthlySubtotal, lineDiscountTotal, discountTotal, monthly, lines, onboarding, ob, term, currentOrgType };
 }
 
 // -- Generate Quote (PDF + Email) --
@@ -3384,7 +3661,7 @@ function buildPDF() {
   doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
   doc.text('Service', margin + 4, y + 5.5);
-  doc.text('Detail', margin + 90, y + 5.5);
+  doc.text('Detail', margin + 84, y + 5.5);
   doc.text('Monthly Cost', W - margin - 4, y + 5.5, { align: 'right' });
   y += 8;
 
@@ -3395,6 +3672,8 @@ function buildPDF() {
       doc.setFillColor(244, 247, 251);
       doc.rect(margin, y, W - margin * 2, 9, 'F');
     }
+    const detail = line.discountPct > 0 ? `${line.sub || ''} • ${formatDiscountPercent(line.discountPct)}% discount` : (line.sub || '');
+    const priceText = buildPriceSummaryText(line.originalAmount, line.amount, line.discountPct);
     doc.setTextColor(...text);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8.5);
@@ -3402,14 +3681,16 @@ function buildPDF() {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(...muted);
-    doc.text(pdfSafe(line.sub || ''), margin + 90, y + 6);
+    doc.text(pdfSafe(detail), margin + 84, y + 6);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8.5);
     doc.setTextColor(...text);
-    doc.text(pdfSafe(line.val), W - margin - 4, y + 6, { align: 'right' });
+    doc.text(pdfSafe(priceText), W - margin - 4, y + 6, { align: 'right' });
     rowAlt = !rowAlt;
     y += 9;
   });
+
+  const hasLineDiscounts = state.lines.some(line => line.discountPct > 0);
 
   // Total row
   doc.setFillColor(...navy);
@@ -3417,10 +3698,10 @@ function buildPDF() {
   doc.setTextColor(...white);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
-  doc.text(state.discountTotal > 0 ? 'MONTHLY SUBTOTAL' : 'MONTHLY TOTAL', margin + 4, y + 7.5);
+  doc.text(state.discountTotal > 0 ? 'MONTHLY SUBTOTAL' : (hasLineDiscounts ? 'DISCOUNTED MONTHLY TOTAL' : 'MONTHLY TOTAL'), margin + 4, y + 7.5);
   doc.setTextColor(...accent);
   doc.setFontSize(11);
-  doc.text(pdfSafe(fmt(financials.gross)), W - margin - 4, y + 7.5, { align: 'right' });
+  doc.text(pdfSafe(fmt(state.discountTotal > 0 ? financials.gross : financials.net)), W - margin - 4, y + 7.5, { align: 'right' });
   y += 13;
 
   if (state.discountTotal > 0) {
@@ -3438,7 +3719,7 @@ function buildPDF() {
     doc.setTextColor(...white);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
-    doc.text('DISCOUNTED MONTHLY TOTAL', margin + 4, y + 7.5);
+    doc.text('FINAL MONTHLY TOTAL', margin + 4, y + 7.5);
     doc.setTextColor(...accent);
     doc.setFontSize(11);
     doc.text(pdfSafe(fmt(state.monthly)), W - margin - 4, y + 7.5, { align: 'right' });
@@ -3531,7 +3812,7 @@ function downloadBlob(blob, filename) {
 async function sendEmail(company, name, email) {
   if (CONFIG.emailjs_public_key === 'YOUR_EMAILJS_PUBLIC_KEY') return; // skip if not configured
   const state = window._quoteState;
-  const linesSummary = state.lines.map(l => `${l.label}: ${l.val}`).join('\n');
+  const linesSummary = state.lines.map(l => `${l.label}: ${l.valText || fmt(l.amount || 0)}`).concat(state.discountTotal > 0 ? [`Non-Profit Discount: -${fmt(state.discountTotal)}`] : []).join('\n');
   await emailjs.send(CONFIG.emailjs_service_id, CONFIG.emailjs_template_id, {
     to_email:      CONFIG.notify_email,
     client_company: company,
@@ -3555,15 +3836,15 @@ function buildSalesSummaryHtml(company, name, email, phone) {
   const orgTypeLabel = state.currentOrgType === 'nonprofit' ? 'Non-Profit' : 'Commercial';
   const tbc = financials.allCostKnown ? '' : '*';
 
-  const rows = financials.rows.map(({ line, gross, discount, net, unitCost, totalCost, profit, marginPct }) => {
+  const rows = financials.rows.map(({ line, list, lineDiscount, orgDiscount, net, unitCost, totalCost, profit, marginPct }) => {
     const margin = profit != null && net > 0 ? marginPct.toFixed(1) + '%' : 'TBC';
     return `<tr>
       ${td(line.label)}
       ${td(line.qty, 'center')}
       ${td(gbp(line.unitPrice), 'right')}
       ${td(unitCost != null ? gbp(unitCost) : 'TBC', 'right')}
-      ${td(gbp(gross), 'right')}
-      ${td(discount > 0 ? '-' + gbp(discount) : '–', 'right')}
+      ${td(gbp(list), 'right')}
+      ${td(getInternalDiscountText(line, lineDiscount, orgDiscount), 'right')}
       ${td(gbp(net), 'right')}
       ${td(totalCost != null ? gbp(totalCost) : 'TBC', 'right')}
       ${td(profit != null ? gbp(profit) : 'TBC', 'right')}
@@ -3600,7 +3881,7 @@ function buildSalesSummaryHtml(company, name, email, phone) {
         <th style="padding:8px 10px;text-align:center;border:1px solid #1e3a5f;">Qty</th>
         <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Unit Sell</th>
         <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Unit Cost</th>
-        <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Gross Rev</th>
+        <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">List Rev</th>
         <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Discount</th>
         <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Net Rev</th>
         <th style="padding:8px 10px;text-align:right;border:1px solid #1e3a5f;">Mo. Cost</th>
@@ -3614,8 +3895,8 @@ function buildSalesSummaryHtml(company, name, email, phone) {
   <div style="background:#1e3a5f;color:#ffffff;padding:14px 24px;border-radius:0 0 6px 6px;margin-top:20px;">
     <table style="width:100%;border-collapse:collapse;font-size:13px;">
       <tr>
-        <td style="padding:4px 0;width:50%;"><strong>Monthly Gross Revenue</strong></td>
-        <td style="text-align:right;">${gbp(financials.gross)}</td>
+        <td style="padding:4px 0;width:50%;"><strong>Monthly List Revenue</strong></td>
+        <td style="text-align:right;">${gbp(financials.list)}</td>
         <td style="padding:4px 0 4px 30px;width:50%;"><strong>Annual Net Revenue</strong></td>
         <td style="text-align:right;">${gbp(annualNetRevenue)}</td>
       </tr>
@@ -3762,13 +4043,13 @@ function buildSalesPDF() {
   const gbp = n => '\u00a3' + n.toFixed(2);
   const tbc = financials.allCostKnown ? '' : '*';
 
-  const tableBody = financials.rows.map(({ line, gross, discount, net, unitCost, totalCost, profit, marginPct }) => [
+  const tableBody = financials.rows.map(({ line, list, lineDiscount, orgDiscount, net, unitCost, totalCost, profit, marginPct }) => [
     pdfSafe(line.label),
     String(line.qty),
     gbp(line.unitPrice),
     unitCost != null ? gbp(unitCost) : 'TBC',
-    gbp(gross),
-    discount > 0 ? '-' + gbp(discount) : '–',
+    gbp(list),
+    pdfSafe(getInternalDiscountText(line, lineDiscount, orgDiscount)),
     gbp(net),
     totalCost != null ? gbp(totalCost) : 'TBC',
     profit != null ? gbp(profit) : 'TBC',
@@ -3778,7 +4059,7 @@ function buildSalesPDF() {
   // -- AutoTable --
   docL.autoTable({
     startY: y,
-    head: [['Service', 'Qty', 'Unit Sell', 'Unit Cost', 'Gross Rev', 'Discount', 'Net Rev', 'Mo. Cost', 'Mo. Profit', 'Margin']],
+    head: [['Service', 'Qty', 'Unit Sell', 'Unit Cost', 'List Rev', 'Discount', 'Net Rev', 'Mo. Cost', 'Mo. Profit', 'Margin']],
     body: tableBody,
     theme: 'grid',
     styles: { fontSize: 7.5, cellPadding: 2.2, textColor: [30, 58, 95] },
@@ -3812,13 +4093,13 @@ function buildSalesPDF() {
 
   const col1 = margin + 6, col2 = margin + 76, col3 = margin + 146, col4 = margin + 216;
   docL.setTextColor(147, 197, 253); docL.setFontSize(7.5); docL.setFont('helvetica', 'normal');
-  docL.text('Monthly Gross Revenue', col1, sy + 9);
+  docL.text('Monthly List Revenue', col1, sy + 9);
   docL.text('Monthly Discount',      col2, sy + 9);
   docL.text('Monthly Net Revenue',   col3, sy + 9);
   docL.text('Monthly Cost',          col4, sy + 9);
 
   docL.setTextColor(255, 255, 255); docL.setFontSize(10); docL.setFont('helvetica', 'bold');
-  docL.text(gbp(financials.gross),                                   col1, sy + 17);
+  docL.text(gbp(financials.list),                                    col1, sy + 17);
   docL.text(financials.discount > 0 ? '-' + gbp(financials.discount) : '–', col2, sy + 17);
   docL.text(gbp(financials.net),                                     col3, sy + 17);
   docL.text(gbp(financials.cost) + tbc,                              col4, sy + 17);
@@ -3885,6 +4166,7 @@ function today() {
 // Init
 renderProjectCards();
 renderStandaloneCards();
+injectManagedDiscountInputs();
 setDefaultSectionDates();
 toggleMs365Options();
 updateMsLicensePrices();
