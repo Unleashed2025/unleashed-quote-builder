@@ -2853,6 +2853,12 @@ function buildSalesSummaryHtml(company, name, email, phone) {
         <td style="padding:4px 0 4px 30px;"><strong>Onboarding (one-off)</strong></td>
         <td style="text-align:right;">${ob > 0 ? gbp(ob) : '&ndash;'}</td>
       </tr>
+      ${state.addonImplSell > 0 ? <tr>
+        <td style="padding:4px 0;"><strong>Add-on Config. Days (one-off sell)</strong></td>
+        <td style="text-align:right;">${gbp(state.addonImplSell)}</td>
+        <td style="padding:4px 0 4px 30px;"><strong>Add-on Config. Cost / Profit</strong></td>
+        <td style="text-align:right;">${gbp(state.addonImplDays * 300)} / ${gbp(state.addonImplSell - state.addonImplDays * 300)}</td>
+      </tr> : ''}
       <tr>
         <td style="padding:4px 0;"><strong>Monthly Net Revenue</strong></td>
         <td style="text-align:right;">${gbp(financials.net)}</td>
