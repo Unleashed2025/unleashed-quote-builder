@@ -282,7 +282,16 @@
       color: #0f172a;
     }
     .addon-qty-label { font-size: .75rem; color: #94a3b8; }
-
+    .discount-row { display: flex; align-items: center; gap: .4rem; margin-top: .3rem; flex-wrap: wrap; }
+    .discount-label { font-size: .72rem; color: #94a3b8; white-space: nowrap; margin: 0; }
+    .discount-input-wrap { display: flex; align-items: center; gap: 2px; }
+    .discount-input {
+      width: 52px; padding: .2rem .35rem;
+      font-size: .78rem; border: 1px solid #cbd5e1;
+      border-radius: 6px; background: #f8fafc; color: #0f172a;
+      text-align: center; box-shadow: none;
+    }
+    .discount-input:focus { border-color: #2563eb; outline: none; box-shadow: none; }
     .discount-pct { font-size: .78rem; color: #64748b; }
     .price-discounted { font-size: .82rem; color: #16a34a; font-weight: 700; }
     .price-original { font-size: .75rem; color: #94a3b8; text-decoration: line-through; }
@@ -1786,7 +1795,8 @@ function formatDiscountPercent(value) {
   return Number.isInteger(pct) ? String(pct) : pct.toFixed(1).replace(/\.0$/, '');
 }
 
-function getDiscountInputHtml(id, handler) { return ''; }">
+function getDiscountInputHtml(id, handler) {
+  return `<div class="discount-row" data-discount-id="${id}">
     <label class="discount-label" for="${id}">Discount</label>
     <div class="discount-input-wrap">
       <input type="number" id="${id}" class="discount-input" min="0" max="100" step="0.5" value="0" onclick="event.stopPropagation()" oninput="${handler}" onchange="${handler}" />
@@ -2562,7 +2572,7 @@ function buildPDF() {
   doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
   doc.text('Service', margin + 4, y + 5.5);
-  doc.text('Detail', margin + 80, y + 5.5);
+  doc.text('Detail', margin + 84, y + 5.5);
   doc.text('Monthly Cost', W - margin - 4, y + 5.5, { align: 'right' });
   y += 8;
 
@@ -2573,7 +2583,8 @@ function buildPDF() {
       doc.setFillColor(244, 247, 251);
       doc.rect(margin, y, W - margin * 2, 9, 'F');
     }
-    const subText = (line.sub || '').split('\u2022')[0].trim();
+    const detail = line.discountPct > 0 ? `${line.sub || ''} • ${formatDiscountPercent(line.discountPct)}% discount` : (line.sub || '');
+    const priceText = buildPriceSummaryText(line.originalAmount, line.amount, line.discountPct);
     doc.setTextColor(...text);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8.5);
@@ -2581,12 +2592,12 @@ function buildPDF() {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(...muted);
-    doc.text(pdfSafe(subText), margin + 84, y + 6);
+    doc.text(pdfSafe(detail), margin + 84, y + 6);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8.5);
     doc.setTextColor(...text);
-    doc.text(pdfSafe(fmt(line.amount)), W - margin - 4, y + 6, { align: 'right' });
-        rowAlt = !rowAlt;
+    doc.text(pdfSafe(priceText), W - margin - 4, y + 6, { align: 'right' });
+    rowAlt = !rowAlt;
     y += 9;
   });
 
@@ -2739,48 +2750,6 @@ async function sendEmail(company, name, email) {
   });
 }
 
-function buildAddonImplSection() {
-  var items = [];
-  Object.keys(ADDON_IMPL).forEach(function(key) {
-    var sel = '.addon-item input[type=checkbox][value="' + key + '"]' + ':checked';
-    var cb = document.querySelector(sel);
-    if (!cb) return;
-    var days = ADDON_IMPL[key]; var sell = days * 800; var cost = days * 300;
-    var a = ADDONS[key];
-    items.push({ name: a ? a.name : key, days: days, sell: sell, cost: cost, profit: sell - cost });
-  });
-  if (!items.length) return '';
-  var g = function(n) { return '\u00a3' + Number(n).toFixed(2); };
-  var tD=0, tS=0, tC=0, tP=0;
-  var rows = items.map(function(i) {
-    tD += i.days; tS += i.sell; tC += i.cost; tP += i.profit;
-    var r = '<tr>';
-    r += '<td style="padding:6px 10px;border:1px solid #dde8f4;">'+i.name+'</td>';
-    r += '<td style="padding:6px 10px;border:1px solid #dde8f4;text-align:center;">'+i.days+' days</td>';
-    r += '<td style="padding:6px 10px;border:1px solid #dde8f4;text-align:right;">'+g(i.sell)+'</td>';
-    r += '<td style="padding:6px 10px;border:1px solid #dde8f4;text-align:right;">'+g(i.cost)+'</td>';
-    r += '<td style="padding:6px 10px;border:1px solid #dde8f4;text-align:right;color:#16a34a;font-weight:bold;">'+g(i.profit)+'</td>';
-    r += '</tr>'; return r;
-  }).join('');
-  var tbl = '<h3 style="margin:24px 0 8px;font-size:14px;color:#1e3a5f;">Add-on Configuration Services (One-off)</h3>';
-  tbl += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
-  tbl += '<thead><tr style="background:#1e3a5f;color:#fff;">';
-  tbl += '<th style="padding:8px 10px;text-align:left;">Service</th>';
-  tbl += '<th style="padding:8px 10px;text-align:center;">Days</th>';
-  tbl += '<th style="padding:8px 10px;text-align:right;">Revenue</th>';
-  tbl += '<th style="padding:8px 10px;text-align:right;">Cost</th>';
-  tbl += '<th style="padding:8px 10px;text-align:right;">Profit</th>';
-  tbl += '</tr></thead><tbody>' + rows + '</tbody>';
-  tbl += '<tfoot><tr style="background:#f0f5fb;font-weight:bold;">';
-  tbl += '<td style="padding:8px 10px;">TOTAL</td>';
-  tbl += '<td style="padding:8px 10px;text-align:center;">'+tD+' days</td>';
-  tbl += '<td style="padding:8px 10px;text-align:right;">'+g(tS)+'</td>';
-  tbl += '<td style="padding:8px 10px;text-align:right;">'+g(tC)+'</td>';
-  tbl += '<td style="padding:8px 10px;text-align:right;color:#16a34a;">'+g(tP)+'</td>';
-  tbl += '</tr></tfoot></table>';
-  return tbl;
-}
-
 function buildSalesSummaryHtml(company, name, email, phone) {
   const state = window._quoteState;
   const financials = getFinancialSummary(state.lines, state.currentOrgType);
@@ -2881,7 +2850,7 @@ function buildSalesSummaryHtml(company, name, email, phone) {
     </table>
     ${!financials.allCostKnown ? '<p style="color:#fde68a;font-size:11px;margin:8px 0 0;">* Some service costs marked TBC \u2013 totals are partial.</p>' : ''}
   </div>
-${buildAddonImplSection()}</body></html>`;
+</body></html>`;
 }
 
 async function sendSalesSummaryEmail(company, name, email) {
