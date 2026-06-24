@@ -1947,8 +1947,8 @@ function showSection(id) {
     setServiceType('managed');
     updatePanel();
   }
-  if (id === 'projects') projUpdatePanel();
-  if (id === 'standalone') saUpdatePanel();
+  if (id === 'projects') { projBuildCards(); projUpdatePanel(); }
+  if (id === 'standalone') { saBuildCards(); saUpdatePanel(); }
   window.scrollTo(0, 0);
 }
 
