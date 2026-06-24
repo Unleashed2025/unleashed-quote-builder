@@ -1576,9 +1576,10 @@
   <div class="page">
     <button class="btn-back" onclick="showHome()">&#x2302; Home</button>
 
-    <!-- Quote details + quote panel -->
     <div class="section-split">
+      <!-- LEFT COLUMN -->
       <div class="form-col">
+
         <div class="card">
           <div class="card-title"><span class="step-badge">1</span> Quote Details</div>
           <div class="form-row">
@@ -1590,23 +1591,42 @@
             <div><label for="sa-date">Date</label><input type="date" id="sa-date" onchange="saUpdatePanel()" /></div>
           </div>
         </div>
+
+        <div class="card">
+          <div class="card-title"><span class="step-badge">2</span> User / Device Count</div>
+          <div class="form-row single">
+            <div>
+              <label for="sa-units">Number of users / devices / mailboxes</label>
+              <input type="number" id="sa-units" min="1" placeholder="e.g. 25" oninput="saUpdatePanel()" />
+            </div>
+          </div>
+          <div class="vcm-note">Sell prices shown are <strong>monthly per unit</strong> with a <strong>5% software-only discount</strong> applied. Implementation days are calculated from your unit count.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="step-badge">3</span> Select Services</div>
+          <div id="sa-list"></div>
+        </div>
+
       </div>
+
+      <!-- RIGHT COLUMN: QUOTE PANEL -->
       <div class="sidebar-col">
         <div class="quote-panel sticky-panel">
           <div class="qp-header">&#x1F4BB; Standalone Software Summary</div>
           <div class="qp-body">
-            <div id="sa-qp-lines"><p class="qp-empty">Select services below to see totals.</p></div>
+            <div id="sa-qp-lines"><p class="qp-empty">Select services above to see totals.</p></div>
             <hr class="qp-divider"/>
             <div class="qp-total-row">
               <div><div class="qp-total-label">Monthly Recurring (ex VAT)</div></div>
               <div class="qp-total-val" id="sa-qp-monthly">&#163;0.00</div>
             </div>
             <div class="qp-total-row">
-              <div><div class="qp-total-label">One-off Implementation</div></div>
-              <div class="qp-total-val" id="sa-qp-impl">&#163;0.00</div>
+              <div><div class="qp-total-label">One-off Implementation</div><div class="qp-sub" id="sa-qp-impl-note"></div></div>
+              <div class="qp-line"><div class="qp-val" id="sa-qp-impl">&#163;0.00</div></div>
             </div>
-            <div class="qp-total-row" style="border-top:2px solid #2563eb;padding-top:.6rem;margin-top:.2rem;">
-              <div><div class="qp-total-label" style="font-weight:700;color:#0f172a;">First Month Total</div></div>
+            <div class="qp-total-row">
+              <div><div class="qp-total-label">First Month Total</div></div>
               <div class="qp-total-val" id="sa-qp-first">&#163;0.00</div>
             </div>
             <button class="btn-generate" onclick="saGeneratePDF()">&#x1F4C4; Generate Quote PDF</button>
@@ -1616,16 +1636,9 @@
         </div>
       </div>
     </div>
-
-    <!-- Full-width service list -->
-    <div class="card" style="margin-top:1.5rem;">
-      <div class="card-title"><span class="step-badge">2</span> Select Services</div>
-      <p class="section-sub">Sell prices include a <strong>5% software-only discount</strong>. Enter quantity per service &mdash; implementation days are calculated automatically.</p>
-      <div id="sa-list"></div>
-    </div>
-
   </div>
 </div>
+
 <!-- ------------------------ FOOTER ------------------------ -->
 <footer style="background:var(--navy);color:#94b8d8;text-align:center;padding:1.5rem 1rem;font-size:.75rem;margin-top:2rem;">
   <img src="https://unleashed2025.github.io/unleashed-quote-builder/logo.png"
@@ -3254,149 +3267,86 @@ function saImplDays(units) {
   return 5;
 }
 
-function saImplBand(qty) {
-  if (!qty || qty <= 0) return 0;
-  if (qty <= 9)   return 1;
-  if (qty <= 19)  return 1.5;
-  if (qty <= 49)  return 2.5;
-  if (qty <= 99)  return 3.5;
-  return 5;
-}
-
 function saBuildCards() {
   const container = document.getElementById('sa-list');
   if (!container) return;
-  container.innerHTML = '';
-
-  SA_SERVICES.forEach(s => {
-    const wrapper = document.createElement('div');
-    wrapper.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem;';
-    wrapper.id = 'sa-pair-' + s.id;
-
-    const unitLabel = s.perUnit ? s.unit + '/mo' : s.unit;
-    const priceStr  = '\u00a3' + s.sell.toFixed(s.sell < 1 ? 3 : 2) + ' / ' + unitLabel;
-
-    // --- Software tile (left) ---
-    const softTile = document.createElement('div');
-    softTile.id = 'sacard-' + s.id;
-    softTile.className = 'check-tile';
-    softTile.innerHTML = `
-      <input type="checkbox" id="sachk-${s.id}" onchange="saUpdatePanel()" />
-      <label for="sachk-${s.id}">
-        <span class="tile-tag ms">${s.perUnit ? 'Per ' + s.unit + ' / mo' : 'Custom qty'}</span>
-        <div class="tile-name">${s.name}</div>
-        <div class="tile-price">${priceStr}</div>
-        <div style="margin-top:.7rem;padding-top:.6rem;border-top:1px solid #e2e8f0;">
-          <div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin-bottom:.35rem;">
-            <label style="font-size:.74rem;color:#64748b;margin:0;">Qty (${s.unit})</label>
-            <input type="number" id="sa-qty-${s.id}" min="1" step="1" value=""
-              placeholder="enter qty"
-              style="width:80px;padding:.2rem .4rem;font-size:.8rem;border:1px solid #cbd5e1;border-radius:6px;text-align:center;background:#fff;"
-              oninput="saUpdatePanel()" onclick="event.stopPropagation()" />
-            <span id="sa-monthtotal-${s.id}" style="font-size:.76rem;color:#2563eb;font-weight:600;"></span>
+  container.innerHTML = SA_SERVICES.map(s => `
+    <div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:1rem 1.1rem;margin-bottom:.7rem;transition:border-color .18s;" id="sacard-${s.id}">
+      <div style="display:flex;align-items:flex-start;gap:.75rem;">
+        <input type="checkbox" id="sachk-${s.id}" style="margin-top:3px;width:17px;height:17px;accent-color:#2563eb;flex-shrink:0;" onchange="saUpdatePanel()" />
+        <label for="sachk-${s.id}" style="flex:1;cursor:pointer;">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap;">
+            <span style="font-size:.72rem;font-weight:700;background:rgba(37,99,235,.08);color:#1d4ed8;border:1px solid rgba(37,99,235,.2);padding:.2rem .6rem;border-radius:999px;">${s.perUnit ? 'Per '+s.unit+' / mo' : 'Custom qty'}</span>
+            <span style="font-size:.82rem;font-weight:700;color:#2563eb;">\u00a3${s.sell.toFixed(s.sell<1?3:2)} / ${s.unit}${s.perUnit?' / mo':''}</span>
           </div>
-          <div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;">
-            <label style="font-size:.72rem;color:#94a3b8;margin:0;">Discount</label>
-            <input type="number" id="sa-disc-${s.id}" min="0" max="100" step="0.5" value="0"
-              style="width:46px;padding:.18rem .3rem;font-size:.76rem;border:1px solid #cbd5e1;border-radius:6px;text-align:center;background:#fff;"
-              oninput="saUpdatePanel()" onclick="event.stopPropagation()" />
-            <span style="font-size:.72rem;color:#64748b;">%</span>
-          </div>
-        </div>
-      </label>`;
-
-    // --- Implementation tile (right) — perUnit only ---
-    const implTile = document.createElement('div');
-    implTile.id = 'sa-impl-' + s.id;
-    if (s.perUnit) {
-      implTile.style.cssText = 'background:#f8fafc;border:1.5px dashed #cbd5e1;border-radius:16px;padding:1.1rem 1.2rem;display:flex;flex-direction:column;gap:.4rem;opacity:.5;transition:opacity .2s,border-color .2s;';
-      implTile.innerHTML = `
-        <span style="font-size:.7rem;font-weight:700;background:rgba(22,163,74,.08);color:#15803d;border:1px solid rgba(22,163,74,.2);padding:.2rem .65rem;border-radius:999px;display:inline-block;width:fit-content;">ONE-OFF IMPLEMENTATION</span>
-        <div style="font-size:.92rem;font-weight:700;color:#0f172a;margin-top:.15rem;">${s.name}</div>
-        <div id="sa-impl-days-${s.id}" style="font-size:.8rem;color:#64748b;">Enter qty to calculate</div>
-        <div id="sa-impl-price-${s.id}" style="font-size:1rem;font-weight:700;color:#16a34a;margin-top:auto;">&ndash;</div>
-        <div style="font-size:.72rem;color:#94a3b8;margin-top:.1rem;">Based on unit count band &bull; &pound;800/day</div>`;
-    } else {
-      implTile.style.cssText = 'background:#f8fafc;border:1.5px dashed #e2e8f0;border-radius:16px;padding:1.1rem 1.2rem;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:.4rem;opacity:.6;';
-      implTile.innerHTML = `<div style="font-size:1.5rem;">&#x2714;&#xFE0F;</div><div style="font-size:.82rem;color:#64748b;text-align:center;">No standard implementation<br>days for this service</div>`;
-    }
-
-    wrapper.appendChild(softTile);
-    wrapper.appendChild(implTile);
-    container.appendChild(wrapper);
-  });
+          <div style="font-size:.95rem;font-weight:700;color:#0f172a;margin-top:.4rem;">${s.name}</div>
+        </label>
+      </div>
+      <div style="margin-top:.6rem;padding-top:.6rem;border-top:1px solid #f1f5f9;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+        <label style="font-size:.75rem;color:#64748b;margin:0;">Qty</label>
+        <input type="number" id="sa-qty-${s.id}" min="0" step="1" value="" placeholder="${s.perUnit?'auto':''}" style="width:70px;padding:.2rem .4rem;font-size:.8rem;border:1px solid #cbd5e1;border-radius:6px;text-align:center;" oninput="saUpdatePanel()" />
+        <label style="font-size:.75rem;color:#94a3b8;margin:0;">Disc</label>
+        <input type="number" id="sa-disc-${s.id}" min="0" max="100" step="0.5" value="0" style="width:52px;padding:.2rem .35rem;font-size:.78rem;border:1px solid #cbd5e1;border-radius:6px;text-align:center;" oninput="saUpdatePanel()" />
+        <span style="font-size:.78rem;color:#64748b;">%</span>
+        <span id="sa-total-${s.id}" style="font-size:.78rem;color:#16a34a;font-weight:600;margin-left:.25rem;"></span>
+      </div>
+    </div>`).join('');
 }
 
 function saUpdatePanel() {
+  const globalUnits = parseInt(document.getElementById('sa-units')?.value)||0;
   const lines = [], priced = [];
-  let totalMonthly = 0, totalCostMonthly = 0, totalImpl = 0, totalImplCost = 0;
+  let totalMonthly = 0, totalCostMonthly = 0;
+  let hasPerUnit = false;
 
   SA_SERVICES.forEach(s => {
-    const chk    = document.getElementById('sachk-' + s.id);
-    const qtyEl  = document.getElementById('sa-qty-' + s.id);
+    const chk = document.getElementById('sachk-' + s.id);
+    const qtyEl = document.getElementById('sa-qty-' + s.id);
     const discEl = document.getElementById('sa-disc-' + s.id);
-    const mthEl  = document.getElementById('sa-monthtotal-' + s.id);
-    const implTile  = document.getElementById('sa-impl-' + s.id);
-    const implDaysEl = document.getElementById('sa-impl-days-' + s.id);
-    const implPriceEl = document.getElementById('sa-impl-price-' + s.id);
-    const card   = document.getElementById('sacard-' + s.id);
+    const totEl = document.getElementById('sa-total-' + s.id);
+    const card = document.getElementById('sacard-' + s.id);
     if (!chk) return;
-
-    const qty  = parseInt(qtyEl?.value) || 0;
-    const disc = Math.max(0, Math.min(100, parseFloat(discEl?.value) || 0));
-    const effSell = s.sell * (1 - disc / 100);
-    const lineMonthly = effSell * qty;
-    const lineCost    = s.cost * qty;
-
-    // Update live totals on software tile
-    if (mthEl) mthEl.textContent = qty > 0 ? '= \u00a3' + lineMonthly.toFixed(2) + '/mo' : '';
-
-    // Update implementation tile
-    if (s.perUnit && implTile) {
-      const days = saImplBand(qty);
-      const implSell = days * 800;
-      const implCostLine = days * 300;
-      if (implDaysEl) implDaysEl.textContent = qty > 0 ? days + ' day' + (days === 1 ? '' : 's') + ' @ \u00a3800/day' : 'Enter qty to calculate';
-      if (implPriceEl) implPriceEl.textContent = qty > 0 ? '\u00a3' + implSell.toFixed(2) : '\u2013';
-      implTile.style.opacity = (chk.checked && qty > 0) ? '1' : '0.5';
-      implTile.style.borderColor = chk.checked && qty > 0 ? '#16a34a' : '#cbd5e1';
-      implTile.style.borderStyle = chk.checked && qty > 0 ? 'solid' : 'dashed';
-      if (chk.checked && qty > 0) { totalImpl += implSell; totalImplCost += implCostLine; }
-    }
-
-    // Highlight software tile
+    const disc = Math.max(0, Math.min(100, parseFloat(discEl?.value)||0));
+    const qtyOverride = parseInt(qtyEl?.value)||0;
+    const qty = s.perUnit ? (qtyOverride > 0 ? qtyOverride : globalUnits) : (qtyOverride || 0);
+    const effSell = s.sell * (1-disc/100);
+    const lineTotal = effSell * qty;
+    const lineCost = s.cost * qty;
+    if (totEl) totEl.textContent = qty > 0 ? '\u00a3'+(effSell*qty).toFixed(2)+'/mo' : '';
     if (card) card.style.borderColor = chk.checked ? '#2563eb' : '#e2e8f0';
-    if (!chk.checked || qty <= 0) return;
-
-    totalMonthly     += lineMonthly;
+    if (!chk.checked) return;
+    if (s.perUnit) hasPerUnit = true;
+    totalMonthly += lineTotal;
     totalCostMonthly += lineCost;
-    priced.push({ name: s.name, unit: s.unit, qty, sell: effSell, lineMonthly, lineCost, disc, perUnit: s.perUnit });
-    lines.push(`<div class="qp-line">
-      <div class="qp-label">
-        <div style="color:#0f172a;font-weight:600;font-size:.84rem;">${s.name}</div>
-        <div style="color:#64748b;font-size:.74rem;">${qty} ${s.unit}${disc > 0 ? ' \u00b7 ' + disc + '% disc' : ''}</div>
-      </div>
-      <div class="qp-val">\u00a3${lineMonthly.toFixed(2)}/mo</div>
-    </div>`);
+    priced.push({ name:s.name, unit:s.unit, qty, sell:effSell, lineTotal, lineCost, disc, perUnit:s.perUnit });
+    lines.push(`<div class="qp-line"><div class="qp-label"><div style="color:#0f172a;font-weight:600;font-size:.84rem;">${s.name}</div><div style="color:#64748b;font-size:.74rem;">${qty} ${s.unit}${disc>0?' Â· '+disc+'% disc':''}</div></div><div class="qp-val">\u00a3${lineTotal.toFixed(2)}/mo</div></div>`);
   });
 
-  document.getElementById('sa-qp-lines').innerHTML  = lines.length ? lines.join('') : '<p class="qp-empty">Select services below to see totals.</p>';
-  document.getElementById('sa-qp-monthly').textContent = '\u00a3' + totalMonthly.toFixed(2);
-  document.getElementById('sa-qp-impl').textContent    = '\u00a3' + totalImpl.toFixed(2);
-  document.getElementById('sa-qp-first').textContent   = '\u00a3' + (totalMonthly + totalImpl).toFixed(2);
+  const implDays = hasPerUnit ? saImplDays(globalUnits) : 0;
+  const implSell = implDays * 800;
+  const implCost = implDays * 300;
+  const implNote = implDays > 0 ? implDays+' day'+(implDays===1?'':'s')+' onboarding' : '';
+
+  document.getElementById('sa-qp-lines').innerHTML = lines.length ? lines.join('') : '<p class="qp-empty">Select services above to see totals.</p>';
+  document.getElementById('sa-qp-monthly').textContent = '\u00a3'+totalMonthly.toFixed(2);
+  document.getElementById('sa-qp-impl').textContent = '\u00a3'+implSell.toFixed(2);
+  document.getElementById('sa-qp-impl-note').textContent = implNote;
+  document.getElementById('sa-qp-first').textContent = '\u00a3'+(totalMonthly+implSell).toFixed(2);
 
   window._saState = {
-    company: document.getElementById('sa-company')?.value.trim() || '',
-    contact: document.getElementById('sa-contact')?.value.trim() || '',
-    email:   document.getElementById('sa-email')?.value.trim() || '',
-    date:    document.getElementById('sa-date')?.value || new Date().toISOString().split('T')[0],
-    items: priced, totalMonthly, totalCostMonthly, totalImpl, totalImplCost,
-    firstMonth: totalMonthly + totalImpl,
-    gp: (totalMonthly - totalCostMonthly) + (totalImpl - totalImplCost),
-    commission: ((totalMonthly - totalCostMonthly) + (totalImpl - totalImplCost)) * 0.25,
-    ready: priced.length > 0
+    company: document.getElementById('sa-company')?.value.trim()||'',
+    contact: document.getElementById('sa-contact')?.value.trim()||'',
+    email:   document.getElementById('sa-email')?.value.trim()||'',
+    date:    document.getElementById('sa-date')?.value||new Date().toISOString().split('T')[0],
+    items: priced, totalMonthly, totalCostMonthly, implDays, implSell, implCost,
+    firstMonth: totalMonthly + implSell,
+    gp: (totalMonthly - totalCostMonthly) + (implSell - implCost),
+    commission: ((totalMonthly - totalCostMonthly) + (implSell - implCost)) * 0.25,
+    ready: priced.length > 0,
+    hasValue: priced.length > 0
   };
 }
+
 function saGeneratePDF() {
   const s = window._saState;
   if (!s) return;
@@ -3511,16 +3461,18 @@ function saSalesReport() {
 function showSalesPinModal_orig(section) { showSalesPinModal(section); }
 
 // Init
-try {
-  injectManagedDiscountInputs();
-  setDefaultSectionDates();
-  toggleMs365Options();
-  updateMsLicensePrices();
-  const managedRadio = document.getElementById('st-managed');
-  if (managedRadio) managedRadio.checked = true;
-  setServiceType('managed');
-  updatePanel();
-} catch(e) { console.error('Init error:', e); }
+projBuildCards();
+saBuildCards();
+injectManagedDiscountInputs();
+setDefaultSectionDates();
+toggleMs365Options();
+updateMsLicensePrices();
+const managedRadio = document.getElementById('st-managed');
+if (managedRadio) managedRadio.checked = true;
+setServiceType('managed');
+updatePanel();
+projUpdatePanel();
+saUpdatePanel();
 showHome();
 </script>
 <script>
