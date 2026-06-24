@@ -3290,6 +3290,7 @@ function saBuildCards() {
         <span style="font-size:.78rem;color:#64748b;">%</span>
         <span id="sa-total-${s.id}" style="font-size:.78rem;color:#16a34a;font-weight:600;margin-left:.25rem;"></span>
       </div>
+      ${s.perUnit ? '<div style="margin-top:.4rem;padding-top:.4rem;border-top:1px dashed #f1f5f9;font-size:.73rem;color:#64748b;" id="saimpl-'+s.id+'"></div>' : ''}
     </div>`).join('');
 }
 
@@ -3297,7 +3298,7 @@ function saUpdatePanel() {
   const globalUnits = parseInt(document.getElementById('sa-units')?.value)||0;
   const lines = [], priced = [];
   let totalMonthly = 0, totalCostMonthly = 0;
-  let hasPerUnit = false;
+  let totalImplSell = 0, totalImplCost = 0, totalImplDays = 0;
 
   SA_SERVICES.forEach(s => {
     const chk = document.getElementById('sachk-' + s.id);
@@ -3314,34 +3315,35 @@ function saUpdatePanel() {
     const lineCost = s.cost * qty;
     if (totEl) totEl.textContent = qty > 0 ? '\u00a3'+(effSell*qty).toFixed(2)+'/mo' : '';
     if (card) card.style.borderColor = chk.checked ? '#2563eb' : '#e2e8f0';
+    if (s.perUnit) {
+      const iDays = saImplDays(qty);
+      const implEl = document.getElementById('saimpl-' + s.id);
+      if (implEl) implEl.textContent = qty > 0 ? 'Est. implementation: '+iDays+' day'+(iDays===1?'':'s')+' \u00b7 \u00a3'+(iDays*800).toFixed(2) : '';
+      if (chk.checked && qty > 0) { totalImplSell += iDays*800; totalImplCost += iDays*300; totalImplDays += iDays; }
+    }
     if (!chk.checked) return;
-    if (s.perUnit) hasPerUnit = true;
     totalMonthly += lineTotal;
     totalCostMonthly += lineCost;
     priced.push({ name:s.name, unit:s.unit, qty, sell:effSell, lineTotal, lineCost, disc, perUnit:s.perUnit });
-    lines.push(`<div class="qp-line"><div class="qp-label"><div style="color:#0f172a;font-weight:600;font-size:.84rem;">${s.name}</div><div style="color:#64748b;font-size:.74rem;">${qty} ${s.unit}${disc>0?' Â· '+disc+'% disc':''}</div></div><div class="qp-val">\u00a3${lineTotal.toFixed(2)}/mo</div></div>`);
+    lines.push(`<div class="qp-line"><div class="qp-label"><div style="color:#0f172a;font-weight:600;font-size:.84rem;">${s.name}</div><div style="color:#64748b;font-size:.74rem;">${qty} ${s.unit}${disc>0?' \u00b7 '+disc+'% disc':''}</div></div><div class="qp-val">\u00a3${lineTotal.toFixed(2)}/mo</div></div>`);
   });
 
-  const implDays = hasPerUnit ? saImplDays(globalUnits) : 0;
-  const implSell = implDays * 800;
-  const implCost = implDays * 300;
-  const implNote = implDays > 0 ? implDays+' day'+(implDays===1?'':'s')+' onboarding' : '';
-
+  const implNote = totalImplDays > 0 ? totalImplDays+' day'+(totalImplDays===1?'':'s')+' onboarding' : '';
   document.getElementById('sa-qp-lines').innerHTML = lines.length ? lines.join('') : '<p class="qp-empty">Select services above to see totals.</p>';
   document.getElementById('sa-qp-monthly').textContent = '\u00a3'+totalMonthly.toFixed(2);
-  document.getElementById('sa-qp-impl').textContent = '\u00a3'+implSell.toFixed(2);
+  document.getElementById('sa-qp-impl').textContent = '\u00a3'+totalImplSell.toFixed(2);
   document.getElementById('sa-qp-impl-note').textContent = implNote;
-  document.getElementById('sa-qp-first').textContent = '\u00a3'+(totalMonthly+implSell).toFixed(2);
+  document.getElementById('sa-qp-first').textContent = '\u00a3'+(totalMonthly+totalImplSell).toFixed(2);
 
   window._saState = {
     company: document.getElementById('sa-company')?.value.trim()||'',
     contact: document.getElementById('sa-contact')?.value.trim()||'',
     email:   document.getElementById('sa-email')?.value.trim()||'',
     date:    document.getElementById('sa-date')?.value||new Date().toISOString().split('T')[0],
-    items: priced, totalMonthly, totalCostMonthly, implDays, implSell, implCost,
-    firstMonth: totalMonthly + implSell,
-    gp: (totalMonthly - totalCostMonthly) + (implSell - implCost),
-    commission: ((totalMonthly - totalCostMonthly) + (implSell - implCost)) * 0.25,
+    items: priced, totalMonthly, totalCostMonthly, implDays: totalImplDays, implSell: totalImplSell, implCost: totalImplCost,
+    firstMonth: totalMonthly + totalImplSell,
+    gp: (totalMonthly - totalCostMonthly) + (totalImplSell - totalImplCost),
+    commission: ((totalMonthly - totalCostMonthly) + (totalImplSell - totalImplCost)) * 0.25,
     ready: priced.length > 0,
     hasValue: priced.length > 0
   };
