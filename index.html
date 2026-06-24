@@ -1533,9 +1533,7 @@
     <button class="btn-back" onclick="showHome()">&#x2302; Home</button>
 
     <div class="section-split">
-      <!-- LEFT COLUMN -->
       <div class="form-col">
-
         <div class="card">
           <div class="card-title"><span class="step-badge">1</span> Quote Details</div>
           <div class="form-row">
@@ -1547,16 +1545,7 @@
             <div><label for="proj-date">Date</label><input type="date" id="proj-date" onchange="projUpdatePanel()" /></div>
           </div>
         </div>
-
-        <div class="card">
-          <div class="card-title"><span class="step-badge">2</span> Select Projects</div>
-          <p class="section-sub">All project work is priced at <strong>&#163;800/day</strong> (sell) and <strong>&#163;300/day</strong> (cost).</p>
-          <div id="proj-list"></div>
-        </div>
-
       </div>
-
-      <!-- RIGHT COLUMN: QUOTE PANEL -->
       <div class="sidebar-col">
         <div class="quote-panel sticky-panel">
           <div class="qp-header">&#x1F527; Project Quote Summary</div>
@@ -1574,9 +1563,15 @@
         </div>
       </div>
     </div>
+
+    <div class="card" style="margin-top:1.5rem;">
+      <div class="card-title"><span class="step-badge">2</span> Select Projects</div>
+      <p class="section-sub">All project work is priced at <strong>&#163;800/day</strong>. Click a tile to add it to your quote.</p>
+      <div id="proj-list"></div>
+    </div>
+
   </div>
 </div>
-
 <div id="section-standalone" class="app-section" style="display:none">
   <div class="page">
     <button class="btn-back" onclick="showHome()">&#x2302; Home</button>
@@ -3077,7 +3072,7 @@ function projDaysFmt(d){ const n=Number(d); return (Number.isInteger(n)?n:n.toFi
 function projBuildCards() {
   const container = document.getElementById('proj-list');
   if (!container) return;
-  container.className = 'bundle-grid';
+  container.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;';
   container.innerHTML = PROJ_ITEMS.map(p => `
     <div class="check-tile" id="projcard-${p.id}">
       <input type="checkbox" id="projchk-${p.id}" onchange="projUpdatePanel()" />
