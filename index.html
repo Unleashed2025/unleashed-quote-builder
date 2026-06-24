@@ -2576,29 +2576,52 @@ function buildPDF() {
   doc.text('Monthly Cost', W - margin - 4, y + 5.5, { align: 'right' });
   y += 8;
 
-  // Rows
+  // Rows — discounted lines get 2-line layout (original struck, discounted in blue)
   let rowAlt = false;
   state.lines.filter(l => l.amount > 0).forEach(line => {
+    const hasDisc = line.discountPct > 0;
+    const rowH = hasDisc ? 15 : 9;
     if (rowAlt) {
       doc.setFillColor(244, 247, 251);
-      doc.rect(margin, y, W - margin * 2, 9, 'F');
+      doc.rect(margin, y, W - margin * 2, rowH, 'F');
     }
-    const detail = line.discountPct > 0 ? `${line.sub || ''} • ${formatDiscountPercent(line.discountPct)}% discount` : (line.sub || '');
-    const priceText = buildPriceSummaryText(line.originalAmount, line.amount, line.discountPct);
+    // Service label
     doc.setTextColor(...text);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8.5);
-    doc.text(pdfSafe(line.label), margin + 4, y + 6);
+    doc.text(pdfSafe(line.label), margin + 4, y + 5.5);
+    // Sub detail
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(...muted);
-    doc.text(pdfSafe(detail), margin + 84, y + 6);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8.5);
-    doc.setTextColor(...text);
-    doc.text(pdfSafe(priceText), W - margin - 4, y + 6, { align: 'right' });
+    doc.text(pdfSafe(line.sub || ''), margin + 84, y + 5.5);
+    if (hasDisc) {
+      // Original price — muted, with strikethrough
+      const origText = pdfSafe(fmt(line.originalAmount));
+      doc.setTextColor(...muted);
+      doc.setFontSize(7.5);
+      doc.text(origText, W - margin - 4, y + 5.5, { align: 'right' });
+      const origW = doc.getTextWidth(origText);
+      doc.setDrawColor(...muted);
+      doc.setLineWidth(0.3);
+      doc.line(W - margin - 4 - origW, y + 4.2, W - margin - 4, y + 4.2);
+      // Second line: discount note + discounted price in blue
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(...muted);
+      doc.text(pdfSafe(formatDiscountPercent(line.discountPct) + '% discount applied'), margin + 84, y + 11.5);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8.5);
+      doc.setTextColor(...accent);
+      doc.text(pdfSafe(fmt(line.amount)), W - margin - 4, y + 11.5, { align: 'right' });
+    } else {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8.5);
+      doc.setTextColor(...text);
+      doc.text(pdfSafe(fmt(line.amount)), W - margin - 4, y + 5.5, { align: 'right' });
+    }
     rowAlt = !rowAlt;
-    y += 9;
+    y += rowH + 1;
   });
 
   const hasLineDiscounts = state.lines.some(line => line.discountPct > 0);
