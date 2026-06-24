@@ -1720,7 +1720,7 @@ const ADDON_IMPL = {
   'dlp':             4,
   'm365-app-sec':    3,
   'data-bucket':     4,
-  'hot-storage':     3
+  'dr-hot':          3
 };
 
 // Internal cost prices (not shown to client – used for sales summary email only)
@@ -2364,6 +2364,21 @@ function updatePanel() {
   } else {
     addonImplRow.style.display = 'none';
   }
+  // Show config cost note inside each affected addon tile
+  Object.entries(ADDON_IMPL).forEach(([key, days]) => {
+    const cb = document.querySelector('.addon-item input[type=checkbox][value="' + key + '"]');
+    if (!cb) return;
+    const addonLabel = cb.parentElement.querySelector('.addon-label');
+    if (!addonLabel) return;
+    let noteEl = addonLabel.querySelector('.addon-impl-note');
+    if (!noteEl) {
+      noteEl = document.createElement('div');
+      noteEl.className = 'addon-impl-note';
+      noteEl.style.cssText = 'font-size:.73rem;color:#2563eb;font-style:italic;font-weight:600;margin-top:.35rem;';
+      addonLabel.appendChild(noteEl);
+    }
+    noteEl.textContent = cb.checked ? 'Config: ' + days + ' day' + (days === 1 ? '' : 's') + ' \u00b7 \u00a3' + (days * 800).toLocaleString('en-GB') : '';
+  });
   const onboarding = ob.cost || 0;
   window._quoteState = { users, devices, bundle, vcmVal, band, vctoDays, monthlySubtotal, lineDiscountTotal, discountTotal, monthly, lines, onboarding, ob, term, currentOrgType, addonImplDays, addonImplSell };
 }
