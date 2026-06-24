@@ -1,4 +1,4 @@
-﻿const CACHE = 'unleashed-qb-v1';
+const CACHE = 'unleashed-qb-v5';
 const ASSETS = [
   '/unleashed-quote-builder/',
   '/unleashed-quote-builder/index.html',
