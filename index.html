@@ -238,6 +238,15 @@
     .ob-cost { font-size: 2rem; font-weight: 800; color: #2563eb; }
     .ob-meta { font-size: .82rem; color: #64748b; line-height: 1.5; }
 
+    /* -- Standalone Services Engineering -- */
+    #card-sa-engineering { margin-top: 1rem; }
+    .sa-eng-row { display: flex; align-items: center; justify-content: space-between; padding: .65rem 0; border-bottom: 1px solid #e2e8f0; }
+    .sa-eng-row:last-child { border-bottom: none; }
+    .sa-eng-name { font-size: .9rem; font-weight: 600; color: #1e293b; }
+    .sa-eng-meta { font-size: .76rem; color: #64748b; margin-top: .1rem; }
+    .sa-eng-price { font-size: .95rem; font-weight: 700; color: #1e293b; white-space: nowrap; }
+    .sa-eng-free-banner { background: #f0fdf4; border: 1.5px solid #bbf7d0; border-radius: 10px; padding: .6rem .9rem; margin-bottom: .75rem; font-size: .82rem; color: #15803d; display: none; }
+
     /* -- Checkbox addon -- */
     .addon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
     .addon-item {
@@ -1447,6 +1456,31 @@
           </div>
         </label>
       </div>
+
+    <!-- Standalone Services Engineering -->
+    <div class="card conditional-section section-managed" id="card-sa-engineering" style="display:none;">
+      <div class="card-title">&#x1F527; Standalone Services Engineering</div>
+      <p class="section-sub">One-off professional services for configuring your selected add-ons.</p>
+      <div class="sa-eng-free-banner" id="sa-eng-free-banner"></div>
+      <div id="sa-eng-paid-list">
+        <div class="sa-eng-row" id="sa-eng-row-dlp" style="display:none;">
+          <div><div class="sa-eng-name">DLP</div><div class="sa-eng-meta">4 days implementation</div></div>
+          <span class="sa-eng-price">&#xA3;3,200</span>
+        </div>
+        <div class="sa-eng-row" id="sa-eng-row-m365-app-sec" style="display:none;">
+          <div><div class="sa-eng-name">M365 App Security</div><div class="sa-eng-meta">3 days implementation</div></div>
+          <span class="sa-eng-price">&#xA3;2,400</span>
+        </div>
+        <div class="sa-eng-row" id="sa-eng-row-dr-hot" style="display:none;">
+          <div><div class="sa-eng-name">Hot Tier</div><div class="sa-eng-meta">3 days implementation</div></div>
+          <span class="sa-eng-price">&#xA3;2,400</span>
+        </div>
+        <div class="sa-eng-row" id="sa-eng-row-data-bucket" style="display:none;">
+          <div><div class="sa-eng-name">Data Storage</div><div class="sa-eng-meta">4 days implementation</div></div>
+          <span class="sa-eng-price">&#xA3;3,200</span>
+        </div>
+      </div>
+    </div><!-- /card-sa-engineering -->
 
     <!-- STEP 8 – Onboarding (both paths) -->
     <div class="card conditional-section section-common" id="card-onboarding">
