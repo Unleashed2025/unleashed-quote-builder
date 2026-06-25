@@ -2699,7 +2699,7 @@ function buildPDF() {
   }
 
   // Add-on Configuration rows
-  var _pdfAddons = Array.from(document.querySelectorAll('.addon-item input[type=checkbox]:checked')).map(function(cb){return cb.value;}).filter(function(k){return ADDON_IMPL[k]||(typeof ADDON_FREE_CONFIG!=='undefined'&&ADDON_FREE_CONFIG.includes(k));});
+  var _pdfAddons = Array.from(document.querySelectorAll('.addon-item input[type=checkbox]:checked')).map(function(cb){return cb.value;}).filter(function(k){return !!ADDON_ENG[k]||ADDON_ENG_FREE.indexOf(k)>=0;});
   if (_pdfAddons.length) {
     doc.setFillColor(...navy); doc.rect(margin,y,W-margin*2,7,'F');
     doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
