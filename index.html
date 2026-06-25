@@ -2940,6 +2940,8 @@ function showStatus(msg, type) {
 // -- Sales PIN modal --
 function showSalesPinModal(section) {
   const targetSection = section || window._activeSection || 'managed';
+  if (targetSection === 'standalone') saUpdatePanel();
+  if (targetSection === 'projects') projUpdatePanel();
   const state = getQuoteStateForSection(targetSection);
   if (!state || !state.hasValue) {
     alert('Please select at least one service before generating a sales summary.');
@@ -2960,8 +2962,8 @@ function verifySalesPin() {
   const entered = document.getElementById('pin-input').value;
   if (entered === CONFIG.sales_pin) {
     closePinModal();
-    if (window._salesSummaryTarget === 'projects') { projSalesReport(); return; }
-    if (window._salesSummaryTarget === 'standalone') { saSalesReport(); return; }
+    if (_salesSummaryTarget === 'projects') { projSalesReport(); return; }
+    if (_salesSummaryTarget === 'standalone') { saSalesReport(); return; }
     buildSalesPDF();
   } else {
     document.getElementById('pin-error').textContent = 'Incorrect PIN – please try again.';
@@ -3328,8 +3330,9 @@ function projUpdatePanel() {
   };
 }
 function projGeneratePDF() {
+  projUpdatePanel();
   const s = window._projState;
-  if (!s) return;
+  if (!s) { const el=document.getElementById('proj-status'); if(el){el.textContent='Please select at least one project.';el.className='status-banner error';el.style.display='block';} return; }
   if (!s.company || !s.contact || !s.email) { const el=document.getElementById('proj-status'); if(el){el.textContent='Please fill in company, contact and email.';el.className='status-banner error';el.style.display='block';} return; }
   if (!s.ready) { const el=document.getElementById('proj-status'); if(el){el.textContent='Please select at least one project.';el.className='status-banner error';el.style.display='block';} return; }
   try {
@@ -3502,8 +3505,9 @@ function saUpdatePanel() {
 }
 
 function saGeneratePDF() {
+  saUpdatePanel();
   const s = window._saState;
-  if (!s) return;
+  if (!s) { const el=document.getElementById('sa-status'); if(el){el.textContent='Please select a service and enter a quantity.';el.className='status-banner error';el.style.display='block';} return; }
   if (!s.company || !s.contact || !s.email) { const el=document.getElementById('sa-status'); if(el){el.textContent='Please fill in company, contact and email.';el.className='status-banner error';el.style.display='block';} return; }
   if (!s.ready) { const el=document.getElementById('sa-status'); if(el){el.textContent='Please select at least one service.';el.className='status-banner error';el.style.display='block';} return; }
   try {
