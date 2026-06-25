@@ -3132,6 +3132,60 @@ function buildSalesPDF() {
   docL.text(onboardComm != null ? gbp(onboardComm) : '\u2013',   col2, commY + 25);
   docL.text(gbp(totalFirstMo) + tbc,                             col3, commY + 25);
 
+  // -- Standalone Services Engineering --
+  var _engPaidKeys = Object.keys(ADDON_ENG).filter(function(k) {
+    var cb = document.querySelector('.addon-item input[type=checkbox][value="' + k + '"]');
+    return cb && cb.checked && ADDON_ENG[k].cost > 0;
+  });
+  var _engFreeKeys = ADDON_ENG_FREE.filter(function(k) {
+    var cb = document.querySelector('.addon-item input[type=checkbox][value="' + k + '"]');
+    return cb && cb.checked;
+  });
+  if (_engPaidKeys.length || _engFreeKeys.length) {
+    docL.addPage();
+    docL.setFillColor(30, 58, 95); docL.rect(0, 0, pW, 14, 'F');
+    docL.setTextColor(255, 255, 255); docL.setFontSize(10); docL.setFont('helvetica', 'bold');
+    docL.text('STANDALONE SERVICES ENGINEERING', pW / 2, 9, { align: 'center' });
+    var ey = 22;
+    if (_engPaidKeys.length) {
+      var _eTS = 0, _eTC = 0, _eTP = 0;
+      var _eRows = _engPaidKeys.map(function(k) {
+        var c = ADDON_ENG[k];
+        _eTS += c.cost; _eTC += c.days * 300; _eTP += c.cost - (c.days * 300);
+        return [c.label, c.days + ' days', '\u00a3' + (c.days * 300).toLocaleString('en-GB'), '\u00a3' + c.cost.toLocaleString('en-GB'), '\u00a3' + (c.cost - c.days * 300).toLocaleString('en-GB')];
+      });
+      _eRows.push(['TOTAL', '', '\u00a3' + _eTC.toLocaleString('en-GB'), '\u00a3' + _eTS.toLocaleString('en-GB'), '\u00a3' + _eTP.toLocaleString('en-GB')]);
+      docL.autoTable({
+        startY: ey,
+        head: [['Service', 'Duration', 'Cost (\u00a3300/day)', 'Sell (\u00a3800/day)', 'Profit']],
+        body: _eRows,
+        theme: 'grid',
+        styles: { fontSize: 9, cellPadding: 3.5, textColor: [30, 58, 95] },
+        headStyles: { fillColor: [30, 58, 95], textColor: 255, fontStyle: 'bold', halign: 'center' },
+        columnStyles: { 0:{cellWidth:90}, 1:{halign:'center',cellWidth:35}, 2:{halign:'right',cellWidth:50}, 3:{halign:'right',cellWidth:50}, 4:{halign:'right',cellWidth:50} },
+        margin: { left: margin, right: margin },
+        didParseCell: function(data) {
+          if (data.row.index === _eRows.length - 1) {
+            data.cell.styles.fontStyle = 'bold';
+            data.cell.styles.fillColor = [15, 23, 42];
+            data.cell.styles.textColor = [255, 255, 255];
+          }
+        }
+      });
+      ey = docL.lastAutoTable.finalY + 10;
+    }
+    if (_engFreeKeys.length) {
+      var _fNames = _engFreeKeys.map(function(k) { return ADDONS[k] ? ADDONS[k].name : k; });
+      docL.setFillColor(240, 253, 244); docL.roundedRect(margin, ey, pW - margin * 2, 16, 2, 2, 'F');
+      docL.setTextColor(22, 163, 74); docL.setFontSize(8); docL.setFont('helvetica', 'bold');
+      docL.text('Included with Managed IT Bundle (basic install):', margin + 6, ey + 7);
+      docL.setFont('helvetica', 'normal');
+      docL.text(_fNames.join(', '), margin + 6, ey + 13);
+    }
+    docL.setTextColor(100, 116, 139); docL.setFontSize(7); docL.setFont('helvetica', 'normal');
+    docL.text('UNLEASHED SOLUTIONS  |  INTERNAL USE ONLY  |  Generated ' + today(), pW / 2, pH - 6, { align: 'center' });
+  }
+
   // -- Footer --
   docL.setTextColor(100, 116, 139); docL.setFontSize(7); docL.setFont('helvetica', 'normal');
   docL.text('UNLEASHED SOLUTIONS  |  INTERNAL USE ONLY  |  Generated ' + today(), pW / 2, pH - 6, { align: 'center' });
