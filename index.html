@@ -2420,7 +2420,7 @@ function updatePanel() {
   else{if(_saImplRow)_saImplRow.style.display='none';}
 
   const onboarding = ob.cost || 0;
-  window._quoteState = { users, devices, bundle, vcmVal, band, vctoDays, monthlySubtotal, lineDiscountTotal, discountTotal, monthly, lines, onboarding, ob, term, currentOrgType, addonImplDays, addonImplSell };
+  window._quoteState = { users, devices, bundle, vcmVal, band, vctoDays, monthlySubtotal, lineDiscountTotal, discountTotal, monthly, lines, onboarding, ob, term, currentOrgType, engTotal: _saTotal };
 }
 
 // -- Generate Quote (PDF + Email) --
