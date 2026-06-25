@@ -2433,7 +2433,8 @@ async function generateQuote() {
     showStatus('Please fill in your Company Name, Your Name and Email Address before generating a quote.', 'error');
     return;
   }
-  if (!window._quoteState || window._quoteState.monthly === 0) {
+  var _qEngCost = Object.keys(ADDON_ENG).filter(function(k){var cb=document.querySelector('.addon-item input[type=checkbox][value='+JSON.stringify(k)+']');return cb&&cb.checked&&ADDON_ENG[k].cost>0;}).reduce(function(s,k){return s+ADDON_ENG[k].cost;},0);
+  if (!window._quoteState || (window._quoteState.monthly === 0 && _qEngCost === 0)) {
     showStatus('Please select at least one service before generating a quote.', 'error');
     return;
   }
