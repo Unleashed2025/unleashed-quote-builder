@@ -1773,6 +1773,7 @@ const ADDONS = {
 
 // Implementation days for specific managed services add-ons (sell rate £800/day)
 const ADDON_ENG = {
+  'teams-telephony': { label: 'Teams Telephony', days: 4, cost: 3200 },
   'dlp':          { label: 'DLP',              days: 4, cost: 3200 },
   'm365-app-sec': { label: 'M365 App Security', days: 3, cost: 2400 },
   'dr-hot':       { label: 'Hot Tier',          days: 3, cost: 2400 },
@@ -2019,7 +2020,8 @@ function showSection(id) {
 function getQuoteStateForSection(section) {
   if (section === 'projects') return window._projState ? { ...window._projState, hasValue: window._projState.items && window._projState.items.length > 0 } : null;
   if (section === 'standalone') return window._saState ? { ...window._saState, hasValue: window._saState.items && window._saState.items.length > 0 } : null;
-  return window._quoteState ? { ...window._quoteState, hasValue: window._quoteState.monthly > 0 } : null;
+  var _engCost = window._quoteState ? Object.keys(ADDON_ENG).filter(function(k){var cb=document.querySelector('.addon-item input[type=checkbox][value='+JSON.stringify(k)+']');return cb&&cb.checked&&ADDON_ENG[k].cost>0;}).reduce(function(s,k){return s+ADDON_ENG[k].cost;},0) : 0;
+  return window._quoteState ? { ...window._quoteState, hasValue: window._quoteState.monthly > 0 || _engCost > 0 } : null;
 }
 
 function setDefaultSectionDates() {
