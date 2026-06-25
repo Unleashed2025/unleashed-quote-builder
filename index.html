@@ -1479,6 +1479,38 @@
           <div><div class="sa-eng-name">Data Storage</div><div class="sa-eng-meta">4 days implementation</div></div>
           <span class="sa-eng-price">&#xA3;3,200</span>
         </div>
+        <div class="sa-eng-row" id="sa-eng-row-teams-telephony" style="display:none;">
+          <div><div class="sa-eng-name">Teams Telephony</div><div class="sa-eng-meta">4 days implementation</div></div>
+          <span class="sa-eng-price">&#xA3;3,200</span>
+        </div>
+        <div class="sa-eng-row" id="sa-eng-row-edr" style="display:none;">
+          <div><div class="sa-eng-name">EDR</div><div class="sa-eng-meta">Basic install included when managed service procured</div></div>
+          <span class="sa-eng-price" style="color:#16a34a;">Included</span>
+        </div>
+        <div class="sa-eng-row" id="sa-eng-row-xdr" style="display:none;">
+          <div><div class="sa-eng-name">XDR</div><div class="sa-eng-meta">Basic install included when managed service procured</div></div>
+          <span class="sa-eng-price" style="color:#16a34a;">Included</span>
+        </div>
+        <div class="sa-eng-row" id="sa-eng-row-mdr-std" style="display:none;">
+          <div><div class="sa-eng-name">MDR Standard</div><div class="sa-eng-meta">Basic install included when managed service procured</div></div>
+          <span class="sa-eng-price" style="color:#16a34a;">Included</span>
+        </div>
+        <div class="sa-eng-row" id="sa-eng-row-mdr-adv" style="display:none;">
+          <div><div class="sa-eng-name">MDR Advanced</div><div class="sa-eng-meta">Basic install included when managed service procured</div></div>
+          <span class="sa-eng-price" style="color:#16a34a;">Included</span>
+        </div>
+        <div class="sa-eng-row" id="sa-eng-row-m365-backup" style="display:none;">
+          <div><div class="sa-eng-name">M365 Backup</div><div class="sa-eng-meta">Basic install included when managed service procured</div></div>
+          <span class="sa-eng-price" style="color:#16a34a;">Included</span>
+        </div>
+        <div class="sa-eng-row" id="sa-eng-row-gws-backup" style="display:none;">
+          <div><div class="sa-eng-name">GWS Backup</div><div class="sa-eng-meta">Basic install included when managed service procured</div></div>
+          <span class="sa-eng-price" style="color:#16a34a;">Included</span>
+        </div>
+        <div class="sa-eng-row" id="sa-eng-row-email-security" style="display:none;">
+          <div><div class="sa-eng-name">Email Security</div><div class="sa-eng-meta">Basic install included when managed service procured</div></div>
+          <span class="sa-eng-price" style="color:#16a34a;">Included</span>
+        </div>
       </div>
     </div><!-- /card-sa-engineering -->
 
@@ -2376,11 +2408,11 @@ function updatePanel() {
   var _saChecked = Array.from(document.querySelectorAll('.addon-item input[type=checkbox]:checked')).map(function(cb){return cb.value;});
   var _saEngKeys = Object.keys(ADDON_ENG);
   var _saCard = document.getElementById('card-sa-engineering');
-  if (_saCard) _saCard.style.display = (_saChecked.some(function(k){return _saEngKeys.indexOf(k)>=0;}) || _saChecked.some(function(k){return ADDON_ENG_FREE.indexOf(k)>=0;})) ? '' : 'none';
+  if (_saCard) _saCard.style.display = _saChecked.some(function(k){return _saEngKeys.indexOf(k)>=0;}) ? '' : 'none';
   _saEngKeys.forEach(function(k){var row=document.getElementById('sa-eng-row-'+k);if(row)row.style.display=_saChecked.indexOf(k)>=0?'flex':'none';});
-  var _saFB=document.getElementById('sa-eng-free-banner');
-  if(_saFB){var _saFS=_saChecked.filter(function(k){return ADDON_ENG_FREE.indexOf(k)>=0;});if(_saFS.length){_saFB.style.display='';_saFB.innerHTML='\u2713 <strong>Included with Managed IT Bundle:</strong> '+_saFS.map(function(k){return ADDONS[k]?ADDONS[k].name:k;}).join(', ');}else{_saFB.style.display='none';}}
-  var _saTotal=_saEngKeys.filter(function(k){return _saChecked.indexOf(k)>=0;}).reduce(function(s,k){return s+ADDON_ENG[k].cost;},0);
+  ADDON_ENG_FREE.concat(['teams-telephony']).forEach(function(k){var row=document.getElementById('sa-eng-row-'+k);if(row)row.style.display=_saChecked.indexOf(k)>=0?'flex':'none';});
+  if(_saCard)_saCard.style.display=(_saChecked.some(function(k){return _saEngKeys.indexOf(k)>=0||ADDON_ENG_FREE.indexOf(k)>=0||k==='teams-telephony';})?'':'none');
+    var _saTotal=_saEngKeys.filter(function(k){return _saChecked.indexOf(k)>=0;}).reduce(function(s,k){return s+ADDON_ENG[k].cost;},0);
   var _saImplRow=document.getElementById('qp-addon-impl-row'),_saImplVal=document.getElementById('qp-addon-impl-val');
   if(_saTotal>0){if(_saImplVal)_saImplVal.textContent=fmt(_saTotal);if(_saImplRow)_saImplRow.style.display='flex';}
   else{if(_saImplRow)_saImplRow.style.display='none';}
