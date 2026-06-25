@@ -1503,14 +1503,10 @@
           <div style="font-size:1rem;font-weight:700;color:#94a3b8;" id="qp-onboarding-val">–</div>
         </div>
         <div class="qp-total-row" id="qp-addon-impl-row" style="margin-top:.4rem;display:none">
-          <div class="qp-total-label" style="font-size:.78rem;">Add-on Configuration (one-off)</div>
+          <div class="qp-total-label" style="font-size:.78rem;">Add-on Configuration</div>
           <div style="font-size:1rem;font-weight:700;color:#94a3b8;" id="qp-addon-impl-val">–</div>
         </div>
 
-        <div class="qp-total-row" id="qp-free-config-row" style="margin-top:.4rem;display:none">
-          <div class="qp-total-label" style="font-size:.78rem;color:#16a34a;">Config: EDR / XDR / MDR / Backup / Email</div>
-          <div style="font-size:.78rem;font-weight:600;color:#16a34a;" id="qp-free-config-val">Included free</div>
-        </div>
         <button class="btn-generate" id="btn-generate" onclick="generateQuote()">
           &#x1F4C4; Generate &amp; Download Quote
         </button>
@@ -1710,15 +1706,7 @@ const ADDONS = {
 };
 
 // Implementation days for specific managed services add-ons (sell rate £800/day)
-const ADDON_IMPL = {
-  'dlp':         4,
-  'm365-app-sec':3,
-  'dr-hot':      3,
-  'data-bucket': 4
-};
-
-// Addons where configuration is included free with managed services bundle
-const ADDON_FREE_CONFIG = ['edr','xdr','mdr-std','mdr-adv','m365-backup','gws-backup','email-security'];
+const ADDON_IMPL = {};
 
 // Internal cost prices (not shown to client – used for sales summary email only)
 const COST_PRICES = {
@@ -2354,10 +2342,6 @@ function updatePanel() {
   } else {
     addonImplRow.style.display = 'none';
   }
-  const checkedAddonKeys = Array.from(document.querySelectorAll('.addon-item input[type=checkbox]:checked')).map(cb => cb.value);
-  const hasFreeConfig = checkedAddonKeys.some(k => ADDON_FREE_CONFIG.includes(k));
-  const freeRow = document.getElementById('qp-free-config-row');
-  if (freeRow) freeRow.style.display = hasFreeConfig ? 'flex' : 'none';
   // Show config cost note inside each affected addon tile
   Object.entries(ADDON_IMPL).forEach(([key, days]) => {
     const cb = document.querySelector('.addon-item input[type=checkbox][value="' + key + '"]');
@@ -2651,35 +2635,16 @@ function buildPDF() {
     y += 13;
   }
 
-  // Add-on Configuration rows (per addon)
-  var checkedAddons = Array.from(document.querySelectorAll('.addon-item input[type=checkbox]:checked')).map(function(cb) { return cb.value; });
-  var configAddons = checkedAddons.filter(function(k) { return ADDON_IMPL[k] || ADDON_FREE_CONFIG.includes(k); });
-  if (configAddons.length > 0) {
-    doc.setFillColor(...navy);
-    doc.rect(margin, y, W - margin * 2, 7, 'F');
-    doc.setTextColor(255,255,255);
+  // Add-on Configuration (one-off impl cost)
+  if (state.addonImplSell > 0) {
+    doc.setFillColor(238, 244, 255);
+    doc.rect(margin, y, W - margin * 2, 9, 'F');
+    doc.setTextColor(...navy);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7.5);
-    doc.text('ADD-ON CONFIGURATION (ONE-OFF)', margin + 4, y + 5);
-    y += 7;
-    var rAlt = false;
-    configAddons.forEach(function(k) {
-      if (rAlt) { doc.setFillColor(244,247,251); doc.rect(margin, y, W - margin * 2, 8, 'F'); }
-      var aName = ADDONS[k] ? ADDONS[k].name : k;
-      var days = ADDON_IMPL[k] || 0;
-      var isFree = ADDON_FREE_CONFIG.includes(k);
-      var priceStr = isFree ? 'Included with Managed IT Bundle' : (fmt(days * 800) + ' (' + days + ' day' + (days === 1 ? '' : 's') + ' @ ' + String.fromCharCode(163) + '800/day)');
-      doc.setTextColor(30,41,59);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8);
-      doc.text(pdfSafe(aName), margin + 4, y + 5.5);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7.5);
-      if (isFree) { doc.setTextColor(22,163,74); } else { doc.setTextColor(30,41,59); }
-      doc.text(pdfSafe(priceStr), W - margin - 4, y + 5.5, { align: 'right' });
-      rAlt = !rAlt; y += 8;
-    });
-    y += 4;
+    doc.setFontSize(8.5);
+    doc.text('Add-on Configuration (one-off)', margin + 4, y + 6);
+    doc.text(pdfSafe(fmt(state.addonImplSell) + ' (' + state.addonImplDays + ' day' + (state.addonImplDays === 1 ? '' : 's') + ')'), W - margin - 4, y + 6, { align: 'right' });
+    y += 13;
   }
 
   // Contract term
@@ -2761,45 +2726,45 @@ async function sendEmail(company, name, email) {
 }
 
 function buildAddonImplSection() {
-  var checkedKeys = Array.from(document.querySelectorAll('.addon-item input[type=checkbox]:checked')).map(function(cb){ return cb.value; });
-  var configKeys = checkedKeys.filter(function(k){ return ADDON_IMPL[k] || ADDON_FREE_CONFIG.includes(k); });
-  if (!configKeys.length) return '';
-  var g = function(n) { return String.fromCharCode(163) + Number(n).toFixed(2); };
-  var tS=0, tC=0, tP=0;
-  var rows = configKeys.map(function(k) {
-    var a = ADDONS[k]; var name = a ? a.name : k;
-    var isFree = ADDON_FREE_CONFIG.includes(k);
-    var days = ADDON_IMPL[k] || 0;
-    if (!isFree) { tS += days*800; tC += days*300; tP += days*500; }
-    if (isFree) {
-      return '<tr><td style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;' + String.fromCharCode(34) + '>' + name + '</td><td colspan=' + String.fromCharCode(34) + '4' + String.fromCharCode(34) + ' style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;color:#16a34a;font-style:italic;' + String.fromCharCode(34) + '>Included with Managed IT Services bundle</td></tr>';
-    }
+  var items = [];
+  Object.keys(ADDON_IMPL).forEach(function(key) {
+    var cb = document.querySelector('.addon-item input[type=checkbox][value=' + String.fromCharCode(34) + key + String.fromCharCode(34) + ']:checked');
+    if (!cb) return;
+    var days = ADDON_IMPL[key]; var sell = days * 800; var cost = days * 300;
+    var a = ADDONS[key];
+    items.push({ name: a ? a.name : key, days: days, sell: sell, cost: cost, profit: sell - cost });
+  });
+  if (!items.length) return '';
+  var g = function(n) { return '\u00a3' + Number(n).toFixed(2); };
+  var tD=0, tS=0, tC=0, tP=0;
+  var rows = items.map(function(i) {
+    tD += i.days; tS += i.sell; tC += i.cost; tP += i.profit;
     var r = '<tr>';
-    r += '<td style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;' + String.fromCharCode(34) + '>' + name + ' (' + days + ' days)</td>';
-    r += '<td style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;text-align:right;' + String.fromCharCode(34) + '>' + g(days*800) + '</td>';
-    r += '<td style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;text-align:right;' + String.fromCharCode(34) + '>' + g(days*300) + '</td>';
-    r += '<td style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;text-align:right;color:#16a34a;font-weight:bold;' + String.fromCharCode(34) + '>' + g(days*500) + '</td>';
+    r += '<td style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;' + String.fromCharCode(34) + '>' + i.name + '</td>';
+    r += '<td style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;text-align:center;' + String.fromCharCode(34) + '>' + i.days + ' days</td>';
+    r += '<td style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;text-align:right;' + String.fromCharCode(34) + '>' + g(i.sell) + '</td>';
+    r += '<td style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;text-align:right;' + String.fromCharCode(34) + '>' + g(i.cost) + '</td>';
+    r += '<td style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;text-align:right;color:#16a34a;font-weight:bold;' + String.fromCharCode(34) + '>' + g(i.profit) + '</td>';
     r += '</tr>'; return r;
   }).join('');
-  var h = '<h3 style=' + String.fromCharCode(34) + 'margin:24px 0 8px;font-size:14px;color:#1e3a5f;' + String.fromCharCode(34) + '>Add-on Configuration Services</h3>';
+  var h = '<h3 style=' + String.fromCharCode(34) + 'margin:24px 0 8px;font-size:14px;color:#1e3a5f;' + String.fromCharCode(34) + '>Add-on Configuration Services (One-off)</h3>';
   h += '<table style=' + String.fromCharCode(34) + 'width:100%;border-collapse:collapse;font-size:12px;' + String.fromCharCode(34) + '>';
   h += '<thead><tr style=' + String.fromCharCode(34) + 'background:#1e3a5f;color:#fff;' + String.fromCharCode(34) + '>';
   h += '<th style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:left;' + String.fromCharCode(34) + '>Service</th>';
+  h += '<th style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:center;' + String.fromCharCode(34) + '>Days</th>';
   h += '<th style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;' + String.fromCharCode(34) + '>Revenue</th>';
   h += '<th style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;' + String.fromCharCode(34) + '>Cost</th>';
-  h += '<th style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;' + String.fromCharCode(34) + '>GP</th>';
+  h += '<th style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;' + String.fromCharCode(34) + '>Profit</th>';
   h += '</tr></thead><tbody>' + rows + '</tbody>';
-  if (tS > 0) {
-    h += '<tfoot><tr style=' + String.fromCharCode(34) + 'background:#f0f5fb;font-weight:bold;' + String.fromCharCode(34) + '>';
-    h += '<td style=' + String.fromCharCode(34) + 'padding:8px 10px;' + String.fromCharCode(34) + '>TOTALS (charged)</td>';
-    h += '<td style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;' + String.fromCharCode(34) + '>' + g(tS) + '</td>';
-    h += '<td style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;' + String.fromCharCode(34) + '>' + g(tC) + '</td>';
-    h += '<td style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;color:#16a34a;' + String.fromCharCode(34) + '>' + g(tP) + '</td>';
-    h += '</tr></tfoot>';
-  }
-  h += '</table>';
+  h += '<tfoot><tr style=' + String.fromCharCode(34) + 'background:#f0f5fb;font-weight:bold;' + String.fromCharCode(34) + '>';
+  h += '<td style=' + String.fromCharCode(34) + 'padding:8px 10px;' + String.fromCharCode(34) + '>TOTAL</td>';
+  h += '<td style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:center;' + String.fromCharCode(34) + '>' + tD + ' days</td>';
+  h += '<td style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;' + String.fromCharCode(34) + '>' + g(tS) + '</td>';
+  h += '<td style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;' + String.fromCharCode(34) + '>' + g(tC) + '</td>';
+  h += '<td style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;color:#16a34a;' + String.fromCharCode(34) + '>' + g(tP) + '</td>';
+  h += '</tr></tfoot></table>';
   return h;
-}}
+}
 
 function buildSalesSummaryHtml(company, name, email, phone) {
   const state = window._quoteState;
