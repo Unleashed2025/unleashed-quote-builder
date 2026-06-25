@@ -1537,12 +1537,8 @@
           <div style="font-size:1rem;font-weight:700;color:#94a3b8;" id="qp-onboarding-val">–</div>
         </div>
         <div class="qp-total-row" id="qp-addon-impl-row" style="margin-top:.4rem;display:none">
-          <div class="qp-total-label" style="font-size:.78rem;">Add-on Configuration (one-off)</div>
+          <div class="qp-total-label" style="font-size:.78rem;">Standalone Services Engineering (one-off)</div>
           <div style="font-size:1rem;font-weight:700;color:#94a3b8;" id="qp-addon-impl-val">–</div>
-        </div>
-        <div class="qp-total-row" id="qp-free-config-row" style="margin-top:.4rem;display:none">
-          <div class="qp-total-label" style="font-size:.78rem;color:#16a34a;">Config included free:</div>
-          <div id="qp-free-config-val" style="font-size:.75rem;font-weight:600;color:#16a34a;"></div>
         </div>
 
         <button class="btn-generate" id="btn-generate" onclick="generateQuote()">
@@ -1744,13 +1740,13 @@ const ADDONS = {
 };
 
 // Implementation days for specific managed services add-ons (sell rate £800/day)
-const ADDON_IMPL = {
-  'dlp':          4,
-  'm365-app-sec':  3,
-  'dr-hot':        3,
-  'data-bucket':   4
+const ADDON_ENG = {
+  'dlp':          { label: 'DLP',              days: 4, cost: 3200 },
+  'm365-app-sec': { label: 'M365 App Security', days: 3, cost: 2400 },
+  'dr-hot':       { label: 'Hot Tier',          days: 3, cost: 2400 },
+  'data-bucket':  { label: 'Data Storage',      days: 4, cost: 3200 }
 };
-const ADDON_FREE_CONFIG = ['edr','xdr','mdr-std','mdr-adv','m365-backup','gws-backup','email-security'];
+const ADDON_ENG_FREE = ['edr','xdr','mdr-std','mdr-adv','m365-backup','gws-backup','email-security'];
 
 // Internal cost prices (not shown to client – used for sales summary email only)
 const COST_PRICES = {
@@ -2376,36 +2372,19 @@ function updatePanel() {
     obRow.style.display = 'none';
   }
 
-  const addonImplDays = Array.from(document.querySelectorAll('.addon-item input[type=checkbox]:checked')).reduce((sum, cb) => sum + (ADDON_IMPL[cb.value] || 0), 0);
-  const addonImplSell = addonImplDays * 800;
-  const addonImplRow  = document.getElementById('qp-addon-impl-row');
-  const addonImplVal  = document.getElementById('qp-addon-impl-val');
-  if (addonImplSell > 0) {
-    addonImplVal.textContent = fmt(addonImplSell) + ' (' + addonImplDays + ' day' + (addonImplDays === 1 ? '' : 's') + ')';
-    addonImplRow.style.display = 'flex';
-  } else {
-    addonImplRow.style.display = 'none';
-  }
-  var _checkedKeys = Array.from(document.querySelectorAll('.addon-item input[type=checkbox]:checked')).map(function(cb){return cb.value;});
-  var _freeKeys = _checkedKeys.filter(function(k){return typeof ADDON_FREE_CONFIG!=='undefined' && ADDON_FREE_CONFIG.includes(k);});
-  var _freeRow = document.getElementById('qp-free-config-row');
-  var _freeVal = document.getElementById('qp-free-config-val');
-  if (_freeRow) { if (_freeKeys.length) { _freeRow.style.display='flex'; if(_freeVal) _freeVal.textContent=_freeKeys.map(function(k){return ADDONS[k]?ADDONS[k].name:k;}).join(', '); } else { _freeRow.style.display='none'; } }
-  // Show config cost note inside each affected addon tile
-  Object.entries(ADDON_IMPL).forEach(([key, days]) => {
-    const cb = document.querySelector('.addon-item input[type=checkbox][value="' + key + '"]');
-    if (!cb) return;
-    const addonLabel = cb.parentElement.querySelector('.addon-label');
-    if (!addonLabel) return;
-    let noteEl = addonLabel.querySelector('.addon-impl-note');
-    if (!noteEl) {
-      noteEl = document.createElement('div');
-      noteEl.className = 'addon-impl-note';
-      noteEl.style.cssText = 'font-size:.73rem;color:#2563eb;font-style:italic;font-weight:600;margin-top:.35rem;';
-      addonLabel.appendChild(noteEl);
-    }
-    noteEl.textContent = cb.checked ? 'Config: ' + days + ' day' + (days === 1 ? '' : 's') + ' \u00b7 \u00a3' + (days * 800).toLocaleString('en-GB') : '';
-  });
+  // Standalone Services Engineering show/hide
+  var _saChecked = Array.from(document.querySelectorAll('.addon-item input[type=checkbox]:checked')).map(function(cb){return cb.value;});
+  var _saEngKeys = Object.keys(ADDON_ENG);
+  var _saCard = document.getElementById('card-sa-engineering');
+  if (_saCard) _saCard.style.display = (_saChecked.some(function(k){return _saEngKeys.indexOf(k)>=0;}) || _saChecked.some(function(k){return ADDON_ENG_FREE.indexOf(k)>=0;})) ? '' : 'none';
+  _saEngKeys.forEach(function(k){var row=document.getElementById('sa-eng-row-'+k);if(row)row.style.display=_saChecked.indexOf(k)>=0?'flex':'none';});
+  var _saFB=document.getElementById('sa-eng-free-banner');
+  if(_saFB){var _saFS=_saChecked.filter(function(k){return ADDON_ENG_FREE.indexOf(k)>=0;});if(_saFS.length){_saFB.style.display='';_saFB.innerHTML='\u2713 <strong>Included with Managed IT Bundle:</strong> '+_saFS.map(function(k){return ADDONS[k]?ADDONS[k].name:k;}).join(', ');}else{_saFB.style.display='none';}}
+  var _saTotal=_saEngKeys.filter(function(k){return _saChecked.indexOf(k)>=0;}).reduce(function(s,k){return s+ADDON_ENG[k].cost;},0);
+  var _saImplRow=document.getElementById('qp-addon-impl-row'),_saImplVal=document.getElementById('qp-addon-impl-val');
+  if(_saTotal>0){if(_saImplVal)_saImplVal.textContent=fmt(_saTotal);if(_saImplRow)_saImplRow.style.display='flex';}
+  else{if(_saImplRow)_saImplRow.style.display='none';}
+
   const onboarding = ob.cost || 0;
   window._quoteState = { users, devices, bundle, vcmVal, band, vctoDays, monthlySubtotal, lineDiscountTotal, discountTotal, monthly, lines, onboarding, ob, term, currentOrgType, addonImplDays, addonImplSell };
 }
@@ -2689,19 +2668,20 @@ function buildPDF() {
   if (_pdfAddons.length) {
     doc.setFillColor(...navy); doc.rect(margin,y,W-margin*2,7,'F');
     doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
-    doc.text('ADD-ON CONFIGURATION',margin+4,y+5); y+=7;
-    var _rAlt=false;
-    _pdfAddons.forEach(function(k){
-      if(_rAlt){doc.setFillColor(244,247,251);doc.rect(margin,y,W-margin*2,8,'F');}
-      var _n=ADDONS[k]?ADDONS[k].name:k; var _d=ADDON_IMPL[k]||0;
-      var _isFree=typeof ADDON_FREE_CONFIG!=='undefined'&&ADDON_FREE_CONFIG.includes(k);
-      var _p=_isFree?'Included with Managed IT Bundle':fmt(_d*800)+' ('+_d+' day'+(_d===1?'':'s')+' @ \u00a3800/day)';
+    doc.text('STANDALONE SERVICES ENGINEERING',margin+4,y+5); y+=7;
+    var _saAll=_pdfAddons.filter(function(k){return ADDON_ENG[k]||ADDON_ENG_FREE.indexOf(k)>=0;});
+    var _saAlt=false;
+    _saAll.forEach(function(k){
+      if(_saAlt){doc.setFillColor(244,247,251);doc.rect(margin,y,W-margin*2,8,'F');}
+      var _isFree=ADDON_ENG_FREE.indexOf(k)>=0;
+      var _nm=ADDONS[k]?ADDONS[k].name:k;
+      var _pr=_isFree?'Included with Managed IT Bundle':(ADDON_ENG[k].label+' \u2013 '+ADDON_ENG[k].days+' days \u2013 \u00a3'+ADDON_ENG[k].cost.toLocaleString('en-GB'));
       doc.setTextColor(30,41,59);doc.setFont('helvetica','bold');doc.setFontSize(8);
-      doc.text(pdfSafe(_n),margin+4,y+5.5);
+      doc.text(pdfSafe(_nm),margin+4,y+5.5);
       doc.setFont('helvetica','normal');doc.setFontSize(7.5);
       if(_isFree){doc.setTextColor(22,163,74);}else{doc.setTextColor(30,41,59);}
-      doc.text(pdfSafe(_p),W-margin-4,y+5.5,{align:'right'});
-      _rAlt=!_rAlt;y+=8;
+      doc.text(pdfSafe(_pr),W-margin-4,y+5.5,{align:'right'});
+      _saAlt=!_saAlt;y+=8;
     }); y+=4;
   }
 
@@ -2784,34 +2764,19 @@ async function sendEmail(company, name, email) {
 }
 
 function buildAddonImplSection() {
-  var checkedKeys = Array.from(document.querySelectorAll('.addon-item input[type=checkbox]:checked')).map(function(cb){return cb.value;});
-  var configKeys = checkedKeys.filter(function(k){return ADDON_IMPL[k]||(typeof ADDON_FREE_CONFIG!=='undefined'&&ADDON_FREE_CONFIG.includes(k));});
-  if (!configKeys.length) return '';
-  var g=function(n){return String.fromCharCode(163)+Number(n).toFixed(2);};
+  var checked=Array.from(document.querySelectorAll('.addon-item input[type=checkbox]:checked')).map(function(cb){return cb.value;});
+  var paidKeys=Object.keys(ADDON_ENG).filter(function(k){return checked.indexOf(k)>=0;});
+  var freeKeys=ADDON_ENG_FREE.filter(function(k){return checked.indexOf(k)>=0;});
+  if(!paidKeys.length&&!freeKeys.length)return '';
+  var g=function(n){return '\u00a3'+Number(n).toLocaleString('en-GB');};
+  var rows='';
+  freeKeys.forEach(function(k){var name=ADDONS[k]?ADDONS[k].name:k;rows+='<tr><td style="padding:6px 10px;border:1px solid #dde8f4;">'+name+'</td><td colspan="4" style="padding:6px 10px;border:1px solid #dde8f4;color:#16a34a;font-style:italic;">Included with Managed IT Bundle</td></tr>';});
   var tS=0,tC=0,tP=0;
-  var rows=configKeys.map(function(k){
-    var a=ADDONS[k];var name=a?a.name:k;
-    var isFree=typeof ADDON_FREE_CONFIG!=='undefined'&&ADDON_FREE_CONFIG.includes(k);
-    var days=ADDON_IMPL[k]||0;
-    if(!isFree){tS+=days*800;tC+=days*300;tP+=days*500;}
-    if(isFree) return '<tr><td style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;' + String.fromCharCode(34) + '>' + name + '</td><td colspan=' + String.fromCharCode(34) + '4' + String.fromCharCode(34) + ' style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;color:#16a34a;font-style:italic;' + String.fromCharCode(34) + '>Included with Managed IT Services bundle</td></tr>';
-    var r='<tr>';
-    r+='<td style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;' + String.fromCharCode(34) + '>' + name + ' (' + days + ' days)</td>';
-    r+='<td style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;text-align:right;' + String.fromCharCode(34) + '>' + g(days*800) + '</td>';
-    r+='<td style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;text-align:right;' + String.fromCharCode(34) + '>' + g(days*300) + '</td>';
-    r+='<td style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;text-align:right;color:#16a34a;font-weight:bold;' + String.fromCharCode(34) + '>' + g(days*500) + '</td>';
-    r+='</tr>'; return r;
-  }).join('');
-  var h='<h3 style=' + String.fromCharCode(34) + 'margin:24px 0 8px;font-size:14px;color:#1e3a5f;' + String.fromCharCode(34) + '>Add-on Configuration Services</h3>';
-  h+='<table style=' + String.fromCharCode(34) + 'width:100%;border-collapse:collapse;font-size:12px;' + String.fromCharCode(34) + '>';
-  h+='<thead><tr style=' + String.fromCharCode(34) + 'background:#1e3a5f;color:#fff;' + String.fromCharCode(34) + '>';
-  h+='<th style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:left;' + String.fromCharCode(34) + '>Service</th>';
-  h+='<th style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;' + String.fromCharCode(34) + '>Revenue</th>';
-  h+='<th style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;' + String.fromCharCode(34) + '>Cost</th>';
-  h+='<th style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;' + String.fromCharCode(34) + '>GP</th></tr></thead><tbody>'+rows+'</tbody>';
-  if(tS>0){h+='<tfoot><tr style=' + String.fromCharCode(34) + 'background:#f0f5fb;font-weight:bold;' + String.fromCharCode(34) + '><td style=' + String.fromCharCode(34) + 'padding:8px 10px;' + String.fromCharCode(34) + '>TOTALS</td><td style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;' + String.fromCharCode(34) + '>'+g(tS)+'</td><td style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;' + String.fromCharCode(34) + '>'+g(tC)+'</td><td style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;color:#16a34a;' + String.fromCharCode(34) + '>'+g(tP)+'</td></tr></tfoot>';}
-  h+='</table>'; return h;
+  paidKeys.forEach(function(k){var c=ADDON_ENG[k];tS+=c.cost;tC+=c.days*300;tP+=c.cost-(c.days*300);rows+='<tr><td style="padding:6px 10px;border:1px solid #dde8f4;">'+c.label+' ('+c.days+' days)</td><td style="padding:6px 10px;border:1px solid #dde8f4;text-align:right;">'+g(c.cost)+'</td><td style="padding:6px 10px;border:1px solid #dde8f4;text-align:right;">'+g(c.days*300)+'</td><td style="padding:6px 10px;border:1px solid #dde8f4;text-align:right;color:#16a34a;font-weight:700;">'+g(c.cost-(c.days*300))+'</td></tr>';});
+  if(paidKeys.length)rows+='<tr style="background:#f0f9ff;font-weight:700;"><td style="padding:6px 10px;border:1px solid #dde8f4;">Total</td><td style="padding:6px 10px;border:1px solid #dde8f4;text-align:right;">'+g(tS)+'</td><td style="padding:6px 10px;border:1px solid #dde8f4;text-align:right;">'+g(tC)+'</td><td style="padding:6px 10px;border:1px solid #dde8f4;text-align:right;color:#16a34a;">'+g(tP)+'</td></tr>';
+  return '<h3 style="margin:18px 0 8px;font-size:13px;color:#1e293b;">Standalone Services Engineering</h3>'+'<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="background:#1e3a5f;color:#fff;">'+(paidKeys.length?'<th style="padding:6px 10px;text-align:left;">Service</th><th style="padding:6px 10px;text-align:right;">Revenue</th><th style="padding:6px 10px;text-align:right;">Cost</th><th style="padding:6px 10px;text-align:right;">GP</th>':'<th style="padding:6px 10px;text-align:left;">Service</th><th colspan="3">Notes</th>')+'</tr></thead><tbody>'+rows+'</tbody></table>';
 }
+
 function buildSalesSummaryHtml(company, name, email, phone) {
   const state = window._quoteState;
   const financials = getFinancialSummary(state.lines, state.currentOrgType);
