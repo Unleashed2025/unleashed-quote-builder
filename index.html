@@ -2584,15 +2584,13 @@ function buildPDF() {
     y += 9;
   });
 
-  const hasLineDiscounts = state.lines.some(line => line.discountPct > 0);
-
   // Total row
   doc.setFillColor(...navy);
   doc.rect(margin, y, W - margin * 2, 11, 'F');
   doc.setTextColor(...white);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
-  doc.text(state.discountTotal > 0 ? 'MONTHLY SUBTOTAL' : (hasLineDiscounts ? 'DISCOUNTED MONTHLY TOTAL' : 'MONTHLY TOTAL'), margin + 4, y + 7.5);
+  doc.text('MONTHLY TOTAL', margin + 4, y + 7.5);
   doc.setTextColor(...accent);
   doc.setFontSize(11);
   doc.text(pdfSafe(fmt(state.discountTotal > 0 ? financials.gross : financials.net)), W - margin - 4, y + 7.5, { align: 'right' });
@@ -2733,6 +2731,47 @@ async function sendEmail(company, name, email) {
   });
 }
 
+function buildAddonImplSection() {
+  var items = [];
+  Object.keys(ADDON_IMPL).forEach(function(key) {
+    var cb = document.querySelector('.addon-item input[type=checkbox][value=' + String.fromCharCode(34) + key + String.fromCharCode(34) + ']:checked');
+    if (!cb) return;
+    var days = ADDON_IMPL[key]; var sell = days * 800; var cost = days * 300;
+    var a = ADDONS[key];
+    items.push({ name: a ? a.name : key, days: days, sell: sell, cost: cost, profit: sell - cost });
+  });
+  if (!items.length) return '';
+  var g = function(n) { return '\u00a3' + Number(n).toFixed(2); };
+  var tD=0, tS=0, tC=0, tP=0;
+  var rows = items.map(function(i) {
+    tD += i.days; tS += i.sell; tC += i.cost; tP += i.profit;
+    var r = '<tr>';
+    r += '<td style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;' + String.fromCharCode(34) + '>' + i.name + '</td>';
+    r += '<td style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;text-align:center;' + String.fromCharCode(34) + '>' + i.days + ' days</td>';
+    r += '<td style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;text-align:right;' + String.fromCharCode(34) + '>' + g(i.sell) + '</td>';
+    r += '<td style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;text-align:right;' + String.fromCharCode(34) + '>' + g(i.cost) + '</td>';
+    r += '<td style=' + String.fromCharCode(34) + 'padding:6px 10px;border:1px solid #dde8f4;text-align:right;color:#16a34a;font-weight:bold;' + String.fromCharCode(34) + '>' + g(i.profit) + '</td>';
+    r += '</tr>'; return r;
+  }).join('');
+  var h = '<h3 style=' + String.fromCharCode(34) + 'margin:24px 0 8px;font-size:14px;color:#1e3a5f;' + String.fromCharCode(34) + '>Add-on Configuration Services (One-off)</h3>';
+  h += '<table style=' + String.fromCharCode(34) + 'width:100%;border-collapse:collapse;font-size:12px;' + String.fromCharCode(34) + '>';
+  h += '<thead><tr style=' + String.fromCharCode(34) + 'background:#1e3a5f;color:#fff;' + String.fromCharCode(34) + '>';
+  h += '<th style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:left;' + String.fromCharCode(34) + '>Service</th>';
+  h += '<th style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:center;' + String.fromCharCode(34) + '>Days</th>';
+  h += '<th style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;' + String.fromCharCode(34) + '>Revenue</th>';
+  h += '<th style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;' + String.fromCharCode(34) + '>Cost</th>';
+  h += '<th style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;' + String.fromCharCode(34) + '>Profit</th>';
+  h += '</tr></thead><tbody>' + rows + '</tbody>';
+  h += '<tfoot><tr style=' + String.fromCharCode(34) + 'background:#f0f5fb;font-weight:bold;' + String.fromCharCode(34) + '>';
+  h += '<td style=' + String.fromCharCode(34) + 'padding:8px 10px;' + String.fromCharCode(34) + '>TOTAL</td>';
+  h += '<td style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:center;' + String.fromCharCode(34) + '>' + tD + ' days</td>';
+  h += '<td style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;' + String.fromCharCode(34) + '>' + g(tS) + '</td>';
+  h += '<td style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;' + String.fromCharCode(34) + '>' + g(tC) + '</td>';
+  h += '<td style=' + String.fromCharCode(34) + 'padding:8px 10px;text-align:right;color:#16a34a;' + String.fromCharCode(34) + '>' + g(tP) + '</td>';
+  h += '</tr></tfoot></table>';
+  return h;
+}
+
 function buildSalesSummaryHtml(company, name, email, phone) {
   const state = window._quoteState;
   const financials = getFinancialSummary(state.lines, state.currentOrgType);
@@ -2833,7 +2872,7 @@ function buildSalesSummaryHtml(company, name, email, phone) {
     </table>
     ${!financials.allCostKnown ? '<p style="color:#fde68a;font-size:11px;margin:8px 0 0;">* Some service costs marked TBC \u2013 totals are partial.</p>' : ''}
   </div>
-</body></html>`;
+${buildAddonImplSection()}</body></html>`;
 }
 
 async function sendSalesSummaryEmail(company, name, email) {
